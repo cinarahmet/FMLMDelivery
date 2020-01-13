@@ -41,12 +41,15 @@ public class CSVReader
             while ((s = sr.ReadLine()) != null)
             {
                 var line = s.Split(',');
-                var xDock_Id = line[0];
-                var xDock_long = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);
-                var xDock_lat = Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture);
-                var xDock_Demand = Convert.ToDouble(line[3]);
+                var xDock_City = line[0];
+                var xDock_Id = line[1];
+                var xDock_region = line[2];
+                var xDock_long = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_dist_threshold = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_Demand = Convert.ToDouble(line[6]);
 
-                var xDock = new xDocks(xDock_Id, xDock_long, xDock_lat, xDock_Demand);
+                var xDock = new xDocks(xDock_City, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Demand);
                 _xDocks.Add(xDock);
             }
         }
