@@ -5,24 +5,59 @@ using System.Text;
 
 public class Hub
 {
-    private readonly String _id;
+
+    private String _city;
+
+    private String _id;
+
+    private readonly String _region;
 
     private readonly Double _longitude;
 
     private readonly Double _latitude;
 
-    private readonly Double _cost;
+    private readonly Double _dist_thres;
 
-    public Hub(String id, Double longitude, Double latitude, Double cost)
+    private readonly Double _capacity;
+
+    private readonly Boolean _already_opened;
+
+    public Hub(String city,String id,String region, Double longitude, Double latitude,Double dist_thres, Double capacity, Boolean already_opened)
     {
+        _city = city;
         _id = id;
+        _region = region;
         _longitude = longitude;
         _latitude = latitude;
-        _cost = cost;
+        _dist_thres = dist_thres;
+        _capacity = capacity;
+        _already_opened = already_opened;
     }
+
+
+    public Boolean If_Already_Opened()
+    {
+        return _already_opened;
+    }
+
+    public string Get_City()
+    {
+        return _city;
+    }
+
     public string Get_Id()
     {
         return _id;
+    }
+
+    public string Get_Region()
+    {
+        return _region;
+    }
+
+    public Double Get_Dsitance_Threshold()
+    {
+        return _dist_thres;
     }
 
     public Double Get_Longitude()
@@ -35,9 +70,8 @@ public class Hub
         return _latitude;
     }
 
-    public Double Get_Cost()
+    public Double Get_Capacity()
     {
-        return _cost;
+        return _capacity;
     }
-
 }

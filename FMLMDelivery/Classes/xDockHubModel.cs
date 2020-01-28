@@ -9,7 +9,7 @@ using System.Device.Location;
 
 namespace FMLMDelivery
 {
-    class Model
+    class xDockHubModel
     {
         /// <summary>
         /// The maximum distance that a XDock can be assigned to a Hub 
@@ -21,6 +21,8 @@ namespace FMLMDelivery
         /// </summary>
         private Double max_num_xdock_assigned = 400;
 
+        private Double min_num_xdock_assigned = 4;
+
         /// <summary>
         /// Min number of XDock that can be assigned to a single Hub.
         /// </summary>
@@ -29,7 +31,7 @@ namespace FMLMDelivery
         /// <summary>
         /// Total amount of demand for each hub
         /// </summary>
-        private Double max_hub_capaticity = 40000;
+        private Double max_hub_capaticity = 4500000;
 
         /// <summary>
         /// The maximum distance that a XDock can be assigned to a Hub in the west side
@@ -199,7 +201,7 @@ namespace FMLMDelivery
         /// <summary>
         /// List of opened hubs latitude and longitude
         /// </summary>
-        private List<Latitude_Longtitude> lat_long;
+        //private List<Latitude_Longtitude> lat_long;
 
         /// <summary>
         /// demand normalization proportion 
@@ -220,10 +222,12 @@ namespace FMLMDelivery
 
         private int num_hubs = 0;
 
+        private List<Hub> new_hubs;
 
 
 
-        public Model(List<xDocks> xDocks, List<Hub> hubs,Boolean cost_incurred,Boolean capacity_incurred,Int32 P, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2)
+
+        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
 
             _solver = new Cplex();
@@ -252,8 +256,7 @@ namespace FMLMDelivery
             c = new List<double>();
             country_names = new Dictionary<int, string>();
             x_dock_demand = new List<double>();
-            
-            lat_long = new List<Latitude_Longtitude>();
+            new_hubs = new List<Hub>();
             normalized_demand = new List<double>();
         }
 
@@ -282,34 +285,34 @@ namespace FMLMDelivery
         }
 
         //In order to return the Latitude and Longitude information of the solution.
-        private void Get_Latitude_Longtitude()
-        {
-            for (int j = 0; j < _numOfHubs; j++)
-            {
+        //private void Get_Latitude_Longtitude()
+        //{
+        //    for (int j = 0; j < _numOfHubs; j++)
+        //    {
 
-                if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
-                {
+        //        if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
+        //        {
 
 
-                    if (_solver.GetValue(y[j]) > 0.9)
-                    {
+        //            if (_solver.GetValue(y[j]) > 0.9)
+        //            {
 
-                        var valueslat = _hubs[j].Get_Latitude();
-                        var valueslong = _hubs[j].Get_Longitude();
+        //                var valueslat = _hubs[j].Get_Latitude();
+        //                var valueslong = _hubs[j].Get_Longitude();
 
-                        lat_long.Add(new Latitude_Longtitude { Latitude = valueslat, Longtitude = valueslong });
+        //                lat_long.Add(new Latitude_Longtitude { Latitude = valueslat, Longtitude = valueslong });
 
-                    }
-                }
+        //            }
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
         //In order to return the Latitude and Longitude information of the solution.
-        public List<Latitude_Longtitude> Read_Latitude_Longtitude()
-        {
-            return lat_long;
-        }
+        //public List<Latitude_Longtitude> Read_Latitude_Longtitude()
+        //{
+        //    return lat_long;
+        //}
 
 
         //public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -363,7 +366,7 @@ namespace FMLMDelivery
         {
             for (int j = 0; j < _numOfHubs; j++)
             {
-                var c_j = _hubs[j].Get_Cost();
+                var c_j = _hubs[j].Get_Capacity();
                 c.Add(c_j);
             }
         }
@@ -375,49 +378,21 @@ namespace FMLMDelivery
             for (int i = 0; i < _numOfXdocks; i++)
             {
                 var longtitude = _xDocks[i].Get_Longitude();
+                var threshold = _xDocks[i].Get_Distance_Threshold();
                 var a_i = new List<Double>();
                 for (int j = 0; j < _numOfHubs; j++)
                 {
-                    if (longtitude <32)
+
+                    if (d[i][j] <= threshold)
                     {
-                        if (d[i][j] < distance_thresholdwest)
-                        {
-                            var a_ij = 1;
-                            a_i.Add(a_ij);
-                        }
-                        else
-                        {
-                            var a_ij = 0;
-                            a_i.Add(a_ij);
-                        }
-                    }
-                    else if (longtitude < 38)
-                    {
-                        if (d[i][j] < distance_thresholdmiddle)
-                        {
-                            var a_ij = 1;
-                            a_i.Add(a_ij);
-                        }
-                        else
-                        {
-                            var a_ij = 0;
-                            a_i.Add(a_ij);
-                        }
+                        var a_ij = 1;
+                        a_i.Add(a_ij);
                     }
                     else
                     {
-                        if (d[i][j] < distance_thresholdeast)
-                        {
-                            var a_ij = 1;
-                            a_i.Add(a_ij);
-                        }
-                        else
-                        {
-                            var a_ij = 0;
-                            a_i.Add(a_ij);
-                        }
+                        var a_ij = 0;
+                        a_i.Add(a_ij);
                     }
-
                 }
                 a.Add(a_i);
             }
@@ -430,11 +405,41 @@ namespace FMLMDelivery
            // AddInitialSolution();
             Solve();
             Create_Country_Names();
-            Get_Latitude_Longtitude();
             Get_Num_Hubs();
+            Get_new_Hubs();
             Print();
             ClearModel();
             
+        }
+
+        public List<Hub> Return_New_Hubs()
+        {
+            return new_hubs;
+        }
+
+        private void Get_new_Hubs()
+        {
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
+                {
+                    if (_solver.GetValue(y[j]) > 0.9)
+                    {
+                        var city = _hubs[j].Get_City();
+                        var id = _hubs[j].Get_Id();
+                        var region = _hubs[j].Get_Region();
+                        var valueslat = _hubs[j].Get_Latitude();
+                        var valueslong = _hubs[j].Get_Longitude();
+                        var dist = _hubs[j].Get_Dsitance_Threshold();
+                        var capacity = _hubs[j].Get_Capacity();
+                        var already_opened = _hubs[j].If_Already_Opened();
+
+                        var new_hub = new Hub(city, id, region, valueslong, valueslat, dist, capacity, already_opened);
+                        new_hubs.Add(new_hub);
+                    }
+                }
+
+            }
         }
 
         //In order to return to minimum number of hubs that gives a feasible solution
@@ -450,7 +455,7 @@ namespace FMLMDelivery
         }
 
         //In order to return to minimum number of hubs that gives a feasible solution
-        public Int32 Return_Hubs()
+        public Int32 Return_num_Hubs()
         {
             return num_hubs;
         }
@@ -591,6 +596,7 @@ namespace FMLMDelivery
         {
             CoverageConstraints();
             MainHubConstraint();
+            Nonnegativity_Constraint();
             if (_cost_incurred)
             {
                 UnAssigned_XDock_Constraints();
@@ -608,7 +614,7 @@ namespace FMLMDelivery
                 {
                     TotalHubConstraint();
                     Capacity_Constraint();
-                    Min_X_Dock_Constraint();
+                   // Min_X_Dock_Constraint();
                 }
                 if (phase_2)
                 {
@@ -625,6 +631,21 @@ namespace FMLMDelivery
            
         }
 
+        private void Nonnegativity_Constraint()
+        {
+            for (int i = 0; i < _numOfXdocks; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    _solver.AddGe(x[i][j], 0);
+                }
+            }
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                _solver.AddGe(y[j], 0);
+            }
+        }
+
         //y[j]*beta <= ∑x[i,j]*a[i,j]*demand[i]
         private void Min_X_Dock_Constraint()
         {
@@ -637,6 +658,17 @@ namespace FMLMDelivery
                 }
                 constraint.AddTerm(y[j], -min_hub_capacity);
                 _solver.AddGe(constraint,0);
+            }
+
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                var constraint = _solver.LinearNumExpr();
+                for (int i = 0; i < _numOfXdocks; i++)
+                {
+                    constraint.AddTerm(x[i][j], a[i][j]);
+                }
+                constraint.AddTerm(y[j], -min_num_xdock_assigned);
+                _solver.AddGe(constraint, 0);
             }
         }
         //∑∑x[i,j]*a[i,j]*d[i] >= covarage_percentage*demand
@@ -684,6 +716,17 @@ namespace FMLMDelivery
                     constraint.AddTerm(x[i][j], demand_included);
                 }
                 constraint.AddTerm(y[j], -max_hub_capaticity);
+                _solver.AddLe(constraint, 0);
+            }
+
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                var constraint = _solver.LinearNumExpr();
+                for (int i = 0; i < _numOfXdocks; i++)
+                {
+                    constraint.AddTerm(x[i][j], a[i][j]);
+                }
+                constraint.AddTerm(y[j], -max_num_xdock_assigned);
                 _solver.AddLe(constraint, 0);
             }
         }
@@ -858,8 +901,6 @@ namespace FMLMDelivery
                     _objective.AddTerm(y[j], 1);
                 }
             }
-
-
             _solver.AddMinimize(_objective);
 
         }

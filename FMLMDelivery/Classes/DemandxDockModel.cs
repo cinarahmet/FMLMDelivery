@@ -10,27 +10,30 @@ using System.Device.Location;
 /// IMPORTANT !!!!!!!!!
 /// This model does not differ from other model file, the only difference is this model is modified for county and xDocks rather than xDocks and hubs.
 /// </summary>
-public class Model2
+public class DemandxDockModel
 {
-    /// <summary>
-    /// The maximum distance that a county can be assigned to a xDock
-    /// </summary>
-    private Double distance_threshold = 100;
-
+ 
     /// <summary>
     /// Maximum number of County that can be assigned to a single xDock.
     /// </summary>
     private Double max_num_county_assigned = 400;
 
+
+    private Int32 min_num_county_assigned = 2;
+
     /// <summary>
     /// Min amount that xDock can be opened.
     /// </summary>
-    private Double min_xDock_capacity = 1000;
+    private Double min_xDock_capacity = 1250;
+
+    private Double big_city_min_xDock_capacity = 2500;
 
     /// <summary>
     /// Max amount that xDock can be opened.
     /// </summary>
-    private Double max_xDock_capaticity = 4000;
+    private Double max_xDock_capaticity = 5000;
+
+    private Double max_hub_capacity = 400000;
 
     /// <summary>
     /// The maximum distance that a County can be assigned to a xDock in the west side
@@ -49,7 +52,7 @@ public class Model2
 
     /// <summary>
     /// Cplex object
-    /// </summary>
+    /// </summary>  
     private readonly Cplex _solver;
 
     /// <summary>
@@ -70,7 +73,7 @@ public class Model2
     /// <summary>
     /// List of County
     /// </summary>
-    private List<County> _county;
+    private List<DemandPoint> _county;
 
     /// <summary>
     /// x[i, j] € {0,1} denotes whether county i is assigned to xDock j
@@ -199,7 +202,12 @@ public class Model2
     /// <summary>
     /// List of opened xDocks latitude and longitude
     /// </summary>
-    private List<xDocks> lat_long;
+    private List<xDocks> new_XDocks;
+
+    /// <summary>
+    /// List of potential Hub locations
+    /// </summary>
+    private List<Hub> potential_Hubs;
 
     /// <summary>
     /// demand normalization proportion 
@@ -221,7 +229,8 @@ public class Model2
     private Int32 xDock_count = 0;
 
 
-    public Model2(List<County> Counties, List<xDocks> xDocks, Boolean cost_incurred, Boolean capacity_incurred, Int32 P, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2)
+
+    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Int32 P, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
@@ -250,7 +259,8 @@ public class Model2
 
         xDock_names = new Dictionary<int, string>();
         county_demand = new List<double>();
-        lat_long = new List<xDocks>();
+        new_XDocks = new List<xDocks>();
+        potential_Hubs = new List<Hub>();
         normalized_demand = new List<double>();
 
     }
@@ -266,11 +276,11 @@ public class Model2
     private void Get_Demand_Weight()
     {
         double totalweight = 0;
-        for (int i = 0; i < _numOfXdocks; i++)
+        for (int i = 0; i < _numOfCounty; i++)
         {
             totalweight = county_demand[i] + totalweight;
         }
-        for (int i = 0; i < _numOfXdocks; i++)
+        for (int i = 0; i < _numOfCounty; i++)
         {
             var dp2 = new List<Double>();
             double proportion = county_demand[i] / totalweight;
@@ -287,19 +297,23 @@ public class Model2
             {
                 if (_solver.GetValue(y[j]) > 0.9)
                 {
-                    var name = _xDocks[j].Get_Id();
+                    var city = _xDocks[j].Get_City();
+                    var county = _xDocks[j].Get_Id();
+                    var region = _xDocks[j].Get_Region();
                     var valueslat = _xDocks[j].Get_Latitude();
                     var valueslong = _xDocks[j].Get_Longitude();
+                    var distance_threshold = _xDocks[j].Get_Distance_Threshold();
                     var demand = 0.0;
+                    var already_opened = _xDocks[j].If_Already_Opened();
                     for (int i = 0; i < _numOfCounty; i++)
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
                         {
-                            demand += _xDocks[i].Get_Demand();
+                            demand += _county[i].Get_Demand();
                         }
                     }
-                    var x_Dock =new xDocks(name,valueslong,valueslat,demand);
-                    lat_long.Add(x_Dock);
+                    var x_Dock =new xDocks(city,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
+                    new_XDocks.Add(x_Dock);
 
                 }
             }
@@ -307,9 +321,36 @@ public class Model2
         }
     }
 
+    private void Get_Hubs()
+    {
+        if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
+        {
+            for (int i = 0; i < new_XDocks.Count; i++)
+            {
+                var city = new_XDocks[i].Get_City();
+                var id = new_XDocks[i].Get_Id();
+                var region = new_XDocks[i].Get_Region();
+                var longitude = new_XDocks[i].Get_Longitude();
+                var latitude = new_XDocks[i].Get_Latitude();
+                var dist_thres = new_XDocks[i].Get_Distance_Threshold();
+                var capacity = max_hub_capacity;
+                var already_opened = false;
+                var potential_hub = new Hub(city, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                potential_Hubs.Add(potential_hub);
+
+            }
+        }
+
+    }
+
+    public List<Hub> Return_Potential_Hubs()
+    {
+        return potential_Hubs;
+    }
+
     public List<xDocks> Return_XDock()
     {
-        return lat_long;
+        return new_XDocks;
     }
 
     private void Get_Distance_Matrix()
@@ -363,49 +404,20 @@ public class Model2
         for (int i = 0; i < _numOfCounty; i++)
         {
             var longtitude = _county[i].Get_Longitude();
+            var threshold = _county[i].Get_Distance_Threshold();
             var a_i = new List<Double>();
             for (int j = 0; j < _numOfXdocks; j++)
             {
-                if (longtitude < 32)
+                if (d[i][j]<= threshold)
                 {
-                    if (d[i][j] < distance_thresholdwest)
-                    {
-                        var a_ij = 1;
-                        a_i.Add(a_ij);
-                    }
-                    else
-                    {
-                        var a_ij = 0;
-                        a_i.Add(a_ij);
-                    }
-                }
-                else if (longtitude < 38)
-                {
-                    if (d[i][j] < distance_thresholdmiddle)
-                    {
-                        var a_ij = 1;
-                        a_i.Add(a_ij);
-                    }
-                    else
-                    {
-                        var a_ij = 0;
-                        a_i.Add(a_ij);
-                    }
+                    var a_ij = 1;
+                    a_i.Add(a_ij);
                 }
                 else
                 {
-                    if (d[i][j] < distance_thresholdeast)
-                    {
-                        var a_ij = 1;
-                        a_i.Add(a_ij);
-                    }
-                    else
-                    {
-                        var a_ij = 0;
-                        a_i.Add(a_ij);
-                    }
+                    var a_ij = 0;
+                    a_i.Add(a_ij);
                 }
-
             }
             a.Add(a_i);
         }
@@ -419,6 +431,7 @@ public class Model2
         Solve();
         Create_XDock_Names();
         Get_xDock();
+        Get_Hubs();
         Get_Num_XDocks();
         Print();
         ClearModel();
@@ -453,9 +466,9 @@ public class Model2
 
         }
         _objVal = Math.Round(_solver.GetObjValue(), 2);
-        var stats = _solver.GetStatus();
+        var status = _solver.GetStatus();
         Console.WriteLine("Objective value is {0}\n", _objVal);
-        Console.WriteLine("Solution status is {0}\n", stats);
+        Console.WriteLine("Solution status is {0}\n", status);
         var n_var = _solver.NbinVars;
         Console.WriteLine("Number of variables : {0}", n_var);
 
@@ -562,6 +575,7 @@ public class Model2
     {
         CoverageConstraints();
         MainHubConstraint();
+        Already_Opened();
         if (_cost_incurred)
         {
             UnAssigned_XDock_Constraints();
@@ -578,11 +592,12 @@ public class Model2
             {
                 TotalXDockConstraint();
                 Capacity_Constraint();
-               // Min_County_Constraint();
+                Min_County_Constraint();
             }
             if (phase_2)
             {
                 Demand_Coverage_Constraint();
+                
             }
 
         }
@@ -590,9 +605,25 @@ public class Model2
         {
             Demand_Coverage_Constraint();
             Capacity_Constraint();
-            //Min_County_Constraint();
+            Min_County_Constraint();
         }
 
+    }
+    private void Already_Opened()
+    {
+        for (int j = 0; j < _numOfXdocks; j++)
+        {
+            var constraint = _solver.LinearNumExpr();
+            constraint.AddTerm(y[j], 1);
+            if (_xDocks[j].If_Already_Opened())
+            {
+                _solver.AddEq(constraint, 1);
+            }
+            else
+            {
+                _solver.AddLe(constraint, 1);
+            }
+        }
     }
 
     private void Min_County_Constraint()
@@ -604,9 +635,28 @@ public class Model2
             {
                 constraint.AddTerm(x[i][j], a[i][j] * county_demand[i]);
             }
-            constraint.AddTerm(y[j], -min_xDock_capacity);
+            if (_xDocks[j].Get_City() == "Istanbul" || _xDocks[j].Get_City() == "Ankara" || _xDocks[j].Get_City() == "Izmir" || _xDocks[j].Get_City() == "Bursa")
+            {
+                constraint.AddTerm(y[j], -big_city_min_xDock_capacity);
+            }
+            else
+            {
+                constraint.AddTerm(y[j], -min_xDock_capacity);
+            }
+            
             _solver.AddGe(constraint, 0);
         }
+
+        //for (int j = 0; j < _numOfXdocks; j++)
+        //{
+        //    var constraint = _solver.LinearNumExpr();
+        //    for (int i = 0; i < _numOfCounty; i++)
+        //    {
+        //        constraint.AddTerm(x[i][j], a[i][j]);
+        //    }
+        //    constraint.AddTerm(y[j], -min_num_county_assigned);
+        //    _solver.AddGe(constraint, 0);
+        //}
     }
 
     private void Demand_Coverage_Constraint()
@@ -653,6 +703,18 @@ public class Model2
             constraint.AddTerm(y[j], -max_xDock_capaticity);
             _solver.AddLe(constraint, 0);
         }
+
+        for (int j = 0; j < _numOfXdocks; j++)
+        {
+            var constraint = _solver.LinearNumExpr();
+            for (int i = 0; i < _numOfCounty; i++)
+            {
+                constraint.AddTerm(x[i][j], a[i][j]);
+            }
+            constraint.AddTerm(y[j], -max_num_county_assigned);
+            _solver.AddLe(constraint, 0);
+        }
+
     }
 
     private void UnAssigned_XDock_Constraints()
@@ -854,7 +916,7 @@ public class Model2
         //Create y[j] variables
         for (int j = 0; j < _numOfXdocks; j++)
         {
-            var name = $"x[{(j + 1)}]";
+            var name = $"y[{(j + 1)}]";
             var y_j = _solver.NumVar(0, 1, NumVarType.Bool, name);
             y.Add(y_j);
         }

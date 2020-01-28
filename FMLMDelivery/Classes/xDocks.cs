@@ -19,7 +19,11 @@ public class xDocks
 
     private readonly Double _demand;
 
-    public xDocks(String city,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double demand)
+    private readonly Boolean _already_opened;
+
+    
+
+    public xDocks(String city,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double demand,Boolean already_opened)
     {
         _city = city;
         _id = id;
@@ -28,10 +32,16 @@ public class xDocks
         _latitude = latitude;
         _distance_threshold = distance_threshold;
         _demand = demand;
+        _already_opened = already_opened;
 
     }
 
-    public double Get_Distance_Threshold()
+    public Boolean If_Already_Opened()
+    {
+        return _already_opened;
+    }
+
+    public Double Get_Distance_Threshold()
     {
         return _distance_threshold;
     }
