@@ -13,9 +13,15 @@ public class CSVReader
 
     private readonly List<xDocks> _agency = new List<xDocks>();
 
+    private readonly List<Seller> _small_seller = new List<Seller>();
+
+    private readonly List<Seller> _big_seller = new List<Seller>();
+    
     private readonly string _county_file;
 
     private readonly string _xDocks_file;
+
+    private readonly string _seller_file;
 
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
@@ -24,11 +30,12 @@ public class CSVReader
     private Int32 _month;
 
 
-    public CSVReader(string county_file, string xDock_file, Int32 month)
+    public CSVReader(string county_file, string xDock_file, string Seller_file, Int32 month)
     {
         _county_file = county_file;
         _xDocks_file = xDock_file;
         _month = month+6;
+        _seller_file = Seller_file;
     }
 
     private void Create_County_Region_Threshold()
@@ -56,17 +63,17 @@ public class CSVReader
     private void Create_xDock_Region_Threshold()
     {
         var s_1 = "Akdeniz";
-        var value = 1500 ;
+        var value = 320 ;
         var s_2 = "Marmara";
-        var value_2 = 1500;
+        var value_2 = 150;
         var s_3 = "İçAnadolu";
-        var value_3 = 1500;
+        var value_3 = 180;
         var s_4 = "Ege";
-        var value_4 = 1500;
+        var value_4 = 180;
         var s_5 = "Güneydoğu";
-        var value_5 = 1500;
+        var value_5 = 320;
         var s_6 = "Karadeniz";
-        var value_6 = 1500;
+        var value_6 = 180;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
@@ -81,6 +88,7 @@ public class CSVReader
         Create_xDock_Region_Threshold();
         Read_XDock();
         Read_Demand_Point();
+        Read_Sellers();
     }
 
     private void Read_Demand_Point()
@@ -221,6 +229,38 @@ public class CSVReader
             }
         }
     }
+    public void Read_Sellers()
+    {
+        using (var sr = File.OpenText(_seller_file))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(",");
+                var seller_city = line[0];
+                var seller_county = line[1];
+                var seller_region = line[2];
+                var seller_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_dist= Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_demand = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                if (seller_demand <= 1000)
+                {
+
+                   var small_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long,seller_dist,seller_demand);
+                    _small_seller.Add(small_seller);
+
+}
+                else
+                {
+                    var big_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand);
+                    _big_seller.Add(big_seller);
+                }
+            }
+        }
+
+
+    }
 
     public List<xDocks> Get_XDocks()
     {
@@ -236,5 +276,12 @@ public class CSVReader
     {
         return _agency;
     }
-
+    public List<Seller> Get_Small_Sellers()
+    {
+        return _small_seller;
+    }
+    public List<Seller> Get_Big_Sellers()
+    {
+        return _big_seller;
+    }
 }

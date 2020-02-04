@@ -66,6 +66,10 @@ public class DemandxDockModel
     private readonly Int32 _numOfCounty;
 
     /// <summary>
+    /// Number of Seller
+    /// </summary>
+    private readonly Int32 _numOfSeller;
+    /// <summary>
     /// List of posible xDocks 
     /// </summary>
     private List<xDocks> _xDocks;
@@ -74,12 +78,19 @@ public class DemandxDockModel
     /// List of County
     /// </summary>
     private List<DemandPoint> _county;
-
+    /// <summary>
+    /// List of sellers
+    /// </summary>
+    private List<Seller> _sellers;
     /// <summary>
     /// x[i, j] € {0,1} denotes whether county i is assigned to xDock j
     /// </summary>
     private List<List<INumVar>> x;
 
+    /// <summary>
+    /// s[i,j]  € {0,1} denotes whether seller i is assigned to xDock j
+    /// </summary>
+    private List<List<INumVar>> s;
     /// <summary>
     /// y[j] € {0,1} denotes whether opened xDock on location j
     /// </summary>
@@ -94,6 +105,11 @@ public class DemandxDockModel
     /// a[i,j] € {0,1} denotes whether county i is in the range of xDock j.
     /// </summary>
     private List<List<Double>> a;
+    
+    /// <summary>
+    /// aseller[i,j] € {0,1} whether seller i is in the range of xDock j.
+    /// </summary>
+    private List<List<Double>> a_seller;
 
     /// <summary>
     /// Linearization variable: Created in order to eliminate arg min cost func. for distances of un-covered county. 
@@ -111,10 +127,14 @@ public class DemandxDockModel
     private List<INumVar> k;
 
     /// <summary>
-    /// d[i,j] € {0,1} is the distance matrix for all county i's and xDock j's
+    /// d[i,j]  is the distance matrix for all county i's and xDock j's
     /// </summary>
     private List<List<Double>> d;
 
+    /// <summary>
+    /// dseller[i,j] is the distance matrix for all seller i's and xDock j's
+    /// </summary>
+    private List<List<Double>> d_seller;
     /// <summary>
     /// A sufficiently big number
     /// </summary>
@@ -195,6 +215,10 @@ public class DemandxDockModel
     private List<Double> county_demand;
 
     /// <summary>
+    /// Demand of each seller
+    /// </summary>
+    private List<Double> seller_demand;
+    /// <summary>
     /// Weigted demand for counties
     /// </summary>
     private Boolean _demand_weighted;
@@ -230,15 +254,17 @@ public class DemandxDockModel
 
 
 
-    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Int32 P, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, List<Seller> small_seller, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Int32 P, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
         _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
         _xDocks = xDocks;
         _county = Counties;
+        _sellers = small_seller;
         _numOfXdocks = xDocks.Count;
         _numOfCounty = Counties.Count;
+        _numOfSeller = small_seller.Count;
         _cost_incurred = cost_incurred;
         _capacity_incurred = capacity_incurred;
         _min_xDock_model = min_hub_model;
@@ -248,13 +274,16 @@ public class DemandxDockModel
         _demand_covarage = Demand_Covarage;
 
         x = new List<List<INumVar>>();
+        s = new List<List<INumVar>>();
         y = new List<INumVar>();
         z = new List<INumVar>();
         a = new List<List<Double>>();
+        a_seller = new List<List<Double>>();
         f = new List<List<INumVar>>();
         mu = new List<INumVar>();
         k = new List<INumVar>();
         d = new List<List<double>>();
+        d_seller = new List<List<double>>();
         c = new List<double>();
 
         xDock_names = new Dictionary<int, string>();
@@ -262,7 +291,7 @@ public class DemandxDockModel
         new_XDocks = new List<xDocks>();
         potential_Hubs = new List<Hub>();
         normalized_demand = new List<double>();
-
+        seller_demand = new List<double>();
     }
 
     public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -371,6 +400,24 @@ public class DemandxDockModel
             d.Add(d_i);
         }
     }
+    private void Get_Distance_Matrix_Seller()
+    {   //Calculating distance matrix for sellers
+        for (int i = 0; i < _numOfSeller; i++)
+        {
+            var d_k = new List<double>();
+            for (int j = 0; j < _numOfXdocks ; j++)
+            {
+                var long_1 = _sellers[i].Get_Longitude();
+                var lat_1 = _sellers[i].Get_Latitude();
+                var long_2 = _xDocks[j].Get_Longitude();
+                var lat_2 = _xDocks[j].Get_Latitude();
+                var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+                d_k.Add(d_ij);
+            }
+            d_seller.Add(d_k);
+        }
+
+    }
 
     private void Get_Num_XDocks()
     {
@@ -422,6 +469,30 @@ public class DemandxDockModel
             a.Add(a_i);
         }
     }
+    private void Create_Distance_Threshold_Seller()
+    {   //Create a_seller[i,j] matrix
+        for (int i = 0; i < _numOfSeller; i++)
+        {
+            
+            var threshold = _sellers[i].Get_Distance_Threshold();
+            var a_k = new List<Double>();
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                if (d_seller[i][j] <= threshold)
+                {
+                    var a_ij = 1;
+                    a_k.Add(a_ij);
+                }
+                else
+                {
+                    var a_ij = 0;
+                    a_k.Add(a_ij);
+                }
+            }
+            a_seller.Add(a_k);
+        }
+
+    }
 
     public void Run()
     {
@@ -472,13 +543,14 @@ public class DemandxDockModel
         var n_var = _solver.NbinVars;
         Console.WriteLine("Number of variables : {0}", n_var);
 
-        for (int i = 0; i < _numOfCounty; i++)
+        for (int i = 0; i < _numOfSeller; i++)
         {
             for (int j = 0; j < _numOfXdocks; j++)
             {
-                if (_solver.GetValue(x[i][j]) > 0.9)
+               if (_solver.GetValue(s[i][j]) > 0.9)
                 {
-                  //  Console.WriteLine("x[{0},{1}] = {2}", i, j, _solver.GetValue(x[i][j]));
+                    Console.WriteLine("s[{0},{1}] = {2}", i, j, _solver.GetValue(s[i][j]));
+                    Console.WriteLine("s[{0},{1}] = {2}", i, j, _xDocks[j].Get_Id());
                 }
 
             }
@@ -489,7 +561,7 @@ public class DemandxDockModel
         {
             if (_solver.GetValue(y[j]) > 0.9)
             {
-               // Console.WriteLine("y[{0}] = {1}", j, _solver.GetValue(y[j]));
+               // Console.WriteLine("y[{0}] = {1}", j, _xDocks[j].Get_Id());
             }
 
         }
@@ -522,8 +594,10 @@ public class DemandxDockModel
     private void Get_Parameters()
     {
         Get_Distance_Matrix();
+        Get_Distance_Matrix_Seller();
         Get_Cost_Parameters();
         Create_Distance_Threshold_Matrix();
+        Create_Distance_Threshold_Seller();
         Get_Demand_Parameters();
         Get_Demand_Weight();
         Get_Total_Demand();
@@ -543,6 +617,11 @@ public class DemandxDockModel
         {
             var d_i = _county[i].Get_Demand();
             county_demand.Add(d_i);
+        }
+        for (int i = 0; i < _numOfSeller; i++)
+        {
+            var d_k = _sellers[i].Get_Demand();
+            seller_demand.Add(d_k);
         }
     }
 
@@ -576,6 +655,7 @@ public class DemandxDockModel
         CoverageConstraints();
         MainHubConstraint();
         Already_Opened();
+        Seller_Assignment_Constraint2();
         if (_cost_incurred)
         {
             UnAssigned_XDock_Constraints();
@@ -597,7 +677,8 @@ public class DemandxDockModel
             if (phase_2)
             {
                 Demand_Coverage_Constraint();
-                
+                Seller_Assignment_Constraint();
+                Seller_Capacity_Constraint();
             }
 
         }
@@ -658,7 +739,43 @@ public class DemandxDockModel
         //    _solver.AddGe(constraint, 0);
         //}
     }
-
+    private void Seller_Assignment_Constraint2()
+    {
+        for (int i = 0; i < _numOfSeller; i++)
+        {
+            
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                _solver.AddLe(s[i][j], 1);
+            }
+            
+        }
+    }
+    private void Seller_Assignment_Constraint()
+    {
+        for (int i = 0; i < _numOfSeller; i++)
+        {
+            var constraint = _solver.LinearNumExpr();
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                constraint.AddTerm(s[i][j], a_seller[i][j]);
+            }
+            _solver.AddEq(constraint, 1);
+        }
+    }
+    private void Seller_Capacity_Constraint()
+    {
+        for (int j = 0; j < _numOfXdocks; j++)
+        {
+            var constraint = _solver.LinearNumExpr();
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                constraint.AddTerm(s[i][j], a_seller[i][j]);
+                constraint.AddTerm(y[j], - M_1 );
+            }
+            _solver.AddLe(constraint,0);
+        }
+    }
     private void Demand_Coverage_Constraint()
     {
         var constraint = _solver.LinearNumExpr();
@@ -714,7 +831,7 @@ public class DemandxDockModel
             constraint.AddTerm(y[j], -max_num_county_assigned);
             _solver.AddLe(constraint, 0);
         }
-
+       
     }
 
     private void UnAssigned_XDock_Constraints()
@@ -839,6 +956,7 @@ public class DemandxDockModel
                 _solver.AddLe(constraint, 0);
             }
         }
+
     }
 
     /// <summary>
@@ -880,7 +998,14 @@ public class DemandxDockModel
                 for (int j = 0; j < _numOfXdocks; j++)
                 {
                     _objective.AddTerm(x[i][j], d[i][j] * county_demand[i]);
-
+                    
+                }
+            }
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                for (int j = 0; j < _numOfXdocks; j++)
+                {
+                    _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]);
                 }
             }
 
@@ -911,6 +1036,17 @@ public class DemandxDockModel
                 x_i.Add(x_ij);
             }
             x.Add(x_i);
+        }
+        for (int i = 0; i < _numOfSeller; i++)
+        {
+            var s_i = new List<INumVar>();
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                var name = $"s[{i + 1}][{(j + 1)}]";
+                var s_ij = _solver.NumVar(0, 1, NumVarType.Bool, name);
+                s_i.Add(s_ij);
+            }
+            s.Add(s_i);
         }
 
         //Create y[j] variables
