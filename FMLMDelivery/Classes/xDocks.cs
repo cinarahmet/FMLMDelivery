@@ -21,6 +21,8 @@ public class xDocks
 
     private readonly Boolean _already_opened;
 
+    private readonly Double _cumulative_demand;
+
     
 
     public xDocks(String city,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double demand,Boolean already_opened)
@@ -33,6 +35,7 @@ public class xDocks
         _distance_threshold = distance_threshold;
         _demand = demand;
         _already_opened = already_opened;
+       // _cumulative_demand = cumulative_demand;
 
     }
 
@@ -75,7 +78,10 @@ public class xDocks
     {
         return _demand;
     }
-   
+    public Double Get_Cumulative_Demand()
+    {
+        return _cumulative_demand;
+    }
 }
 
     

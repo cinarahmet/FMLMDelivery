@@ -18,7 +18,8 @@ public class Seller
 
     private Double _dist_thres;
 
-    public Seller(String city, String id, String region, Double longitude, Double latitude, Double dist_thres, Double demand)
+    private String _size;
+    public Seller(String city, String id, String region, Double longitude, Double latitude, Double dist_thres, Double demand, String Size)
     {
         _city = city;
         _Id = id;
@@ -26,7 +27,8 @@ public class Seller
         _longitude = longitude;
         _latitude = latitude;
         _dist_thres = dist_thres;
-        _demand = demand;        
+        _demand = demand;
+        _size = Size;
 
     }
 
@@ -57,6 +59,10 @@ public class Seller
     public Double Get_Distance_Threshold()
     {
         return _dist_thres;
+    }
+    public String Get_Size()
+    {
+        return _size;
     }
 
 }

@@ -31,7 +31,7 @@ public class DemandxDockModel
     /// <summary>
     /// Max amount that xDock can be opened.
     /// </summary>
-    private Double max_xDock_capaticity = 5000;
+    private Double max_xDock_capaticity = 4000;
 
     private Double max_hub_capacity = 400000;
 
@@ -334,12 +334,22 @@ public class DemandxDockModel
                     var distance_threshold = _xDocks[j].Get_Distance_Threshold();
                     var demand = 0.0;
                     var already_opened = _xDocks[j].If_Already_Opened();
+                    var cumulative_demand = 0.0;
                     for (int i = 0; i < _numOfCounty; i++)
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
                         {
                             demand += _county[i].Get_Demand();
                         }
+
+                    }
+                    for (int k = 0; k < _numOfSeller; k++)
+                    {
+                        if (_solver.GetValue(s[k][j]) > 0.9)
+                        {
+                            cumulative_demand += _sellers[k].Get_Demand();
+                        }
+
                     }
                     var x_Dock =new xDocks(city,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
                     new_XDocks.Add(x_Dock);
@@ -349,7 +359,7 @@ public class DemandxDockModel
 
         }
     }
-
+    
     private void Get_Hubs()
     {
         if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
@@ -502,6 +512,7 @@ public class DemandxDockModel
         Solve();
         Create_XDock_Names();
         Get_xDock();
+        
         Get_Hubs();
         Get_Num_XDocks();
         Print();
@@ -677,8 +688,8 @@ public class DemandxDockModel
             if (phase_2)
             {
                 Demand_Coverage_Constraint();
-                Seller_Assignment_Constraint();
-                Seller_Capacity_Constraint();
+                //Seller_Assignment_Constraint();
+                //Seller_Capacity_Constraint();
             }
 
         }
@@ -687,6 +698,8 @@ public class DemandxDockModel
             Demand_Coverage_Constraint();
             Capacity_Constraint();
             Min_County_Constraint();
+           // Seller_Assignment_Constraint();
+           // Seller_Capacity_Constraint();
         }
 
     }

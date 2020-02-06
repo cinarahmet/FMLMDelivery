@@ -105,8 +105,7 @@ namespace FMLMDelivery
         /// aseller[i,j] € {0,1} whether seller i is in the range of Hub j.
         /// </summary>
         private List<List<Double>> a_seller;
-
-
+        
         /// <summary>
         /// Linearization variable: Created in order to eliminate arg min cost func. for distances of un-covered xDocks. 
         /// </summary>
@@ -131,6 +130,18 @@ namespace FMLMDelivery
         /// dseller[i,j] is the distance matrix for all seller i's and Hub j's
         /// </summary>
         private List<List<Double>> d_seller;
+        /// <summary>
+        /// Revised distance matrix with notion of adding smalle sellers the minimum distance of xdocks and recalculating the seller to hub distance matrix.
+        /// </summary>
+        private List<List<Double>> d_sellerhub;
+        /// <summary>
+        /// 
+        /// </summary>
+        private List<double> min_distance;
+        /// <summary>
+        /// 
+        /// </summary>
+        private List<double> xdock_chosen;
 
         /// <summary>
         /// A sufficiently big number
@@ -251,11 +262,9 @@ namespace FMLMDelivery
         private int num_hubs = 0;
 
         private List<Hub> new_hubs;
+        private double total_demand_seller;
 
-
-
-
-        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs,List<Seller> big_seller, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
+        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs,List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
 
             _solver = new Cplex();
@@ -263,7 +272,7 @@ namespace FMLMDelivery
             _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
             _xDocks = xDocks;
             _hubs = hubs;
-            _sellers = big_seller;
+            _sellers = sellers;
             _numOfXdocks = xDocks.Count;
             _numOfHubs = hubs.Count;
             _numOfSeller = _sellers.Count;
@@ -286,6 +295,9 @@ namespace FMLMDelivery
             k = new List<INumVar>();
             d = new List<List<double>>();
             d_seller = new List<List<double>>();
+            d_sellerhub = new List<List<double>>();
+            min_distance = new List<Double>();
+            xdock_chosen = new List<Double>();
             c = new List<double>();
             country_names = new Dictionary<int, string>();
             x_dock_demand = new List<double>();
@@ -322,7 +334,7 @@ namespace FMLMDelivery
 
         private void Get_Distance_Matrix()
         {
-            //Calculating the distance matrix
+            
             for (int i = 0; i < _numOfXdocks; i++)
             {
                 var d_i = new List<double>();
@@ -338,6 +350,51 @@ namespace FMLMDelivery
                 d.Add(d_i);
             }
         }
+        private void Get_Revised_Distance()
+        {
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                if (_sellers[i].Get_Size() == "Small")
+                {
+                    for (int e = 0; e < _numOfXdocks; e++)
+                    {
+                        if (xdock_chosen[i] ==e )
+                        {
+                            var d_i = new List<double>();
+                            for (int k = 0; k < _numOfHubs; k++)
+                            {
+                                var long_1 = _xDocks[Convert.ToInt32(xdock_chosen[i])].Get_Longitude();
+                                var lat_1 = _xDocks[Convert.ToInt32(xdock_chosen[i])].Get_Latitude();
+                                var long_2 = _hubs[k].Get_Longitude();
+                                var lat_2 = _hubs[k].Get_Latitude();
+                                var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2) + min_distance[i];
+
+                                d_i.Add(d_ij);
+                            }
+                            d_sellerhub.Add(d_i);
+                        }
+                    }
+                   
+                }
+                else
+                {
+                    var d_i = new List<double>();
+                    for (int k = 0; k < _numOfHubs; k++)
+                    {
+                        var long_1 = _sellers[i].Get_Longitude();
+                        var lat_1 = _sellers[i].Get_Latitude();
+                        var long_2 = _hubs[k].Get_Longitude();
+                        var lat_2 = _hubs[k].Get_Latitude();
+                        var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+
+                        d_i.Add(d_ij);
+                    }
+                    d_sellerhub.Add(d_i);
+                }
+
+
+            }
+        }
         private void Get_Distance_Matrix_Seller()
         {   //Calculating distance matrix for sellers
             for (int i = 0; i < _numOfSeller; i++)
@@ -350,9 +407,31 @@ namespace FMLMDelivery
                     var long_2 = _xDocks[j].Get_Longitude();
                     var lat_2 = _xDocks[j].Get_Latitude();
                     var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+
                     d_k.Add(d_ij);
                 }
                 d_seller.Add(d_k);
+            }
+
+        }
+        private void Min_Distance()
+        {
+           
+            var dist = new Double();
+            var index = new Double();
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                dist = 1000000;
+                for (int j = 0; j < _numOfXdocks; j++)
+                {
+                    if (d_seller[i][j] < dist)
+                    {
+                        dist = d_seller[i][j];
+                        index = j;
+                    }
+                }
+                min_distance.Add(dist);
+                xdock_chosen.Add(index);
             }
 
         }
@@ -407,7 +486,7 @@ namespace FMLMDelivery
                 
                 var threshold = _sellers[i].Get_Distance_Threshold();
                 var a_k = new List<Double>();
-                for (int j = 0; j < _numOfXdocks; j++)
+                for (int j = 0; j < _numOfHubs; j++)
                 {
                     if (d_seller[i][j] <= threshold)
                     {
@@ -530,13 +609,26 @@ namespace FMLMDelivery
                 {
                     if (_solver.GetValue(x[i][j] ) > 0.9)
                     {
-                        Console.WriteLine("x[{0},{1}] = {2}", i, j, _solver.GetValue(x[i][j]));
+                        //Console.WriteLine("x[{0},{1}] = {2}", i, j, _solver.GetValue(x[i][j]));
                     }
                    
                 }
             }
-
-
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    if (_solver.GetValue(s[i][j])>0.9)
+                    {
+                        Console.WriteLine("s[{0},{1}] = {2}", i, j, _solver.GetValue(s[i][j]));
+                    }
+                }
+            }
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                Console.WriteLine("mindist[{0}] = {1}", i, xdock_chosen[i]);
+            }
+           
             for (int j = 0; j < _numOfHubs; j++)
             {
                 if (_solver.GetValue(y[j])>0.9)
@@ -573,8 +665,10 @@ namespace FMLMDelivery
 
         private void Get_Parameters()
         {
-            Get_Distance_Matrix();
             Get_Distance_Matrix_Seller();
+            Min_Distance();
+            Get_Distance_Matrix();
+            Get_Revised_Distance();
             Get_Cost_Parameters();
             Create_Distance_Threshold_Matrix();
             Create_Distance_Threshold_Seller();
@@ -588,6 +682,10 @@ namespace FMLMDelivery
             for (int i = 0; i < _numOfXdocks; i++)
             {
                 total_demand = x_dock_demand[i] + total_demand;
+            }
+            for (int j = 0; j < _numOfSeller; j++)
+            {
+                total_demand_seller += _sellers[j].Get_Demand();
             }
         }
         private void Get_Demand_Parameters()
@@ -656,16 +754,21 @@ namespace FMLMDelivery
                     Demand_Coverage_Constraint();
                     Seller_Capacity_Constraint();
                     Seller_Assignment_Constraint();
+                    Seller_Demand_Satisfaction_Constraint();
+
+
                 }
 
             }
             if (_min_hub_model)
             {
-
+                Seller_Capacity_Constraint();
+                Seller_Assignment_Constraint();
                 Demand_Coverage_Constraint();
                 Capacity_Constraint();
+                Seller_Demand_Satisfaction_Constraint();
             }
-           
+
         }
 
         private void Nonnegativity_Constraint()
@@ -725,7 +828,7 @@ namespace FMLMDelivery
                 {
                     constraint.AddTerm(s[i][j], a_seller[i][j]);
                 }
-                _solver.AddEq(constraint, 1);
+                _solver.AddLe(constraint, 1);
             }
         }
         private void Seller_Capacity_Constraint()
@@ -736,10 +839,23 @@ namespace FMLMDelivery
                 for (int i = 0; i < _numOfSeller; i++)
                 {
                     constraint.AddTerm(s[i][j], a_seller[i][j]);
-                    constraint.AddTerm(y[j], -M_1);
+                    constraint.AddTerm(y[j], -200000);
                 }
                 _solver.AddLe(constraint, 0);
             }
+        }
+        private void Seller_Demand_Satisfaction_Constraint()
+        {
+            var constraint = _solver.LinearNumExpr();
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    constraint.AddTerm(s[i][j], a_seller[i][j]*seller_demand[i]);
+                    
+                }
+            }
+            _solver.AddGe(constraint, total_demand_seller * 0.76);
         }
         //∑∑x[i,j]*a[i,j]*d[i] >= covarage_percentage*demand
         private void Demand_Coverage_Constraint()
@@ -965,7 +1081,7 @@ namespace FMLMDelivery
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
-                        _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]);
+                        _objective.AddTerm(s[i][j], d_sellerhub[i][j] * seller_demand[i]);
                     }
                 }
 

@@ -16,6 +16,8 @@ public class CSVReader
     private readonly List<Seller> _small_seller = new List<Seller>();
 
     private readonly List<Seller> _big_seller = new List<Seller>();
+
+    private readonly List<Seller> _total_seller = new List<Seller>();
     
     private readonly string _county_file;
 
@@ -244,18 +246,21 @@ public class CSVReader
                 var seller_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
                 var seller_dist= Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                 var seller_demand = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_size = line[7];
                 if (seller_demand <= 1000)
                 {
 
-                   var small_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long,seller_dist,seller_demand);
+                   var small_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long,seller_dist,seller_demand,seller_size);
                     _small_seller.Add(small_seller);
 
 }
                 else
                 {
-                    var big_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand);
+                    var big_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand,seller_size);
                     _big_seller.Add(big_seller);
                 }
+                var total_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                _total_seller.Add(total_seller);
             }
         }
 
@@ -283,5 +288,9 @@ public class CSVReader
     public List<Seller> Get_Big_Sellers()
     {
         return _big_seller;
+    }
+    public List<Seller> Get_Total_Sellers()
+    {
+        return _total_seller;
     }
 }
