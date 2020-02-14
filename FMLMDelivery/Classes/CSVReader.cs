@@ -13,9 +13,17 @@ public class CSVReader
 
     private readonly List<xDocks> _agency = new List<xDocks>();
 
+    private readonly List<Seller> _small_seller = new List<Seller>();
+
+    private readonly List<Seller> _big_seller = new List<Seller>();
+
+    private readonly List<Seller> _total_seller = new List<Seller>();
+
     private readonly string _county_file;
 
     private readonly string _xDocks_file;
+
+    private readonly string _seller_file;
 
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
@@ -24,11 +32,12 @@ public class CSVReader
     private Int32 _month;
 
 
-    public CSVReader(string county_file, string xDock_file, Int32 month)
+    public CSVReader(string county_file, string xDock_file, string Seller_file, Int32 month)
     {
         _county_file = county_file;
         _xDocks_file = xDock_file;
-        _month = month+6;
+        _month = month + 6;
+        _seller_file = Seller_file;
     }
 
     private void Create_County_Region_Threshold()
@@ -52,21 +61,21 @@ public class CSVReader
         region_county_threshold.TryAdd(s_5, value_5);
         region_county_threshold.TryAdd(s_6, value_6);
     }
-    
+
     private void Create_xDock_Region_Threshold()
     {
         var s_1 = "Akdeniz";
-        var value = 1500 ;
+        var value = 320;
         var s_2 = "Marmara";
-        var value_2 = 1500;
+        var value_2 = 150;
         var s_3 = "İçAnadolu";
-        var value_3 = 1500;
+        var value_3 = 180;
         var s_4 = "Ege";
-        var value_4 = 1500;
+        var value_4 = 180;
         var s_5 = "Güneydoğu";
-        var value_5 = 1500;
+        var value_5 = 320;
         var s_6 = "Karadeniz";
-        var value_6 = 1500;
+        var value_6 = 180;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
@@ -77,10 +86,11 @@ public class CSVReader
 
     public void Read()
     {
-        Create_County_Region_Threshold(); 
+        Create_County_Region_Threshold();
         Create_xDock_Region_Threshold();
         Read_XDock();
         Read_Demand_Point();
+        Read_Sellers();
     }
 
     private void Read_Demand_Point()
@@ -130,7 +140,7 @@ public class CSVReader
                         }
                     }
                 }
-                
+
             }
         }
     }
@@ -159,7 +169,7 @@ public class CSVReader
                 }
                 var Already_Opened = Convert.ToDouble(line[7]);
                 var xDock_Already_Opened = false;
-                if (Already_Opened==1.0)
+                if (Already_Opened == 1.0)
                 {
                     xDock_Already_Opened = true;
                 }
@@ -169,7 +179,7 @@ public class CSVReader
                 {
                     xDock_Capacity = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
                 }
-                
+
                 var xDock = new xDocks(xDock_City, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened);
                 if (type_value)
                 {
@@ -179,14 +189,14 @@ public class CSVReader
                 {
                     _xDocks.Add(xDock);
                 }
-                
+
 
                 if (Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000) > 1)
                 {
                     for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000); i++)
                     {
                         var xDock_city_ = line[0];
-                        var xDock_Id_ = line[1] + " " + i ;
+                        var xDock_Id_ = line[1] + " " + i;
                         var xDock_region_ = line[2];
                         var type_value_ = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
                         var xDock_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
@@ -203,8 +213,8 @@ public class CSVReader
                             xDock_Already_Opened_ = true;
                         }
                         var xDock_Capacity_ = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
-                        
-                        var xDock_ = new xDocks(xDock_city_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_,xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_);
+
+                        var xDock_ = new xDocks(xDock_city_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_, xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_);
                         if (type_value_)
                         {
                             _agency.Add(xDock_);
@@ -213,13 +223,48 @@ public class CSVReader
                         {
                             _xDocks.Add(xDock_);
                         }
-                        
+
                     }
                 }
 
 
             }
         }
+    }
+    public void Read_Sellers()
+    {
+        using (var sr = File.OpenText(_seller_file))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(",");
+                var seller_city = line[0];
+                var seller_county = line[1];
+                var seller_region = line[2];
+                var seller_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_dist = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_demand = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_size = line[7];
+                if (seller_demand <= 1000)
+                {
+
+                    var small_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                    _small_seller.Add(small_seller);
+
+                }
+                else
+                {
+                    var big_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                    _big_seller.Add(big_seller);
+                }
+                var total_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                _total_seller.Add(total_seller);
+            }
+        }
+
+
     }
 
     public List<xDocks> Get_XDocks()
@@ -236,5 +281,16 @@ public class CSVReader
     {
         return _agency;
     }
-
+    public List<Seller> Get_Small_Sellers()
+    {
+        return _small_seller;
+    }
+    public List<Seller> Get_Big_Sellers()
+    {
+        return _big_seller;
+    }
+    public List<Seller> Get_Total_Sellers()
+    {
+        return _total_seller;
+    }
 }
