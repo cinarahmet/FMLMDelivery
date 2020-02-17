@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ChoETL" Version="1.1.0.4" />
     <PackageReference Include="System.Device.Location.Portable" Version="1.0.0" />
   </ItemGroup>
 

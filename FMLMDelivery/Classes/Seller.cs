@@ -19,6 +19,8 @@ public class Seller
     private Double _dist_thres;
 
     private String _size;
+
+    
     public Seller(String city, String id, String region, Double longitude, Double latitude, Double dist_thres, Double demand, String Size)
     {
         _city = city;

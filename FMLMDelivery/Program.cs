@@ -17,11 +17,13 @@ namespace FMLMDelivery
             var small_seller = new List<Seller>();
             var big_seller = new List<Seller>();
             var total_seller = new List<Seller>();
+            var real_distances = new Dictionary<string, Dictionary<string, Double>>();
             //Provide the month index (1-January, 12-December)
             var month = 10;
-            var reader = new CSVReader("Demand_Data.csv", "Potential_Xdock_Data.csv","Potential_Seller_Data.csv", month);
+            var reader = new CSVReader("Demand_Data.csv", "Potential_Xdock_Data.csv","Potential_Seller_Data.csv", "Distance_Matrix.csv", "Location_Id_String.csv", month);
             reader.Read();
             demand_point = reader.Get_County();
+            real_distances = reader.Get_Real_Distances();
             potential_xDocks = reader.Get_XDocks();
             agency = reader.Get_Agency();
             small_seller = reader.Get_Small_Sellers();
@@ -32,7 +34,7 @@ namespace FMLMDelivery
 
 
 
-            var runner = new Runner(demand_point,potential_xDocks,agency, small_seller, big_seller,total_seller);
+            var runner = new Runner(demand_point,potential_xDocks,agency, small_seller, big_seller,total_seller, real_distances);
             (xDocks , hubs)=runner.Run();
             Console.ReadKey();
         }

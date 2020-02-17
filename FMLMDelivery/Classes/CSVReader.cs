@@ -18,6 +18,8 @@ public class CSVReader
     private readonly List<Seller> _big_seller = new List<Seller>();
 
     private readonly List<Seller> _total_seller = new List<Seller>();
+
+    private readonly Dictionary<string, Dictionary<string, Double>> distances = new Dictionary<string, Dictionary<string, Double>>();
     
     private readonly string _county_file;
 
@@ -25,6 +27,10 @@ public class CSVReader
 
     private readonly string _seller_file;
 
+    private readonly string _distance_matrix;
+
+    private readonly string _id_file;
+        
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
     private Dictionary<String, Double> region_xDock_threshold = new Dictionary<string, double>();
@@ -32,12 +38,15 @@ public class CSVReader
     private Int32 _month;
 
 
-    public CSVReader(string county_file, string xDock_file, string Seller_file, Int32 month)
+    public CSVReader(string county_file, string xDock_file, string Seller_file, string distance_matrix, string id_file, Int32 month)
     {
         _county_file = county_file;
         _xDocks_file = xDock_file;
         _month = month+6;
         _seller_file = Seller_file;
+        _distance_matrix = distance_matrix;
+        _id_file = id_file;
+        
     }
 
     private void Create_County_Region_Threshold()
@@ -65,7 +74,7 @@ public class CSVReader
     private void Create_xDock_Region_Threshold()
     {
         var s_1 = "Akdeniz";
-        var value = 320 ;
+        var value = 180 ;
         var s_2 = "Marmara";
         var value_2 = 150;
         var s_3 = "İçAnadolu";
@@ -86,7 +95,8 @@ public class CSVReader
 
     public void Read()
     {
-        Create_County_Region_Threshold(); 
+        Create_County_Region_Threshold();
+        Read_Distance_matrix();
         Create_xDock_Region_Threshold();
         Read_XDock();
         Read_Demand_Point();
@@ -104,6 +114,7 @@ public class CSVReader
                 var county_City = line[0];
                 var county_ID = line[1];
                 var county_Region = line[2];
+                var county_adress = line[19];
                 var type_value = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
                 if (!type_value)
                 {
@@ -120,7 +131,7 @@ public class CSVReader
                         county_Demand = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
                     }
 
-                    var county = new DemandPoint(county_City, county_ID, county_Region, county_long, county_lat, county_dis_thres, county_Demand);
+                    var county = new DemandPoint(county_City, county_ID, county_Region, county_long, county_lat, county_dis_thres, county_Demand,county_adress);
                     _county.Add(county);
 
                     if (Math.Ceiling(Convert.ToDouble(line[_month]) / 4000) > 1)
@@ -130,12 +141,13 @@ public class CSVReader
                             var county_City_ = line[0];
                             var county_ID_ = line[1] + " " + i;
                             var county_Region_ = line[2];
+                            var county_adress_ = line[19];
                             var county_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
                             var county_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                             var county_dis_thres_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                             var county_Demand_ = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
 
-                            var county_ = new DemandPoint(county_City_, county_ID_, county_Region_, county_long_, county_lat_, county_dis_thres_, county_Demand_);
+                            var county_ = new DemandPoint(county_City_, county_ID_, county_Region_, county_long_, county_lat_, county_dis_thres_, county_Demand_,county_adress_);
                             _county.Add(county_);
                         }
                     }
@@ -159,6 +171,7 @@ public class CSVReader
                 var xDock_City = line[0];
                 var xDock_Id = line[1];
                 var xDock_region = line[2];
+                var xDock_Adress = line[20];
                 var type_value = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
                 var xDock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
@@ -180,7 +193,7 @@ public class CSVReader
                     xDock_Capacity = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
                 }
                 
-                var xDock = new xDocks(xDock_City, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened);
+                var xDock = new xDocks(xDock_City, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened,xDock_Adress);
                 if (type_value)
                 {
                     _agency.Add(xDock);
@@ -198,6 +211,7 @@ public class CSVReader
                         var xDock_city_ = line[0];
                         var xDock_Id_ = line[1] + " " + i ;
                         var xDock_region_ = line[2];
+                        var xDock_Adress_ = line[20];
                         var type_value_ = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
                         var xDock_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
                         var xDock_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
@@ -214,7 +228,7 @@ public class CSVReader
                         }
                         var xDock_Capacity_ = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
                         
-                        var xDock_ = new xDocks(xDock_city_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_,xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_);
+                        var xDock_ = new xDocks(xDock_city_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_,xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_,xDock_Adress_);
                         if (type_value_)
                         {
                             _agency.Add(xDock_);
@@ -266,7 +280,54 @@ public class CSVReader
 
 
     }
+    private void Read_Distance_matrix()
+    {
+        var text = File.ReadAllLines(_distance_matrix);
+        var names = new List<String>();
+        var names2 = new List<String>();
 
+        //List of string that can include demand point seller id etc. and must be unique
+        using (var sr = File.OpenText(_id_file))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(',');
+                var ıd = line[0];
+                var ıd2 = line[1];
+                names.Add(ıd);
+                names2.Add(ıd2);
+            }
+
+        }
+        // Split on `,`, convert to int32, add to array, add to outer array
+        var result = text.Select(x => (x.Split(',').Select(Int32.Parse).ToArray())).ToArray();
+        
+        for (int i = 0; i < 179; i++)
+        {
+            var distancesnew = new Dictionary<string, Double>();
+
+            for (int j = 0; j < 196; j++)
+            {
+                if (!distancesnew.ContainsKey(names2[j]))
+                {
+                    distancesnew.Add(names2[j], result[i][j]);
+                }
+
+
+            }
+            if (!distances.ContainsKey(names[i]))
+            {
+                distances.Add(names[i], distancesnew);
+            }
+
+        }      
+                
+    }
+    public Dictionary<string, Dictionary<string, Double>> Get_Real_Distances()
+    {
+        return distances;
+    }
     public List<xDocks> Get_XDocks()
     {
         return _xDocks;

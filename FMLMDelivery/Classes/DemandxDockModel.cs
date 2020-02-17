@@ -6,6 +6,9 @@ using System.Text;
 using ILOG.CPLEX;
 using ILOG.Concert;
 using System.Device.Location;
+using System.IO;
+using System.Linq;
+using ChoETL;
 /// <summary>
 /// IMPORTANT !!!!!!!!!
 /// This model does not differ from other model file, the only difference is this model is modified for county and xDocks rather than xDocks and hubs.
@@ -135,6 +138,15 @@ public class DemandxDockModel
     /// dseller[i,j] is the distance matrix for all seller i's and xDock j's
     /// </summary>
     private List<List<Double>> d_seller;
+
+    /// <summary>
+    /// Real distance matrix using google API
+    /// </summary>
+    private List<List<Double>> d_real;
+    /// <summary>
+    /// Gets the api matrix
+    /// </summary>
+    private Dictionary<string, Dictionary<string, Double>> api_distances;
     /// <summary>
     /// A sufficiently big number
     /// </summary>
@@ -254,7 +266,7 @@ public class DemandxDockModel
 
 
 
-    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, List<Seller> small_seller, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Int32 P, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, List<Seller> small_seller, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Dictionary<string,Dictionary<string,Double>> real_distances, Boolean Phase2, Int32 P, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
@@ -272,6 +284,7 @@ public class DemandxDockModel
         p = P;
         _demand_weighted = Demandweight;
         _demand_covarage = Demand_Covarage;
+        api_distances = real_distances;
 
         x = new List<List<INumVar>>();
         s = new List<List<INumVar>>();
@@ -284,6 +297,7 @@ public class DemandxDockModel
         k = new List<INumVar>();
         d = new List<List<double>>();
         d_seller = new List<List<double>>();
+        d_real = new List<List<double>>();
         c = new List<double>();
 
         xDock_names = new Dictionary<int, string>();
@@ -317,6 +331,7 @@ public class DemandxDockModel
         }
     }
 
+  
     private void Get_xDock()
     {
         for (int j = 0; j < _numOfXdocks; j++)
@@ -334,7 +349,8 @@ public class DemandxDockModel
                     var distance_threshold = _xDocks[j].Get_Distance_Threshold();
                     var demand = 0.0;
                     var already_opened = _xDocks[j].If_Already_Opened();
-                    var cumulative_demand = 0.0;
+                    var adress = _xDocks[j].Get_Adress();
+;                    var cumulative_demand = 0.0;
                     for (int i = 0; i < _numOfCounty; i++)
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
@@ -351,7 +367,7 @@ public class DemandxDockModel
                         }
 
                     }
-                    var x_Dock =new xDocks(city,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
+                    var x_Dock =new xDocks(city,county,region,valueslong,valueslat,distance_threshold,demand,already_opened,adress);
                     new_XDocks.Add(x_Dock);
 
                 }
@@ -428,6 +444,27 @@ public class DemandxDockModel
         }
 
     }
+   private void Get_Distance_Real()
+    {   
+        var from = new Dictionary<string, Double>();
+        
+        for (int i = 0; i < _numOfCounty; i++)
+        {
+            var d_i = new List<double>();
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                var long_1 = _county[i].Get_Longitude();
+                var lat_1 = _county[i].Get_Latitude();
+                var long_2 = _xDocks[j].Get_Longitude();
+                var lat_2 = _xDocks[j].Get_Latitude();                
+                from = api_distances[_county[i].Get_Adress()];
+                var d_ij = from[_xDocks[j].Get_Adress()];
+                d_i.Add(d_ij);
+            }
+            d_real.Add(d_i);
+        }
+
+    }    
 
     private void Get_Num_XDocks()
     {
@@ -454,7 +491,7 @@ public class DemandxDockModel
             c.Add(c_j);
         }
     }
-
+   
     private void Create_Distance_Threshold_Matrix()
     {
         //Create a[i,j] matrix
@@ -477,8 +514,11 @@ public class DemandxDockModel
                 }
             }
             a.Add(a_i);
+         
         }
+        
     }
+   
     private void Create_Distance_Threshold_Seller()
     {   //Create a_seller[i,j] matrix
         for (int i = 0; i < _numOfSeller; i++)
@@ -511,8 +551,7 @@ public class DemandxDockModel
         // AddInitialSolution();
         Solve();
         Create_XDock_Names();
-        Get_xDock();
-        
+        Get_xDock();        
         Get_Hubs();
         Get_Num_XDocks();
         Print();
@@ -605,6 +644,7 @@ public class DemandxDockModel
     private void Get_Parameters()
     {
         Get_Distance_Matrix();
+        Get_Distance_Real();      
         Get_Distance_Matrix_Seller();
         Get_Cost_Parameters();
         Create_Distance_Threshold_Matrix();
@@ -1014,13 +1054,13 @@ public class DemandxDockModel
                     
                 }
             }
-            for (int i = 0; i < _numOfSeller; i++)
+            /*for (int i = 0; i < _numOfSeller; i++)
             {
                 for (int j = 0; j < _numOfXdocks; j++)
                 {
                     _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]);
                 }
-            }
+            }*/
 
         }
         if (_min_xDock_model)

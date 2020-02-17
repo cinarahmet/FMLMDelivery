@@ -19,7 +19,9 @@ public class DemandPoint
 
     private readonly Double _demand;
 
-    public DemandPoint(String city, String id, String region, Double longitude, Double latitude, Double distance_threshold, Double demand)
+    private readonly String _adress;
+
+    public DemandPoint(String city, String id, String region, Double longitude, Double latitude, Double distance_threshold, Double demand, String Adress)
     {
         _city = city;
         _id = id;
@@ -28,6 +30,7 @@ public class DemandPoint
         _latitude = latitude;
         _distance_threshold = distance_threshold;
         _demand = demand;
+        _adress = Adress;
     }
 
    
@@ -65,6 +68,10 @@ public class DemandPoint
     public Double Get_Demand()
     {
         return _demand;
+    }
+    public String Get_Adress()
+    {
+        return _adress;
     }
 }
 

@@ -6,6 +6,7 @@ using System.Text;
 using ILOG.CPLEX;
 using ILOG.Concert;
 using System.Device.Location;
+using ChoETL;
 
 namespace FMLMDelivery
 {
@@ -33,22 +34,7 @@ namespace FMLMDelivery
         /// </summary>
         private Double max_hub_capaticity = 300000;
 
-        /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub in the west side
-        /// </summary>
-        private Double distance_thresholdwest = 200;
-
-        /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub in the middle side
-        /// </summary>
-        private Double distance_thresholdmiddle = 250;
-
-        /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub in the east side
-        /// </summary>
-        private Double distance_thresholdeast = 500;
-
-
+     
         /// <summary>
         /// Number of Xdocks
         /// </summary>
@@ -134,6 +120,10 @@ namespace FMLMDelivery
         /// Revised distance matrix with notion of adding smalle sellers the minimum distance of xdocks and recalculating the seller to hub distance matrix.
         /// </summary>
         private List<List<Double>> d_sellerhub;
+        /// <summary>
+        /// Gets the api distance matrix from google
+        /// </summary>
+        private Dictionary<string, Dictionary<string, Double>> api_distance;
         /// <summary>
         /// 
         /// </summary>
@@ -264,7 +254,7 @@ namespace FMLMDelivery
         private List<Hub> new_hubs;
         private double total_demand_seller;
 
-        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs,List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
+        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs,List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage, Dictionary<string,Dictionary<string,Double>> real_distance, Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
 
             _solver = new Cplex();
@@ -283,6 +273,7 @@ namespace FMLMDelivery
             _demand_weighted = Demandweight;
             _demand_covarage = Demand_Covarage;
             phase_2 = Phase2;
+            api_distance = real_distance;
 
             x = new List<List<INumVar>>();
             s = new List<List<INumVar>>();
@@ -330,7 +321,6 @@ namespace FMLMDelivery
             }
         }
 
-       
 
         private void Get_Distance_Matrix()
         {
@@ -752,9 +742,9 @@ namespace FMLMDelivery
                 if (phase_2)
                 {
                     Demand_Coverage_Constraint();
-                    Seller_Capacity_Constraint();
-                    Seller_Assignment_Constraint();
-                    Seller_Demand_Satisfaction_Constraint();
+                    //Seller_Capacity_Constraint();
+                    //Seller_Assignment_Constraint();
+                    //Seller_Demand_Satisfaction_Constraint();
 
 
                 }
@@ -762,11 +752,11 @@ namespace FMLMDelivery
             }
             if (_min_hub_model)
             {
-                Seller_Capacity_Constraint();
-                Seller_Assignment_Constraint();
+                //Seller_Capacity_Constraint();
+                //Seller_Assignment_Constraint();
                 Demand_Coverage_Constraint();
                 Capacity_Constraint();
-                Seller_Demand_Satisfaction_Constraint();
+                //Seller_Demand_Satisfaction_Constraint();
             }
 
         }
@@ -1077,13 +1067,13 @@ namespace FMLMDelivery
 
                     }
                 }
-                for (int i = 0; i < _numOfSeller; i++)
+                /*for (int i = 0; i < _numOfSeller; i++)
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
                         _objective.AddTerm(s[i][j], d_sellerhub[i][j] * seller_demand[i]);
                     }
-                }
+                }*/
 
 
             }
