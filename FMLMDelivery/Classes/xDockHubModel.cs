@@ -60,6 +60,10 @@ namespace FMLMDelivery
         private readonly Int32 _numOfHubs;
 
         /// <summary>
+        /// Numver of big sellers
+        /// </summary>
+        private readonly Int32 _numOfSellers;
+        /// <summary>
         /// List of xDocks 
         /// </summary>
         private List<xDocks> _xDocks;
@@ -70,10 +74,17 @@ namespace FMLMDelivery
         private List<Hub> _hubs;
 
         /// <summary>
+        /// List of big sellers to be assigned to the hub j
+        /// </summary>
+        private List<Seller> _big_sellers;
+        /// <summary>
         /// x[i, j] € {0,1} denotes whether Xdock i is assigned to hub j
         /// </summary>
         private List<List<INumVar>> x;
-
+        /// <summary>
+        /// s[i, j] € {0,1} denotes whether seller i is assigned to hub j
+        /// </summary>
+        private List<List<INumVar>> s;
         /// <summary>
         /// y[j] € {0,1} denotes whether opened hub on location j
         /// </summary>
@@ -88,6 +99,11 @@ namespace FMLMDelivery
         /// a[i,j] € {0,1} denotes whether xDock i is in the range of hub j.
         /// </summary>
         private List<List<Double>> a;
+
+        /// <summary>
+        /// a_seller[i,j] € {0,1} denotes whether seller i is in the range of hub j.
+        /// </summary>
+        private List<List<Double>> a_seller;
         
         /// <summary>
         /// Linearization variable: Created in order to eliminate arg min cost func. for distances of un-covered xDocks. 
@@ -109,6 +125,11 @@ namespace FMLMDelivery
         /// </summary>
         private List<List<Double>> d;
 
+        /// <summary>
+        /// d_seller[i,j] € {0,1} is the distance matrix for all seller i's and hub j's
+        /// </summary>
+        private List<List<Double>> d_seller;
+        
         /// <summary>
         /// A sufficiently big number
         /// </summary>
@@ -227,7 +248,7 @@ namespace FMLMDelivery
 
 
 
-        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
+        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs,List<Seller> big_sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
 
             _solver = new Cplex();
@@ -235,6 +256,8 @@ namespace FMLMDelivery
             _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
             _xDocks = xDocks;
             _hubs = hubs;
+            _big_sellers = big_sellers;
+            _numOfSellers = _big_sellers.Count;
             _numOfXdocks = xDocks.Count;
             _numOfHubs = hubs.Count;
             _cost_incurred = cost_incurred;
@@ -246,13 +269,16 @@ namespace FMLMDelivery
             phase_2 = Phase2;
 
             x = new List<List<INumVar>>();
+            s = new List<List<INumVar>>();
             y = new List<INumVar>();
             z = new List<INumVar>();
             a = new List<List<Double>>();
+            a_seller = new List<List<Double>>();
             f = new List<List<INumVar>>();
             mu = new List<INumVar>();
             k = new List<INumVar>();
             d = new List<List<double>>();
+            d_seller = new List<List<double>>();
             c = new List<double>();
             country_names = new Dictionary<int, string>();
             x_dock_demand = new List<double>();
@@ -354,6 +380,25 @@ namespace FMLMDelivery
                 d.Add(d_i);
             }
         }
+        private void Get_Distance_Matrix_Seller()
+        {
+            //Calculating the distance matrix for seller
+            for (int i = 0; i < _numOfSellers; i++)
+            {
+                var d_i = new List<double>();
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    var long_1 = _big_sellers[i].Get_Longitude();
+                    var lat_1 = _big_sellers[i].Get_Latitude();
+                    var long_2 = _hubs[j].Get_Longitude();
+                    var lat_2 = _hubs[j].Get_Latitude();
+                    var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+                    d_i.Add(d_ij);
+                }
+                d_seller.Add(d_i);
+            }
+
+        }
 
         public Double GetObjVal()
         {
@@ -396,6 +441,31 @@ namespace FMLMDelivery
                 }
                 a.Add(a_i);
             }
+        }
+        private void Create_Dist_Thresh_Seller()
+        {
+            for (int i = 0; i < _numOfSellers; i++)
+            {
+                var longtitude = _big_sellers[i].Get_Longitude();
+                var threshold = _big_sellers[i].Get_Distance_Threshold();
+                var a_i = new List<Double>();
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+
+                    if (d[i][j] <= threshold)
+                    {
+                        var a_ij = 1;
+                        a_i.Add(a_ij);
+                    }
+                    else
+                    {
+                        var a_ij = 0;
+                        a_i.Add(a_ij);
+                    }
+                }
+                a_seller.Add(a_i);
+            }
+
         }
 
         public void Run()
@@ -547,8 +617,10 @@ namespace FMLMDelivery
         private void Get_Parameters()
         {
             Get_Distance_Matrix();
+            Get_Distance_Matrix_Seller();
             Get_Cost_Parameters();
             Create_Distance_Threshold_Matrix();
+            Create_Dist_Thresh_Seller();
             Get_Demand_Parameters();
             Get_Demand_Weight();
             Get_Total_Demand();
@@ -644,6 +716,39 @@ namespace FMLMDelivery
             {
                 _solver.AddGe(y[j], 0);
             }
+            for (int i = 0; i < _numOfSellers; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    _solver.AddGe(s[i][j], 0);
+                }
+            }
+        }
+        
+        private void Seller_Capacity_Constraint()
+        {
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                var constraint = _solver.LinearNumExpr();
+                for (int i = 0; i < _numOfSellers; i++)
+                {
+                    constraint.AddTerm(s[i][j], a_seller[i][j] * _big_sellers[i].Get_Demand());
+                }
+                constraint.AddTerm(y[j] , -max_hub_capaticity);
+                _solver.AddLe(constraint, 0);
+            }
+        }
+        private void Seller_Demand_Coverage_Constraint()
+        {
+            var constraint = _solver.LinearNumExpr();
+            for (int i = 0; i < _numOfSellers; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    constraint.AddTerm(s[i][j], _big_sellers[i].Get_Demand() * a_seller[i][j]);
+                }
+            }
+            _solver.AddGe(constraint, total_demand_seller * _demand_covarage_seller);
         }
 
         //y[j]*beta <= ∑x[i,j]*a[i,j]*demand[i]
@@ -921,10 +1026,21 @@ namespace FMLMDelivery
                 x.Add(x_i);
             }
 
+            for (int i = 0; i < _numOfSellers; i++)
+            {
+                var s_i = new List<INumVar>();
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    var name = $"s[{i + 1}][{(j + 1)}]";
+                    var x_ij = _solver.NumVar(0, 1, NumVarType.Bool, name);
+                    s_i.Add(x_ij);
+                }
+                s.Add(s_i);
+            }
             //Create y[j] variables
             for (int j = 0; j < _numOfHubs; j++)
             {
-                var name = $"x[{(j + 1)}]";
+                var name = $"y[{(j + 1)}]";
                 var y_j = _solver.NumVar(0, 1, NumVarType.Bool, name);
                 y.Add(y_j);
             }

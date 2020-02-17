@@ -93,13 +93,13 @@ namespace FMLMDelivery
             phase_2 = false;
 
             //xDock-Seller-Hub Assignment
-            var third_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
+            var third_phase = new xDockHubModel(new_xDocks, potential_Hubs, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
             third_phase.Run();
             var num_clusters = third_phase.Return_num_Hubs();
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            third_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+            third_phase = new xDockHubModel(new_xDocks, potential_Hubs, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
             third_phase.Run();
             objVal = third_phase.GetObjVal();
             var new_hubs = third_phase.Return_New_Hubs();
