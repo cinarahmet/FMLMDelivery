@@ -14,21 +14,26 @@ namespace FMLMDelivery
             var xDocks = new List<xDocks>();
             var agency = new List<xDocks>();
             var hubs = new List<Hub>();
+           
 
             //Provide the month index (1-January, 12-December)
             var month = 11;
-            var reader = new CSVReader("Demand_Data.csv", "Potential_Xdock_Data.csv","Potential_Seller_Data", month);
+            var reader = new CSVReader("Demand_Data.csv", "Potential_Xdock_Data.csv","Potential_Seller_Data.csv", month);
             reader.Read();
             demand_point = reader.Get_County();
             potential_xDocks = reader.Get_XDocks();
             agency = reader.Get_Agency();
+            var prior_small_sellers = reader.Get_Prior_Small_Sellers();
+            var regular_small_sellers = reader.Get_Regular_Small_Sellers();
+            var prior_big_sellers = reader.Get_Prior_Big_Sellers();
+            var regular_big_sellers = reader.Get_Regular_Big_Sellers();
 
             String csv = String.Join(Environment.NewLine, demand_point.Select(d => $"{d.Get_Latitude()};{d.Get_Longitude()};{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\test3.csv", csv);
 
 
 
-            var runner = new Runner(demand_point,potential_xDocks,agency);
+            var runner = new Runner(demand_point,potential_xDocks,agency,prior_small_sellers,regular_small_sellers,prior_big_sellers,regular_big_sellers);
             (xDocks , hubs)=runner.Run();
             Console.ReadKey();
         }

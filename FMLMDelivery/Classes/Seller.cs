@@ -10,6 +10,8 @@ public class Seller
 
     private String _Id;
 
+    private Double _priority;
+
     private Double _latitude;
 
     private Double _longitude;
@@ -19,10 +21,11 @@ public class Seller
     private Double _dist_thres;
 
     private String _type;
-    public Seller(String city, String id, String region, Double longitude, Double latitude, Double dist_thres, Double demand, String type)
+    public Seller(String city, String id, String region, Double priority, Double longitude, Double latitude, Double dist_thres, Double demand, String type)
     {
         _city = city;
         _Id = id;
+        _priority = priority;
         _region = region;
         _longitude = longitude;
         _latitude = latitude;
@@ -36,6 +39,12 @@ public class Seller
     {
         return _longitude;
     }
+
+    public Double Get_Priority()
+    {
+        return _priority;
+    }
+
     public Double Get_Latitude()
     {
         return _latitude;

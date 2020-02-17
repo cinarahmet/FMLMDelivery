@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FMLMDelivery;
+using FMLMDelivery.Classes;
 
 namespace FMLMDelivery
 {
@@ -11,12 +12,22 @@ namespace FMLMDelivery
         private List<xDocks> xDocks;
         private List<DemandPoint> county;
         private List<xDocks> agency;
+        private List<Seller> _prior_small_seller;
+        private List<Seller> _prior_big_seller;
+        private List<Seller> _regular_small_seller;
+        private List<Seller> _regular_big_seller;
+        private double total_demand;
 
-        public Runner(List<DemandPoint> _counties, List<xDocks> _xDocks, List<xDocks> _agency)
+
+        public Runner(List<DemandPoint> _counties, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
             xDocks = _xDocks;
             county = _counties;
             agency = _agency;
+            _prior_big_seller = prior_big;
+            _prior_small_seller = prior_small;
+            _regular_big_seller = regular_big;
+            _regular_small_seller = regular_small;
         }
 
        
@@ -51,9 +62,29 @@ namespace FMLMDelivery
             first_phase = new DemandxDockModel(county, xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
+            //xDocks are assigned
             new_xDocks = first_phase.Return_XDock();
             Modify_xDocks(new_xDocks);
             potential_Hubs = first_phase.Return_Potential_Hubs();
+
+
+            //Seller-xDock Assignment
+            total_demand = 0;
+            for (int i = 0; i < _prior_small_seller.Count; i++)
+            {
+                total_demand += _prior_small_seller[i].Get_Demand();
+            }
+
+            var second_phase = new SmallSellerxDockModel(_prior_small_seller,new_xDocks,true);
+            second_phase.Run();
+            var assigned_prior_sellers = second_phase.Return_Assigned_Seller();
+            var covered_demand = second_phase.Return_Covered_Demand();
+            var remaining_demand = total_demand - covered_demand;
+
+            second_phase = new SmallSellerxDockModel(_regular_small_seller, new_xDocks, false, remaining_demand);
+            second_phase.Run();
+            var assigned_regular_sellers = second_phase.Return_Assigned_Seller();
+            var cov_demand = second_phase.Return_Covered_Demand();
 
 
             demand_covarage = 0.90;
@@ -61,16 +92,17 @@ namespace FMLMDelivery
             demand_weighted_model = false;
             phase_2 = false;
 
-            var second_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
-            second_phase.Run();
-            var num_clusters = second_phase.Return_num_Hubs();
+            //xDock-Seller-Hub Assignment
+            var third_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
+            third_phase.Run();
+            var num_clusters = third_phase.Return_num_Hubs();
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            second_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
-            second_phase.Run();
-            objVal = second_phase.GetObjVal();
-            var new_hubs = second_phase.Return_New_Hubs();
+            third_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+            third_phase.Run();
+            objVal = third_phase.GetObjVal();
+            var new_hubs = third_phase.Return_New_Hubs();
             
             
 

@@ -13,9 +13,13 @@ public class CSVReader
 
     private readonly List<xDocks> _agency = new List<xDocks>();
 
-    private readonly List<Seller> _small_seller = new List<Seller>();
+    private readonly List<Seller> _prior_small_seller = new List<Seller>();
 
-    private readonly List<Seller> _big_seller = new List<Seller>();
+    private List<Seller> _regular_small_seller = new List<Seller>();
+
+    private readonly List<Seller> _prior_big_seller = new List<Seller>();
+
+    private List<Seller> _regular_big_seller = new List<Seller>();
 
     private readonly List<Seller> _total_seller = new List<Seller>();
 
@@ -242,24 +246,34 @@ public class CSVReader
                 var seller_city = line[0];
                 var seller_county = line[1];
                 var seller_region = line[2];
-                var seller_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_dist = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_demand = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_size = line[7];
+                var seller_priority = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_dist = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_size = line[8];
                 if (seller_demand <= 1000)
                 {
-
-                    var small_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
-                    _small_seller.Add(small_seller);
-
+                    var small_seller = new Seller(seller_city, seller_county, seller_region, seller_priority, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                    if (seller_priority == 1)
+                    {
+                        _prior_small_seller.Add(small_seller);
+                    }
+                    else
+                    {
+                        _regular_small_seller.Add(small_seller);
+                    }
                 }
                 else
                 {
-                    var big_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
-                    _big_seller.Add(big_seller);
+                    var big_seller = new Seller(seller_city, seller_county,  seller_region, seller_priority,  seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                    if (seller_priority==1)
+                    {
+                        _prior_big_seller.Add(big_seller);
+                    }
+                    _regular_big_seller.Add(big_seller);
                 }
-                var total_seller = new Seller(seller_city, seller_county, seller_region, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                var total_seller = new Seller(seller_city, seller_county,  seller_region, seller_priority, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
                 _total_seller.Add(total_seller);
             }
         }
@@ -281,14 +295,23 @@ public class CSVReader
     {
         return _agency;
     }
-    public List<Seller> Get_Small_Sellers()
+    public List<Seller> Get_Prior_Small_Sellers()
     {
-        return _small_seller;
+        return _prior_small_seller;
     }
-    public List<Seller> Get_Big_Sellers()
+    public List<Seller> Get_Prior_Big_Sellers()
     {
-        return _big_seller;
+        return _prior_big_seller;
     }
+    public List<Seller> Get_Regular_Small_Sellers()
+    {
+        return _regular_small_seller;
+    }
+    public List<Seller> Get_Regular_Big_Sellers()
+    {
+        return _regular_big_seller;
+    }
+
     public List<Seller> Get_Total_Sellers()
     {
         return _total_seller;
