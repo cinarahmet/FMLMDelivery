@@ -70,6 +70,11 @@ namespace FMLMDelivery
         private List<Hub> _hubs;
 
         /// <summary>
+        /// List of sellers
+        /// </summary>
+        private List<Seller> _sellers;
+
+        /// <summary>
         /// x[i, j] € {0,1} denotes whether Xdock i is assigned to hub j
         /// </summary>
         private List<List<INumVar>> x;
@@ -78,6 +83,11 @@ namespace FMLMDelivery
         /// y[j] € {0,1} denotes whether opened hub on location j
         /// </summary>
         private List<INumVar> y;
+
+        /// <summary>
+        /// s[k,j] € {0,1} denotes whether seller k is assigned to hub j
+        /// </summary>
+        private List<INumVar> s;
 
         /// <summary>
         /// z[i] € {0,1} denotes whether xDock i is covered 
