@@ -321,7 +321,7 @@ public class DemandxDockModel
         }
     }
 
-    private void Get_Hubs()
+    private void Get_Potential_Hubs()
     {
         if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
         {
@@ -431,7 +431,7 @@ public class DemandxDockModel
         Solve();
         Create_XDock_Names();
         Get_xDock();
-        Get_Hubs();
+        Get_Potential_Hubs();
         Get_Num_XDocks();
         Print();
         ClearModel();

@@ -93,25 +93,35 @@ namespace FMLMDelivery
             phase_2 = false;
 
             //xDock-Seller-Hub Assignment
-            var third_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
+            var third_phase = new xDockHubModel(new_xDocks, potential_Hubs, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
             third_phase.Run();
             var num_clusters = third_phase.Return_num_Hubs();
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            third_phase = new xDockHubModel(new_xDocks, potential_Hubs, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+            third_phase = new xDockHubModel(new_xDocks, potential_Hubs, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
             third_phase.Run();
             objVal = third_phase.GetObjVal();
             var new_hubs = third_phase.Return_New_Hubs();
-            
+            var assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
             
 
-            String csv = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Latitude()};{d.Get_Longitude()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\test2.csv", csv);
+            String csv = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_Capacity()};{d.Get_Latitude()};{d.Get_Longitude()}"));
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_hubs.csv", csv);
 
             String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_XDocks.csv", csv2);
-            
+
+            String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_prior_small_sellers.csv", csv3);
+
+            String csv4 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_regular_small_sellers.csv", csv4);
+
+            String csv5 = String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_big_sellers.csv", csv5);
+
+
             Console.WriteLine("Hello World!");
             
 

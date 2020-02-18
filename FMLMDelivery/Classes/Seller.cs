@@ -57,7 +57,7 @@ public class Seller
     {
         return _city;
     }
-    public String Get_County()
+    public String Get_Id()
     {
         return _Id;
     }
