@@ -30,6 +30,8 @@ public class CSVReader
     private readonly string _distance_matrix;
 
     private readonly string _id_file;
+
+    private readonly string _id_file_2;
         
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
@@ -38,7 +40,7 @@ public class CSVReader
     private Int32 _month;
 
 
-    public CSVReader(string county_file, string xDock_file, string Seller_file, string distance_matrix, string id_file, Int32 month)
+    public CSVReader(string county_file, string xDock_file, string Seller_file, string distance_matrix, string id_file, string id_file_2, Int32 month)
     {
         _county_file = county_file;
         _xDocks_file = xDock_file;
@@ -46,6 +48,7 @@ public class CSVReader
         _seller_file = Seller_file;
         _distance_matrix = distance_matrix;
         _id_file = id_file;
+        _id_file_2 = id_file_2;
         
     }
 
@@ -156,9 +159,6 @@ public class CSVReader
             }
         }
     }
-
-
-
 
     private void Read_XDock()
     {
@@ -285,7 +285,6 @@ public class CSVReader
         var text = File.ReadAllLines(_distance_matrix);
         var names = new List<String>();
         var names2 = new List<String>();
-
         //List of string that can include demand point seller id etc. and must be unique
         using (var sr = File.OpenText(_id_file))
         {
@@ -294,35 +293,40 @@ public class CSVReader
             {
                 var line = s.Split(',');
                 var ıd = line[0];
-                var ıd2 = line[1];
                 names.Add(ıd);
+                
+            }
+        }
+        using (var sr = File.OpenText(_id_file_2))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(',');
+                var ıd2 = line[0];
                 names2.Add(ıd2);
             }
-
         }
         // Split on `,`, convert to int32, add to array, add to outer array
         var result = text.Select(x => (x.Split(',').Select(Int32.Parse).ToArray())).ToArray();
         
-        for (int i = 0; i < 179; i++)
+        for (int i = 0; i <names.Count ; i++)
         {
             var distancesnew = new Dictionary<string, Double>();
 
-            for (int j = 0; j < 196; j++)
+            for (int j = 0; j < names2.Count; j++)
             {
                 if (!distancesnew.ContainsKey(names2[j]))
                 {
                     distancesnew.Add(names2[j], result[i][j]);
-                }
-
-
+                }                
             }
             if (!distances.ContainsKey(names[i]))
             {
                 distances.Add(names[i], distancesnew);
             }
-
-        }      
-                
+        }    
+              
     }
     public Dictionary<string, Dictionary<string, Double>> Get_Real_Distances()
     {
