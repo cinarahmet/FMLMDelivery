@@ -155,7 +155,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit = 6000;
+    private readonly long _timeLimit =1800;
 
     /// <summary>
     /// Gap limit is given in percentage
@@ -187,7 +187,7 @@ public class DemandxDockModel
     /// <summary>
     /// total number of xDock opened
     /// </summary>
-    private Int32 p;
+    private Double p;
 
     /// <summary>
     /// Demand of each county
@@ -228,9 +228,15 @@ public class DemandxDockModel
 
     private Int32 xDock_count = 0;
 
+    private List<Double> _initial_solution;
+
+    private Boolean _second_part;
+
+    private List<Double> result = new List<Double>();
 
 
-    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Int32 P, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+
+    public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Double P,Boolean second_part, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
@@ -246,6 +252,8 @@ public class DemandxDockModel
         p = P;
         _demand_weighted = Demandweight;
         _demand_covarage = Demand_Covarage;
+        _initial_solution = new List<double>();
+        _second_part = second_part;
 
         x = new List<List<INumVar>>();
         y = new List<INumVar>();
@@ -298,6 +306,7 @@ public class DemandxDockModel
                 if (_solver.GetValue(y[j]) > 0.9)
                 {
                     var city = _xDocks[j].Get_City();
+                    var district = _xDocks[j].Get_District();
                     var county = _xDocks[j].Get_Id();
                     var region = _xDocks[j].Get_Region();
                     var valueslat = _xDocks[j].Get_Latitude();
@@ -312,7 +321,7 @@ public class DemandxDockModel
                             demand += _county[i].Get_Demand();
                         }
                     }
-                    var x_Dock =new xDocks(city,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
+                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
                     new_XDocks.Add(x_Dock);
 
                 }
@@ -328,6 +337,7 @@ public class DemandxDockModel
             for (int i = 0; i < new_XDocks.Count; i++)
             {
                 var city = new_XDocks[i].Get_City();
+                var district = new_XDocks[i].Get_District();
                 var id = new_XDocks[i].Get_Id();
                 var region = new_XDocks[i].Get_Region();
                 var longitude = new_XDocks[i].Get_Longitude();
@@ -335,12 +345,31 @@ public class DemandxDockModel
                 var dist_thres = new_XDocks[i].Get_Distance_Threshold();
                 var capacity = max_hub_capacity;
                 var already_opened = false;
-                var potential_hub = new Hub(city, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
                 potential_Hubs.Add(potential_hub);
 
             }
         }
 
+    }
+
+    private void Get_Opened_xDocks()
+    {
+        for (int j = 0; j < _numOfXdocks; j++)
+        {
+            var value = Math.Round(_solver.GetValue(y[j]));
+            result.Add(value);
+        }
+    }
+
+    public void Provide_Initial_Solution(List<Double> init)
+    {
+        _initial_solution = init;
+    }
+
+    public List<Double> Return_Opened_xDocks()
+    {
+        return result;
     }
 
     public List<Hub> Return_Potential_Hubs()
@@ -355,9 +384,11 @@ public class DemandxDockModel
 
     private void Get_Distance_Matrix()
     {
+        
         //Calculating the distance matrix
         for (int i = 0; i < _numOfCounty; i++)
         {
+            var count = 0;
             var d_i = new List<double>();
             for (int j = 0; j < _numOfXdocks; j++)
             {
@@ -365,6 +396,7 @@ public class DemandxDockModel
                 var lat_1 = _county[i].Get_Latitude();
                 var long_2 = _xDocks[j].Get_Longitude();
                 var lat_2 = _xDocks[j].Get_Latitude();
+                count += 1;
                 var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
                 d_i.Add(d_ij);
             }
@@ -427,14 +459,23 @@ public class DemandxDockModel
     {
         Get_Parameters();
         Build_Model();
-        // AddInitialSolution();
+        if (_second_part)
+        {
+            Add_Initial_Solution();
+        }
         Solve();
+        Get_Opened_xDocks();
         Create_XDock_Names();
         Get_xDock();
         Get_Potential_Hubs();
         Get_Num_XDocks();
         Print();
         ClearModel();
+    }
+
+    private void Add_Initial_Solution()
+    {
+        _solver.AddMIPStart(y.ToArray(), _initial_solution.ToArray());
     }
 
     private void Create_XDock_Names()
@@ -546,7 +587,7 @@ public class DemandxDockModel
         }
     }
 
-    public Int32 Return_Num_Xdock()
+    public Double Return_Num_Xdock()
     {
         return xDock_count;
     }

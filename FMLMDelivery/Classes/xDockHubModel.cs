@@ -483,6 +483,7 @@ namespace FMLMDelivery
                     if (_solver.GetValue(y[j]) > 0.9)
                     {
                         var city = _hubs[j].Get_City();
+                        var district = _hubs[j].Get_District();
                         var id = _hubs[j].Get_Id();
                         var region = _hubs[j].Get_Region();
                         var valueslat = _hubs[j].Get_Latitude();
@@ -505,7 +506,7 @@ namespace FMLMDelivery
                         }
                         var already_opened = _hubs[j].If_Already_Opened();
 
-                        var new_hub = new Hub(city, id, region, valueslong, valueslat, dist, production, already_opened);
+                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist, production, already_opened);
                         new_hubs.Add(new_hub);
                     }
                 }

@@ -8,6 +8,8 @@ public class Hub
 
     private String _city;
 
+    private String _district;
+
     private String _id;
 
     private readonly String _region;
@@ -22,9 +24,10 @@ public class Hub
 
     private readonly Boolean _already_opened;
 
-    public Hub(String city,String id,String region, Double longitude, Double latitude,Double dist_thres, Double capacity, Boolean already_opened)
+    public Hub(String city, String district,String id,String region, Double longitude, Double latitude,Double dist_thres, Double capacity, Boolean already_opened)
     {
         _city = city;
+        _district = district;
         _id = id;
         _region = region;
         _longitude = longitude;
@@ -58,6 +61,11 @@ public class Hub
     public Double Get_Dsitance_Threshold()
     {
         return _dist_thres;
+    }
+
+    public String Get_District()
+    {
+        return _district;
     }
 
     public Double Get_Longitude()

@@ -7,6 +7,8 @@ public class xDocks
 {
     private readonly String _city;
 
+    private readonly String _district;
+
     private readonly String _id;
 
     private readonly String _region;
@@ -23,9 +25,10 @@ public class xDocks
 
     
 
-    public xDocks(String city,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double demand,Boolean already_opened)
+    public xDocks(String city,String district,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double demand,Boolean already_opened)
     {
         _city = city;
+        _district = district; 
         _id = id;
         _region = region;
         _longitude = longitude;
@@ -44,6 +47,11 @@ public class xDocks
     public Double Get_Distance_Threshold()
     {
         return _distance_threshold;
+    }
+
+    public String Get_District()
+    {
+        return _district;
     }
 
     public string Get_City()

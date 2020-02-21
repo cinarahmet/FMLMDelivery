@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using FMLMDelivery;
 using FMLMDelivery.Classes;
+using System.IO;
+
 
 namespace FMLMDelivery
 {
@@ -42,24 +44,27 @@ namespace FMLMDelivery
             var demand_weighted_model = false;
             //Phase 2 takes the solution of min_model as an input and solve same question with demand weighted objective
             var phase_2 = false;
-            var demand_covarage = 0.95;
+            var demand_covarage = 0.88;
             var objVal = 0.0;
             var new_xDocks = new List<xDocks>();
             var potential_Hubs = new List<Hub>();
             var p = 0;
-            var first_phase = new DemandxDockModel(county, xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, p);
+            var first_phase = new DemandxDockModel(county, xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, p,false);
 
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             new_xDocks = first_phase.Return_XDock();
             var min_num = first_phase.Return_Num_Xdock();
+            var opened_xDocks = first_phase.Return_Opened_xDocks();
+
             
 
             //Part 2 for county-xDock pair
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(county, xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num);
+            first_phase = new DemandxDockModel(county, xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num,true);
+            first_phase.Provide_Initial_Solution(opened_xDocks);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             //xDocks are assigned
@@ -107,19 +112,19 @@ namespace FMLMDelivery
             
 
             String csv = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_Capacity()};{d.Get_Latitude()};{d.Get_Longitude()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_hubs.csv", csv);
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_hubs.csv", csv,Encoding.UTF8);
 
             String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_XDocks.csv", csv2);
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_XDocks.csv", csv2, Encoding.UTF8);
 
             String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_prior_small_sellers.csv", csv3);
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_prior_small_sellers.csv", csv3, Encoding.UTF8);
 
-            String csv4 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_regular_small_sellers.csv", csv4);
+            String csv4 = String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_regular_small_sellers.csv", csv4, Encoding.UTF8);
 
             String csv5 = String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_big_sellers.csv", csv5);
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\assigned_big_sellers.csv", csv5, Encoding.UTF8);
 
 
             Console.WriteLine("Hello World!");
