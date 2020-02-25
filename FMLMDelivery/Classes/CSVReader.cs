@@ -40,7 +40,7 @@ public class CSVReader
     {
         _county_file = county_file;
         _xDocks_file = xDock_file;
-        _month = month + 6;
+        _month = month + 7;
         _seller_file = Seller_file;
     }
 
@@ -58,12 +58,15 @@ public class CSVReader
         var value_5 = 30;
         var s_6 = "Karadeniz";
         var value_6 = 30;
+        var s_7 = "Güneydoğu Anadolu";
+        var value_7 = 30;
         region_county_threshold.TryAdd(s_1, value);
         region_county_threshold.TryAdd(s_2, value_2);
         region_county_threshold.TryAdd(s_3, value_3);
         region_county_threshold.TryAdd(s_4, value_4);
         region_county_threshold.TryAdd(s_5, value_5);
         region_county_threshold.TryAdd(s_6, value_6);
+        region_county_threshold.TryAdd(s_7, value_7);
     }
 
     private void Create_xDock_Region_Threshold()
@@ -80,12 +83,15 @@ public class CSVReader
         var value_5 = 320;
         var s_6 = "Karadeniz";
         var value_6 = 300;
+        var s_7 = "Güneydoğu Anadolu";
+        var value_7 = 300;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
         region_xDock_threshold.TryAdd(s_4, value_4);
         region_xDock_threshold.TryAdd(s_5, value_5);
         region_xDock_threshold.TryAdd(s_6, value_6);
+        region_xDock_threshold.TryAdd(s_7, value_7);
     }
 
     public void Read()
@@ -106,14 +112,15 @@ public class CSVReader
             {
                 var line = s.Split(',');
                 var county_City = line[0];
-                var county_ID = line[1];
-                var county_Region = line[2];
-                var type_value = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
+                var county_district = line[1];
+                var county_ID = line[2];
+                var county_Region = line[3];
+                var type_value = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
                 if (!type_value)
                 {
-                    var county_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var county_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                    var county_dis_thres = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                    var county_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var county_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                    var county_dis_thres = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     if (county_dis_thres == 0.0)
                     {
                         county_dis_thres = region_county_threshold[county_Region];
@@ -123,24 +130,30 @@ public class CSVReader
                     {
                         county_Demand = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
                     }
-
-                    var county = new DemandPoint(county_City, county_ID, county_Region, county_long, county_lat, county_dis_thres, county_Demand);
-                    _county.Add(county);
+                    if (county_Demand > 10.0)
+                    {
+                        var county = new DemandPoint(county_City, county_district, county_ID, county_Region, county_long, county_lat, county_dis_thres, county_Demand);
+                        _county.Add(county);
+                    }
 
                     if (Math.Ceiling(Convert.ToDouble(line[_month]) / 4000) > 1)
                     {
                         for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month]) / 4000); i++)
                         {
                             var county_City_ = line[0];
-                            var county_ID_ = line[1] + " " + i;
-                            var county_Region_ = line[2];
-                            var county_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                            var county_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                            var county_dis_thres_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                            var county_district_ = line[1];
+                            var county_ID_ = line[2] + " " + i;
+                            var county_Region_ = line[3];
+                            var county_long_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                            var county_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                            var county_dis_thres_ = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                             var county_Demand_ = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
-
-                            var county_ = new DemandPoint(county_City_, county_ID_, county_Region_, county_long_, county_lat_, county_dis_thres_, county_Demand_);
-                            _county.Add(county_);
+                            if (county_Demand_ > 10.0)
+                            {
+                                var county_ = new DemandPoint(county_City_, county_district_, county_ID_, county_Region_, county_long_, county_lat_, county_dis_thres_, county_Demand_);
+                                _county.Add(county_);
+                            }
+                            
                         }
                     }
                 }
@@ -161,17 +174,18 @@ public class CSVReader
             {
                 var line = s.Split(',');
                 var xDock_City = line[0];
-                var xDock_Id = line[1];
-                var xDock_region = line[2];
-                var type_value = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
-                var xDock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                var xDock_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                var xDock_dist_threshold = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_District = line[1];
+                var xDock_Id = line[2];
+                var xDock_region = line[3];
+                var type_value = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
+                var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                 if (xDock_dist_threshold == 0.0)
                 {
                     xDock_dist_threshold = region_xDock_threshold[xDock_region];
                 }
-                var Already_Opened = Convert.ToDouble(line[7]);
+                var Already_Opened = Convert.ToDouble(line[8]);
                 var xDock_Already_Opened = false;
                 if (Already_Opened == 1.0)
                 {
@@ -183,51 +197,56 @@ public class CSVReader
                 {
                     xDock_Capacity = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
                 }
-
-                var xDock = new xDocks(xDock_City, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened);
-                if (type_value)
+                if (xDock_Capacity > 10.0)
                 {
-                    _agency.Add(xDock);
+                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened);
+                    if (type_value)
+                    {
+                        _agency.Add(xDock);
+                    }
+                    else
+                    {
+                        _xDocks.Add(xDock);
+                    }
                 }
-                else
-                {
-                    _xDocks.Add(xDock);
-                }
-
+                
 
                 if (Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000) > 1)
                 {
                     for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000); i++)
                     {
                         var xDock_city_ = line[0];
-                        var xDock_Id_ = line[1] + " " + i;
-                        var xDock_region_ = line[2];
-                        var type_value_ = Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
-                        var xDock_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                        var xDock_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                        var xDock_dist_threshold_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                        var xDock_district_ = line[1];
+                        var xDock_Id_ = line[2] + " " + i;
+                        var xDock_region_ = line[3];
+                        var type_value_ = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
+                        var xDock_long_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                        var xDock_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                        var xDock_dist_threshold_ = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                         if (xDock_dist_threshold_ == 0.0)
                         {
                             xDock_dist_threshold_ = region_xDock_threshold[xDock_region];
                         }
-                        var Already_Opened_ = Convert.ToDouble(line[7]);
+                        var Already_Opened_ = Convert.ToDouble(line[8]);
                         var xDock_Already_Opened_ = false;
                         if (Already_Opened_ == 1.0)
                         {
                             xDock_Already_Opened_ = true;
                         }
                         var xDock_Capacity_ = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
-
-                        var xDock_ = new xDocks(xDock_city_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_, xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_);
-                        if (type_value_)
+                        if (xDock_Capacity > 10.0)
                         {
-                            _agency.Add(xDock_);
+                            var xDock_ = new xDocks(xDock_city_, xDock_district_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_, xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_);
+                            if (type_value_)
+                            {
+                                _agency.Add(xDock_);
+                            }
+                            else
+                            {
+                                _xDocks.Add(xDock_);
+                            }
                         }
-                        else
-                        {
-                            _xDocks.Add(xDock_);
-                        }
-
+                        
                     }
                 }
 
