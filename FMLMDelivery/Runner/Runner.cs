@@ -29,7 +29,7 @@ namespace FMLMDelivery
             _prior_big_seller = prior_big;
             _prior_small_seller = prior_small;
             _regular_big_seller = regular_big;
-            _regular_small_seller = regular_small;
+            _regular_small_seller = regular_small; 
         }
 
         private Tuple<List<xDocks>, List<Hub>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks)
@@ -99,6 +99,11 @@ namespace FMLMDelivery
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
+
+            var elimination_phase = new PointEliminator(demand_Points, xDocks, 30, 1250);
+            elimination_phase.Run();
+            var eliminated_demand_points = elimination_phase.Return_Candidate_Demand_Points();
+
             var new_xDocks = new List<xDocks>();
             var potential_hub_locations = new List<Hub>();
             var key = "İSTANBUL";
