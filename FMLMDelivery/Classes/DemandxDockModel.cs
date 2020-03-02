@@ -676,7 +676,7 @@ public class DemandxDockModel
             {
                 constraint.AddTerm(x[i][j], a[i][j] * county_demand[i]);
             }
-            if (_xDocks[j].Get_City() == "Istanbul" || _xDocks[j].Get_City() == "Ankara" || _xDocks[j].Get_City() == "Izmir" || _xDocks[j].Get_City() == "Bursa")
+            if (_xDocks[j].Get_City() == "İSTANBUL" || _xDocks[j].Get_City() == "ANKARA" || _xDocks[j].Get_City() == "İZMİR" || _xDocks[j].Get_City() == "BURSA")
             {
                 constraint.AddTerm(y[j], -big_city_min_xDock_capacity);
             }
