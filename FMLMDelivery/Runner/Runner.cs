@@ -70,24 +70,45 @@ namespace FMLMDelivery
             return Tuple.Create(new_xDocks, potential_Hubs);
         }
 
-        private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key)
+        private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key,bool other_cities )
         {
             var city_points = new List<DemandPoint>();
             var pot_xDock_loc = new List<xDocks>();
-            for (int i = 0; i < demand_Points.Count; i++)
+            if (!other_cities)
             {
-                if (demand_Points[i].Get_City() == key)
+                for (int i = 0; i < demand_Points.Count; i++)
                 {
-                    city_points.Add(demand_Points[i]);
+                    if (demand_Points[i].Get_City() == key)
+                    {
+                        city_points.Add(demand_Points[i]);
+                    }
+                }
+                for (int j = 0; j < xDocks.Count; j++)
+                {
+                    if (xDocks[j].Get_City() == key)
+                    {
+                        pot_xDock_loc.Add(xDocks[j]);
+                    }
                 }
             }
-            for (int j = 0; j < xDocks.Count; j++)
+            else
             {
-                if (xDocks[j].Get_City() == key)
+                for (int i = 0; i < demand_Points.Count; i++)
                 {
-                    pot_xDock_loc.Add(xDocks[j]);
+                    if (demand_Points[i].Get_City() != "İSTANBUL" && demand_Points[i].Get_City() != "ANKARA" && demand_Points[i].Get_City() != "İZMİR")
+                    {
+                        city_points.Add(demand_Points[i]);
+                    }
+                }
+                for (int j = 0; j < xDocks.Count; j++)
+                {
+                    if (xDocks[j].Get_City() != "İSTANBUL" && xDocks[j].Get_City() != "ANKARA" && xDocks[j].Get_City() != "İZMİR")
+                    {
+                        pot_xDock_loc.Add(xDocks[j]);
+                    }
                 }
             }
+            
 
             return Tuple.Create(city_points, pot_xDock_loc);
         }
@@ -99,35 +120,59 @@ namespace FMLMDelivery
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
 
-
+            
             var new_xDocks = new List<xDocks>();
             var potential_hub_locations = new List<Hub>();
             var key = "İSTANBUL";
             var city_points = new List<DemandPoint>();
             var pot_xDock_loc = new List<xDocks>();
+            var temp_xDocks = new List<xDocks>();
+            var temp_hubs = new List<Hub>();
 
-            (city_points, pot_xDock_loc) = Get_City_Information(key);
+           
+            
+
+            (city_points, pot_xDock_loc) = Get_City_Information(key,false);
+            
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
             (new_xDocks, potential_hub_locations) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.88);
 
-            var temp_xDocks = new List<xDocks>();
-            var temp_hubs = new List<Hub>();
+            
 
             key = "ANKARA";
-            (city_points, pot_xDock_loc) = Get_City_Information(key);
+            (city_points, pot_xDock_loc) = Get_City_Information(key,false);
+            
+            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
+            elimination_phase.Run();
+            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
+
             (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
 
             key = "İZMİR";
-            (city_points, pot_xDock_loc) = Get_City_Information(key);
+            (city_points, pot_xDock_loc) = Get_City_Information(key,false);
+            
+            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
+            elimination_phase.Run();
+            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
+
             (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
-            
+
+            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
+            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
+            elimination_phase.Run();
+            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.80);
+            new_xDocks.AddRange(temp_xDocks);
+            potential_hub_locations.AddRange(temp_hubs);
+
+
+
             Modify_xDocks(new_xDocks);
             
 
