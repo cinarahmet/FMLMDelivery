@@ -18,7 +18,7 @@ namespace FMLMDelivery
            
 
             //Provide the month index (1-January, 12-December)
-            var month = 6;
+            var month = 10;
             var reader = new CSVReader("Demand_Points.csv", "Potential_Xdocks.csv","Potential_Seller_Data.csv", month);
             reader.Read();
             demand_point = reader.Get_County();

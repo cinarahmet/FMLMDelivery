@@ -5,6 +5,7 @@ using System.Text;
 using ILOG.CPLEX;
 using ILOG.Concert;
 using System.Linq;
+using System.IO;
 
 namespace FMLMDelivery.Classes
 {
@@ -87,7 +88,7 @@ namespace FMLMDelivery.Classes
             {
                 var demand = 0.0;
                 for (int j = 0; j < _num_of_demand_points; j++)
-                {
+                { 
                     if (a[i][j] > 0.9)
                     {
                         demand += _whole_demand_points[j].Get_Demand();
@@ -111,8 +112,23 @@ namespace FMLMDelivery.Classes
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
             Uptade_Candidate_xDocks();
+            Print_Distance_Matrix();
         }
-        
+
+        private void Print_Distance_Matrix()
+        {
+            StreamWriter file = new StreamWriter("C:/Workspace/FMLMDelivery/FMLMDelivery/bin/Debug/netcoreapp2.1" + _whole_demand_points[0].Get_City() + "--dist_matrix--" + ".csv");
+            for (int i = 0; i < _num_of_demand_points; i++)
+            {
+                for (int j = 0; j < _num_of_demand_points; j++)
+                {
+                    file.Write(a[i][j]);
+                    file.Write(",");
+                }
+                file.Write("\n"); // go to next line
+            }
+        }
+
         private void Get_Distance_Matrix()
         {
             //Calculating the distance matrix
