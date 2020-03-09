@@ -17,7 +17,7 @@ namespace FMLMDelivery.Classes
 
         private List<xDocks> _xDocks;
         
-        private Double distance_threshold = 15;
+        private Double distance_threshold = 40;
 
         private List<List<INumVar>> x;
 
@@ -73,6 +73,8 @@ namespace FMLMDelivery.Classes
 
         private Double _remaining_demand;
 
+        private List<String> record = new List<String>();
+
 
         public SmallSellerxDockModel(List<Seller> small_seller, List<xDocks> xDocks,Boolean prior,double remaining_demand = 0)
         {
@@ -90,7 +92,7 @@ namespace FMLMDelivery.Classes
             demand_matrix = new List<double>();
             _assigned_seller = new List<Seller>();
             _remaining_demand = remaining_demand;
-
+            record = new List<String>();
             _num_of_xDocks = _xDocks.Count;
             _num_of_Seller = _small_seller.Count;
 
@@ -177,6 +179,7 @@ namespace FMLMDelivery.Classes
             Solve();
             Calculate_Covered_Demand();
             Assigned_Seller_List();
+            Get_Seller_Csv();
             Print();
             ClearModel();
         }
@@ -218,6 +221,38 @@ namespace FMLMDelivery.Classes
         public double Return_Covered_Demand()
         {
             return covered_demand;
+        }
+
+        public void Get_Seller_Csv()
+
+        {   
+            var count = 0;
+            for (int j = 0; j < _num_of_xDocks; j++)
+            {
+                count += 1;
+                for (int i = 0; i < _num_of_Seller; i++)
+                {
+                    if (_solver.GetValue(x[i][j])>0.9)
+                    {   var xdock_id = "Xdock" + count ;
+                        var xdock_city = _xDocks[j].Get_City();
+                        var xdock_county = _xDocks[j].Get_District();
+                        var xdock_lat = _xDocks[j].Get_Latitude();
+                        var xdock_long = _xDocks[j].Get_Longitude();
+                        var seller_city = _small_seller[i].Get_City();
+                        var seller_ıd = _small_seller[i].Get_Id();
+                        var seller_demand = _small_seller[i].Get_Demand();
+                        var seller_distance = distance_matrix[i][j];
+                        var result = $"{xdock_id},{xdock_city},{xdock_county},{xdock_lat},{xdock_long},{seller_city},{seller_ıd},{seller_distance},{seller_demand}";
+                        record.Add(result);
+                    }
+                }
+                
+                
+            }
+        }
+        public List<String> Get_Seller_Xdock_Info()
+        {
+            return record;
         }
 
         public void ClearModel()

@@ -18,8 +18,8 @@ namespace FMLMDelivery
            
 
             //Provide the month index (1-January, 12-December)
-            var month = 10;
-            var reader = new CSVReader("Demand_Points.csv", "Potential_Xdocks.csv","Potential_Seller_Data.csv", month);
+            var month = 12;
+            var reader = new CSVReader("Demand_Data.csv", "Potential_Xdock_Data.csv", "Potential_Seller_Data.csv", month);
             reader.Read();
             demand_point = reader.Get_County();
             potential_xDocks = reader.Get_XDocks();
@@ -30,7 +30,7 @@ namespace FMLMDelivery
             var regular_big_sellers = reader.Get_Regular_Big_Sellers();
 
             String csv = String.Join(Environment.NewLine, demand_point.Select(d => $"{d.Get_Latitude()};{d.Get_Longitude()};{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\test3.csv", csv);
+            System.IO.File.WriteAllText(@"C:\NETWORK DESIGN\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\test3.csv", csv);
 
 
 
