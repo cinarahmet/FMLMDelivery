@@ -22,7 +22,7 @@ namespace FMLMDelivery
             _header = Header;
             _filename = filename;
             var filepath = @"C:\NETWORK DESIGN\FMLMDelivery\FMLMDelivery\bin\Debug\" + filename + ".csv";
-            _w = new StreamWriter(filepath,true,Encoding.Unicode);
+            _w = new StreamWriter(filepath,false,Encoding.UTF8);
             _w.WriteLine(Header);
         }
 
