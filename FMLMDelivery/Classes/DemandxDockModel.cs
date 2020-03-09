@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using System.IO;
 using ILOG.CPLEX;
 using ILOG.Concert;
 using System.Device.Location;
+using System.Linq;
+using FMLMDelivery;
+
 /// <summary>
 /// IMPORTANT !!!!!!!!!
 /// This model does not differ from other model file, the only difference is this model is modified for county and xDocks rather than xDocks and hubs.
@@ -20,6 +24,7 @@ public class DemandxDockModel
 
 
     private Int32 min_num_county_assigned = 2;
+   
 
     /// <summary>
     /// Min amount that xDock can be opened.
@@ -34,21 +39,7 @@ public class DemandxDockModel
     private Double max_xDock_capaticity = 5000;
 
     private Double max_hub_capacity = 400000;
-
-    /// <summary>
-    /// The maximum distance that a County can be assigned to a xDock in the west side
-    /// </summary>
-    private Double distance_thresholdwest = 15;
-
-    /// <summary>
-    /// The maximum distance that a County can be assigned to a xDock in the middle side
-    /// </summary>
-    private Double distance_thresholdmiddle = 25;
-
-    /// <summary>
-    /// The maximum distance that a County can be assigned to a xDock in the east side
-    /// </summary>
-    private Double distance_thresholdeast = 50;
+    
 
     /// <summary>
     /// Cplex object
@@ -234,6 +225,8 @@ public class DemandxDockModel
 
     private List<Double> result = new List<Double>();
 
+    private  List<String> record_list = new List<String>();
+
 
 
     public DemandxDockModel(List<DemandPoint> Counties, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Double P,Boolean second_part, Boolean cost_incurred = false, Boolean capacity_incurred=false)
@@ -265,6 +258,7 @@ public class DemandxDockModel
         d = new List<List<double>>();
         c = new List<double>();
 
+        record_list = new List<String>();
         xDock_names = new Dictionary<int, string>();
         county_demand = new List<double>();
         new_XDocks = new List<xDocks>();
@@ -469,6 +463,7 @@ public class DemandxDockModel
         Get_xDock();
         Get_Potential_Hubs();
         Get_Num_XDocks();
+        Get_Csv_Information();
         Print();
         ClearModel();
     }
@@ -480,12 +475,14 @@ public class DemandxDockModel
 
     private void Create_XDock_Names()
     {
+        var count = 0;
         for (int j = 0; j < _numOfXdocks; j++)
         {
             if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
             {
                 if (_solver.GetValue(y[j]) > 0.9)
                 {
+                    count += 1;
                     xDock_names.Add(j, _xDocks[j].Get_Id());
                 }
             }
@@ -497,6 +494,43 @@ public class DemandxDockModel
     {
         return xDock_names;
     }
+    private void Get_Csv_Information()
+    {
+        
+        
+        
+        var count = 0;
+        
+        for (int j = 0; j < _xDocks.Count; j++)
+        {
+            if (_solver.GetValue(y[j]) > 0.9)
+            {
+                count += 1;
+                var xdock_city = _xDocks[j].Get_City();
+                var xdock_county = _xDocks[j].Get_District();
+                var xdock_lat = _xDocks[j].Get_Latitude();
+                var xdock_long = _xDocks[j].Get_Longitude();
+                for (int i = 0; i < _county.Count; i++)
+                { var demand_total = new Double();
+                    if (_solver.GetValue(x[i][j]) > 0.9)
+                    {   var x_dockid = "Xdock" + count ;
+                        var district_name = _county[i].Get_District();
+                        demand_total += _county[i].Get_Demand();
+                        var distance_xdock_county = d[i][j];
+                        var result = $"{x_dockid},{xdock_city},{xdock_county},{xdock_lat},{xdock_long},{district_name},{distance_xdock_county},{demand_total}";                                            
+                        record_list.Add(result);
+                    }                    
+                }
+            }
+        }
+                        
+    }
+
+    public List<String> Get_Xdock_County_Info()
+    {
+        return record_list;
+    }
+
 
     private void Print()
     {

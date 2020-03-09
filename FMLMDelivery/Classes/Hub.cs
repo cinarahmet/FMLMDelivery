@@ -58,7 +58,7 @@ public class Hub
         return _region;
     }
 
-    public Double Get_Dsitance_Threshold()
+    public Double Get_Distance_Threshold()
     {
         return _dist_thres;
     }

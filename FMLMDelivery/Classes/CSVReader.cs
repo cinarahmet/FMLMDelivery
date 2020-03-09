@@ -256,7 +256,7 @@ public class CSVReader
     }
     public void Read_Sellers()
     {
-        using (var sr = File.OpenText(_seller_file))
+        using ( var sr = File.OpenText(_seller_file))
         {
             String s = sr.ReadLine();
             while ((s = sr.ReadLine()) != null)

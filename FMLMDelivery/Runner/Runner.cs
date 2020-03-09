@@ -19,7 +19,7 @@ namespace FMLMDelivery
         private List<Seller> _regular_small_seller;
         private List<Seller> _regular_big_seller;
         private double total_demand;
-
+        private List<String> writer_seller = new List<String>();
 
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
@@ -32,7 +32,7 @@ namespace FMLMDelivery
             _regular_small_seller = regular_small; 
         }
 
-        private Tuple<List<xDocks>, List<Hub>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov)
+        private Tuple<List<xDocks>, List<Hub>, List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov)
         {
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
@@ -65,9 +65,8 @@ namespace FMLMDelivery
             objVal = first_phase.GetObjVal();
             //xDocks are assigned
             new_xDocks = first_phase.Return_XDock();
-            potential_Hubs = first_phase.Return_Potential_Hubs();
-
-            return Tuple.Create(new_xDocks, potential_Hubs);
+            potential_Hubs = first_phase.Return_Potential_Hubs();           
+            return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info());
         }
 
         private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key,bool other_cities )
@@ -120,28 +119,30 @@ namespace FMLMDelivery
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
 
-            
+
             var new_xDocks = new List<xDocks>();
+            var writer_xdocks = new List<String>();
             var potential_hub_locations = new List<Hub>();
-            var key = "İSTANBUL";
+            var key = "İZMİR";
             var city_points = new List<DemandPoint>();
             var pot_xDock_loc = new List<xDocks>();
+            var temp_writer = new List<String>();
             var temp_xDocks = new List<xDocks>();
             var temp_hubs = new List<Hub>();
 
-           
-            
 
-            (city_points, pot_xDock_loc) = Get_City_Information(key,false);
-            
-            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
+
+
+            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
+
+            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 1250);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (new_xDocks, potential_hub_locations) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.88);
+            (new_xDocks, potential_hub_locations,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.91);
+            writer_xdocks.AddRange(temp_writer);
 
-            
-
+            /*
             key = "ANKARA";
             (city_points, pot_xDock_loc) = Get_City_Information(key,false);
             
@@ -149,9 +150,11 @@ namespace FMLMDelivery
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
+            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
+            writer_xdocks.AddRange(temp_writer);
+
 
             key = "İZMİR";
             (city_points, pot_xDock_loc) = Get_City_Information(key,false);
@@ -160,21 +163,26 @@ namespace FMLMDelivery
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
+            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
+            writer_xdocks.AddRange(temp_writer);
+
 
             (city_points, pot_xDock_loc) = Get_City_Information(key, true);
             elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
             elimination_phase.Run();
-            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.80);
+            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.80);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
+            writer_xdocks.AddRange(temp_writer);*/
 
-
+            var header_xdock_county = "#Xdock,xDocks City,xDocks İlçe,xDocks_Lat,xDokcs_long,Assigned_ilçe,Uzaklık,İlçe_Demand";
+            var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_county);
+            write_the_xdocks.Write_Records();
 
             Modify_xDocks(new_xDocks);
-            
+
 
             //Seller-xDock Assignment
             total_demand = 0;
@@ -187,12 +195,16 @@ namespace FMLMDelivery
             var assigned_prior_sellers = second_phase.Return_Assigned_Seller();
             var covered_demand = second_phase.Return_Covered_Demand();
             var remaining_demand = total_demand - covered_demand;
+            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
 
             second_phase = new SmallSellerxDockModel(_regular_small_seller, new_xDocks, false, remaining_demand);
             second_phase.Run();
             var assigned_regular_sellers = second_phase.Return_Assigned_Seller();
             var cov_demand = second_phase.Return_Covered_Demand();
-
+            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());           
+            var header = "#Xdock,xDocks City,xDocks İlçe,xDocks_Lat,xDokcs_long, Seller_City,Seller_District,Distance,Seller_Demand";
+            var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
+            writer_small_seller.Write_Records();
 
             var demand_covarage = 0.90;
             var min_model_model = true;
@@ -211,6 +223,10 @@ namespace FMLMDelivery
             var objVal = third_phase.GetObjVal();
             var new_hubs = third_phase.Return_New_Hubs();
             var assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
+            var header_hub = "#Hub,Hub City, Hub County, Hub_Long, Hub_Lat, Type_of_Assignment,City,County,Demand,Distance";
+            var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
+            writer_hub_seller.Write_Records();
+
 
             String csv = String.Join(Environment.NewLine, potential_hub_locations.Select(d => $"{d.Get_Id()};{d.Get_Capacity()};{d.Get_Latitude()};{d.Get_Longitude()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\new_hubs.csv", csv, Encoding.UTF8);

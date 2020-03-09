@@ -34,22 +34,6 @@ namespace FMLMDelivery
         private Double max_hub_capaticity = 4500000;
 
         /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub in the west side
-        /// </summary>
-        private Double distance_thresholdwest = 200;
-
-        /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub in the middle side
-        /// </summary>
-        private Double distance_thresholdmiddle = 250;
-
-        /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub in the east side
-        /// </summary>
-        private Double distance_thresholdeast = 500;
-
-
-        /// <summary>
         /// Number of Xdocks
         /// </summary>
         private readonly Int32 _numOfXdocks;
@@ -262,6 +246,8 @@ namespace FMLMDelivery
 
         private List<Seller> assigned_seller;
 
+        private List<String> records;
+
 
         public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
@@ -302,6 +288,7 @@ namespace FMLMDelivery
             seller_demand = new List<double>();
             new_hubs = new List<Hub>();
             assigned_seller = new List<Seller>();
+            records = new List<String>();
         }
 
         public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -445,6 +432,7 @@ namespace FMLMDelivery
             Get_Num_Hubs();
             Get_new_Hubs();
             Get_Assigned_Sellers();
+            Get_Hub_Xdock_Seller();
             Print();
             ClearModel();
             
@@ -463,7 +451,54 @@ namespace FMLMDelivery
                 }
             }
         }
+        private void Get_Hub_Xdock_Seller()
+        {
+            var count = 0;
+            var count2 = 0;
+            for (int j = 0; j < _hubs.Count; j++)
+            {
+                if (_solver.GetValue(y[j]) > 0.9)
+                {   count+= 1;                
+                    var hub_city = _hubs[j].Get_City();
+                    var hub_district = _hubs[j].Get_District();
+                    var hub_long = _hubs[j].Get_Longitude();
+                    var hub_lat = _hubs[j].Get_Latitude();
 
+                    for (int i = 0; i < _xDocks.Count; i++)
+                    {
+                        if (_solver.GetValue(x[i][j]) > 0.9)
+                        {                            
+                            var type = "xDock";
+                            var xdock_city = _xDocks[i].Get_City();
+                            var xdock_county = _xDocks[i].Get_District();
+                            var xdock_demand = _xDocks[i].Get_Demand();
+                            var xdock_distance = d[i][j];
+                            var result = $"{count},{hub_city},{hub_district},{hub_long},{hub_lat},{type},{xdock_city},{xdock_county},{xdock_demand},{xdock_distance}";
+                            records.Add(result);
+                        }
+                    }
+                    for (int k = 0; k < _sellers.Count; k++)
+                    {
+                        if (_solver.GetValue(s[k][j]) > 0.9)
+                        {
+                            var type = "Big Seller";
+                            var seller_city = _sellers[k].Get_City();
+                            var seller_county = _sellers[k].Get_Id();
+                            var seller_demand = _sellers[k].Get_Demand();
+                            var seller_distance = d_seller[k][j];
+                            var result = $"{count},{hub_city},{hub_district},{hub_long},{hub_lat},{type},{seller_city},{seller_county },{seller_demand},{seller_distance}";
+                            records.Add(result);
+                        }
+                    }
+
+                    
+                }
+            }
+        }
+        public List<String> Get_Hub_Xdock_Seller_Info()
+        {
+            return records;
+        }
         public List<Seller> Return_Assigned_Big_Sellers()
         {
             return assigned_seller;
@@ -488,7 +523,7 @@ namespace FMLMDelivery
                         var region = _hubs[j].Get_Region();
                         var valueslat = _hubs[j].Get_Latitude();
                         var valueslong = _hubs[j].Get_Longitude();
-                        var dist = _hubs[j].Get_Dsitance_Threshold();
+                        var dist = _hubs[j].Get_Distance_Threshold();
                         var production = 0.0;
                         for (int i = 0; i < _numOfXdocks; i++)
                         {
