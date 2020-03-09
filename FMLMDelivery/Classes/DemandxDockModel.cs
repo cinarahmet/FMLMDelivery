@@ -155,7 +155,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =1800;
+    private readonly long _timeLimit =9600;
 
     /// <summary>
     /// Gap limit is given in percentage
@@ -301,7 +301,7 @@ public class DemandxDockModel
         for (int j = 0; j < _numOfXdocks; j++)
         {
 
-            if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
+            if (_status == Cplex.   Status.Feasible || _status == Cplex.Status.Optimal)
             {
                 if (_solver.GetValue(y[j]) > 0.9)
                 {

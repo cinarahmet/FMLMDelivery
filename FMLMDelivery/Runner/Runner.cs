@@ -138,7 +138,7 @@ namespace FMLMDelivery
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (new_xDocks, potential_hub_locations) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.88);
+            (new_xDocks, potential_hub_locations) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
 
             
 
@@ -149,7 +149,7 @@ namespace FMLMDelivery
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
+            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
 
@@ -160,14 +160,25 @@ namespace FMLMDelivery
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
+            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
+            new_xDocks.AddRange(temp_xDocks);
+            potential_hub_locations.AddRange(temp_hubs);
+
+            key = "BURSA";
+            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
+
+            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
+            elimination_phase.Run();
+            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
+
+            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
 
             (city_points, pot_xDock_loc) = Get_City_Information(key, true);
             elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
             elimination_phase.Run();
-            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.80);
+            (temp_xDocks, temp_hubs) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.85);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
 
