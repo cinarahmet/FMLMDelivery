@@ -428,11 +428,14 @@ namespace FMLMDelivery
             Build_Model();
            // AddInitialSolution();
             Solve();
-            Create_Country_Names();
-            Get_Num_Hubs();
-            Get_new_Hubs();
-            Get_Assigned_Sellers();
-            Get_Hub_Xdock_Seller();
+            if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
+            {
+                Create_Country_Names();
+                Get_Num_Hubs();
+                Get_new_Hubs();
+                Get_Assigned_Sellers();
+                Get_Hub_Xdock_Seller();
+            }
             Print();
             ClearModel();
             
@@ -454,14 +457,14 @@ namespace FMLMDelivery
         private void Get_Hub_Xdock_Seller()
         {
             var count = 0;
-            var count2 = 0;
             for (int j = 0; j < _hubs.Count; j++)
             {
                 if (_solver.GetValue(y[j]) > 0.9)
                 {   count+= 1;
-                    var hub_id = "HUB" + count;
+                    var hub_ranking = "HUB" + count;
                     var hub_city = _hubs[j].Get_City();
                     var hub_district = _hubs[j].Get_District();
+                    var hub_id = _hubs[j].Get_Id();
                     var hub_long = _hubs[j].Get_Longitude();
                     var hub_lat = _hubs[j].Get_Latitude();
 
@@ -473,8 +476,9 @@ namespace FMLMDelivery
                             var xdock_city = _xDocks[i].Get_City();
                             var xdock_county = _xDocks[i].Get_District();
                             var xdock_demand = _xDocks[i].Get_Demand();
+                            var xdock_id = _xDocks[i].Get_Id();
                             var xdock_distance = d[i][j];
-                            var result = $"{hub_id},{hub_city},{hub_district},{hub_long},{hub_lat},{type},{xdock_city},{xdock_county},{xdock_demand},{xdock_distance}";
+                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{xdock_city},{xdock_county},{xdock_id},{xdock_demand},{xdock_distance}";
                             records.Add(result);
                         }
                     }
@@ -483,11 +487,13 @@ namespace FMLMDelivery
                         if (_solver.GetValue(s[k][j]) > 0.9)
                         {
                             var type = "Big Seller";
+                            var seller_name = _sellers[k].Get_Name();
+                            var seller_id = _sellers[k].Get_Id();
                             var seller_city = _sellers[k].Get_City();
-                            var seller_county = _sellers[k].Get_Id();
+                            var seller_district = _sellers[k].Get_District();
                             var seller_demand = _sellers[k].Get_Demand();
                             var seller_distance = d_seller[k][j];
-                            var result = $"{hub_id},{hub_city},{hub_district},{hub_long},{hub_lat},{type},{seller_city},{seller_county },{seller_demand},{seller_distance}";
+                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_long},{hub_lat},{type},{seller_name},{seller_id},{seller_city},{seller_district},{seller_demand},{seller_distance}";
                             records.Add(result);
                         }
                     }

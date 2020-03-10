@@ -262,18 +262,19 @@ public class CSVReader
             while ((s = sr.ReadLine()) != null)
             {
                 var line = s.Split(",");
-                var seller_city = line[0];
-                var seller_county = line[1];
-                var seller_region = line[2];
-                var seller_priority = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_name = line[0];
+                var seller_id = line[1];
+                var seller_city = line[2];
+                var seller_district = line[3];
+                var seller_priority = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
                 var seller_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_dist = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_size = line[8];
+                var seller_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_dist = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_demand = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                var seller_size = line[9];
                 if (seller_demand <= 1000)
                 {
-                    var small_seller = new Seller(seller_city, seller_county, seller_region, seller_priority, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                    var small_seller = new Seller(seller_name,seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_dist, seller_demand, seller_size);
                     if (seller_priority == 1)
                     {
                         _prior_small_seller.Add(small_seller);
@@ -285,14 +286,14 @@ public class CSVReader
                 }
                 else
                 {
-                    var big_seller = new Seller(seller_city, seller_county,  seller_region, seller_priority,  seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                    var big_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_dist, seller_demand, seller_size);
                     if (seller_priority==1)
                     {
                         _prior_big_seller.Add(big_seller);
                     }
                     _regular_big_seller.Add(big_seller);
                 }
-                var total_seller = new Seller(seller_city, seller_county,  seller_region, seller_priority, seller_lat, seller_long, seller_dist, seller_demand, seller_size);
+                var total_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_dist, seller_demand, seller_size);
                 _total_seller.Add(total_seller);
             }
         }

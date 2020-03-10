@@ -123,7 +123,7 @@ namespace FMLMDelivery
             var new_xDocks = new List<xDocks>();
             var writer_xdocks = new List<String>();
             var potential_hub_locations = new List<Hub>();
-            var key = "İZMİR";
+            var key = "İSTANBUL";
             var city_points = new List<DemandPoint>();
             var pot_xDock_loc = new List<xDocks>();
             var temp_writer = new List<String>();
@@ -135,22 +135,28 @@ namespace FMLMDelivery
 
             (city_points, pot_xDock_loc) = Get_City_Information(key, true);
 
+            city_points = city_points.Take(0).ToList();
+            pot_xDock_loc = pot_xDock_loc.Take(0).ToList();
+
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 1250);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (new_xDocks, potential_hub_locations,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.91);
+            (new_xDocks, potential_hub_locations,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.75);
             writer_xdocks.AddRange(temp_writer);
 
-            /*
+            
             key = "ANKARA";
             (city_points, pot_xDock_loc) = Get_City_Information(key,false);
-            
+
+            city_points = city_points.Take(100).ToList();
+            pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
+
             elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
+            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.75);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
             writer_xdocks.AddRange(temp_writer);
@@ -158,26 +164,48 @@ namespace FMLMDelivery
 
             key = "İZMİR";
             (city_points, pot_xDock_loc) = Get_City_Information(key,false);
-            
+
+            city_points = city_points.Take(100).ToList();
+            pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
+
             elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
+            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.70);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
             writer_xdocks.AddRange(temp_writer);
 
 
-            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
+            key = "BURSA";
+            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
+
+            city_points = city_points.Take(100).ToList();
+            pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
+
+            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
             elimination_phase.Run();
-            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.80);
+            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
+
+            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.75);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);*/
+            writer_xdocks.AddRange(temp_writer);
 
-            var header_xdock_county = "#Xdock,xDocks City,xDocks İlçe,xDocks_Lat,xDokcs_long,Assigned_ilçe,Uzaklık,İlçe_Demand";
+            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
+
+            city_points = city_points.Take(100).ToList();
+            pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
+
+            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
+            elimination_phase.Run();
+            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.60);
+            new_xDocks.AddRange(temp_xDocks);
+            potential_hub_locations.AddRange(temp_hubs);
+            writer_xdocks.AddRange(temp_writer);
+
+            var header_xdock_county = "#Xdock,xDocks City,xDocks İlçe,xDock ID,xDocks_Lat,xDokcs_long,Assigned_ilçe,Talep Noktası ID,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_county);
             write_the_xdocks.Write_Records();
 
@@ -202,7 +230,7 @@ namespace FMLMDelivery
             var assigned_regular_sellers = second_phase.Return_Assigned_Seller();
             var cov_demand = second_phase.Return_Covered_Demand();
             writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());           
-            var header = "#Xdock,xDocks City,xDocks İlçe,xDocks_Lat,xDokcs_long, Seller_City,Seller_District,Distance,Seller_Demand";
+            var header = "#Xdock,xDocks City,xDocks İlçe,xDocks ID,xDocks_Lat,xDokcs_long, Seller_City,Seller_District,Distance,Seller_Demand";
             var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
             writer_small_seller.Write_Records();
 
@@ -223,7 +251,7 @@ namespace FMLMDelivery
             var objVal = third_phase.GetObjVal();
             var new_hubs = third_phase.Return_New_Hubs();
             var assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-            var header_hub = "#Hub,Hub City, Hub County, Hub_Long, Hub_Lat, Type_of_Assignment,City,County,Demand,Distance";
+            var header_hub = "#Hub,Hub City, Hub County,Hub ID, Hub_Long, Hub_Lat, Type_of_Assignment,City,County,ID,Demand,Distance";
             var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
             writer_hub_seller.Write_Records();
 

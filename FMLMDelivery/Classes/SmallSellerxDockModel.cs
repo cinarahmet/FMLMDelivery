@@ -177,9 +177,12 @@ namespace FMLMDelivery.Classes
             Get_Parameters();
             Build_Model();
             Solve();
-            Calculate_Covered_Demand();
-            Assigned_Seller_List();
-            Get_Seller_Csv();
+            if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
+            {
+                Calculate_Covered_Demand();
+                Assigned_Seller_List();
+                Get_Seller_Csv();
+            }  
             Print();
             ClearModel();
         }
@@ -191,6 +194,7 @@ namespace FMLMDelivery.Classes
 
         private void Assigned_Seller_List()
         {
+
             for (int i = 0; i < _num_of_Seller; i++)
             {
                 for (int j = 0; j < _num_of_xDocks; j++)
@@ -205,17 +209,20 @@ namespace FMLMDelivery.Classes
 
         public void Calculate_Covered_Demand()
         {
-            
-            for (int i = 0; i < _num_of_Seller; i++)
+            if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
             {
-                for (int j = 0; j < _num_of_xDocks; j++)
+                for (int i = 0; i < _num_of_Seller; i++)
                 {
-                    if (_solver.GetValue(x[i][j]) > 0.9)
+                    for (int j = 0; j < _num_of_xDocks; j++)
                     {
-                        covered_demand += _small_seller[i].Get_Demand();
+                        if (_solver.GetValue(x[i][j]) > 0.9)
+                        {
+                            covered_demand += _small_seller[i].Get_Demand();
+                        }
                     }
                 }
             }
+            
         }
 
         public double Return_Covered_Demand()
@@ -233,16 +240,20 @@ namespace FMLMDelivery.Classes
                 for (int i = 0; i < _num_of_Seller; i++)
                 {
                     if (_solver.GetValue(x[i][j])>0.9)
-                    {   var xdock_id = "Xdock" + count ;
+                    {
+                        var xdock_rank = "Xdock" + count ;
                         var xdock_city = _xDocks[j].Get_City();
                         var xdock_county = _xDocks[j].Get_District();
                         var xdock_lat = _xDocks[j].Get_Latitude();
                         var xdock_long = _xDocks[j].Get_Longitude();
+                        var xdock_id = _xDocks[j].Get_Id();
+                        var seller_name = _small_seller[i].Get_Name();
                         var seller_city = _small_seller[i].Get_City();
-                        var seller_ıd = _small_seller[i].Get_Id();
+                        var seller_district = _small_seller[i].Get_District();
+                        var seller_id = _small_seller[i].Get_Id();
                         var seller_demand = _small_seller[i].Get_Demand();
                         var seller_distance = distance_matrix[i][j];
-                        var result = $"{xdock_id},{xdock_city},{xdock_county},{xdock_lat},{xdock_long},{seller_city},{seller_ıd},{seller_distance},{seller_demand}";
+                        var result = $"{xdock_rank},{xdock_city},{xdock_county},{xdock_id},{xdock_lat},{xdock_long},{seller_name},{seller_id},{seller_city},{seller_district},{seller_distance},{seller_demand}";
                         record.Add(result);
                     }
                 }

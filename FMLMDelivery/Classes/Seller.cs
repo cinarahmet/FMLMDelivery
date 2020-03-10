@@ -4,11 +4,13 @@ using System.Text;
 
 public class Seller
 {
-    private String _city;
-
-    private String _region;
+    private String _name;
 
     private String _Id;
+
+    private String _city;
+
+    private String _district;
 
     private Double _priority;
 
@@ -21,18 +23,29 @@ public class Seller
     private Double _dist_thres;
 
     private String _type;
-    public Seller(String city, String id, String region, Double priority, Double longitude, Double latitude, Double dist_thres, Double demand, String type)
+    public Seller(String name,String city, String id, String region, Double priority, Double longitude, Double latitude, Double dist_thres, Double demand, String type)
     {
+        _name = name;
         _city = city;
         _Id = id;
         _priority = priority;
-        _region = region;
+        _district = region;
         _longitude = longitude;
         _latitude = latitude;
         _dist_thres = dist_thres;
         _demand = demand;
         _type = type;
 
+    }
+
+    public String Get_Name()
+    {
+        return _name;
+    }
+
+    public String Get_District()
+    {
+        return _district;
     }
 
     public Double Get_Longitude()
@@ -63,7 +76,7 @@ public class Seller
     }
     public String Get_Region()
     {
-        return _region;
+        return _district;
     }
     public Double Get_Distance_Threshold()
     {

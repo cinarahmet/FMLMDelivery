@@ -64,7 +64,7 @@ public class DemandxDockModel
     /// <summary>
     /// List of County
     /// </summary>
-    private List<DemandPoint> _county;
+    private List<DemandPoint> _demandpoint;
 
     /// <summary>
     /// x[i, j] € {0,1} denotes whether county i is assigned to xDock j
@@ -235,7 +235,7 @@ public class DemandxDockModel
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
         _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
         _xDocks = xDocks;
-        _county = Counties;
+        _demandpoint = Counties;
         _numOfXdocks = xDocks.Count;
         _numOfCounty = Counties.Count;
         _cost_incurred = cost_incurred;
@@ -312,7 +312,7 @@ public class DemandxDockModel
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
                         {
-                            demand += _county[i].Get_Demand();
+                            demand += _demandpoint[i].Get_Demand();
                         }
                     }
                     var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
@@ -386,8 +386,8 @@ public class DemandxDockModel
             var d_i = new List<double>();
             for (int j = 0; j < _numOfXdocks; j++)
             {
-                var long_1 = _county[i].Get_Longitude();
-                var lat_1 = _county[i].Get_Latitude();
+                var long_1 = _demandpoint[i].Get_Longitude();
+                var lat_1 = _demandpoint[i].Get_Latitude();
                 var long_2 = _xDocks[j].Get_Longitude();
                 var lat_2 = _xDocks[j].Get_Latitude();
                 count += 1;
@@ -429,8 +429,8 @@ public class DemandxDockModel
         //Create a[i,j] matrix
         for (int i = 0; i < _numOfCounty; i++)
         {
-            var longtitude = _county[i].Get_Longitude();
-            var threshold = _county[i].Get_Distance_Threshold();
+            var longtitude = _demandpoint[i].Get_Longitude();
+            var threshold = _demandpoint[i].Get_Distance_Threshold();
             var a_i = new List<Double>();
             for (int j = 0; j < _numOfXdocks; j++)
             {
@@ -458,19 +458,26 @@ public class DemandxDockModel
             Add_Initial_Solution();
         }
         Solve();
-        Get_Opened_xDocks();
-        Create_XDock_Names();
-        Get_xDock();
-        Get_Potential_Hubs();
-        Get_Num_XDocks();
-        Get_Csv_Information();
+        if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
+        {
+            Get_Opened_xDocks();
+            Create_XDock_Names();
+            Get_xDock();
+            Get_Potential_Hubs();
+            Get_Num_XDocks();
+            Get_Csv_Information();
+        }
         Print();
         ClearModel();
     }
 
     private void Add_Initial_Solution()
     {
-        _solver.AddMIPStart(y.ToArray(), _initial_solution.ToArray());
+        if (_initial_solution.Count > 0)
+        {
+            _solver.AddMIPStart(y.ToArray(), _initial_solution.ToArray());
+        }
+        
     }
 
     private void Create_XDock_Names()
@@ -495,10 +502,7 @@ public class DemandxDockModel
         return xDock_names;
     }
     private void Get_Csv_Information()
-    {
-        
-        
-        
+    {                      
         var count = 0;
         
         for (int j = 0; j < _xDocks.Count; j++)
@@ -510,14 +514,16 @@ public class DemandxDockModel
                 var xdock_county = _xDocks[j].Get_District();
                 var xdock_lat = _xDocks[j].Get_Latitude();
                 var xdock_long = _xDocks[j].Get_Longitude();
-                for (int i = 0; i < _county.Count; i++)
-                { var demand_total = new Double();
+                var xdock_id = _xDocks[j].Get_Id();
+                for (int i = 0; i < _demandpoint.Count; i++)
+                { 
                     if (_solver.GetValue(x[i][j]) > 0.9)
-                    {   var x_dockid = "Xdock" + count ;
-                        var district_name = _county[i].Get_District();
-                        demand_total += _county[i].Get_Demand();
+                    {   var x_dock_ranking = "Xdock" + count ;
+                        var district_name = _demandpoint[i].Get_District();
+                        var demand_point_id = _demandpoint[i].Get_Id();
+                        var demand = _demandpoint[i].Get_Demand();
                         var distance_xdock_county = d[i][j];
-                        var result = $"{x_dockid},{xdock_city},{xdock_county},{xdock_lat},{xdock_long},{district_name},{distance_xdock_county},{demand_total}";                                            
+                        var result = $"{x_dock_ranking},{xdock_city},{xdock_county},{xdock_id},{xdock_lat},{xdock_long},{district_name},{demand_point_id},{distance_xdock_county},{demand}";                                            
                         record_list.Add(result);
                     }                    
                 }
@@ -616,7 +622,7 @@ public class DemandxDockModel
     {
         for (int i = 0; i < _numOfCounty; i++)
         {
-            var d_i = _county[i].Get_Demand();
+            var d_i = _demandpoint[i].Get_Demand();
             county_demand.Add(d_i);
         }
     }

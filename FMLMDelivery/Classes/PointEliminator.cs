@@ -112,12 +112,12 @@ namespace FMLMDelivery.Classes
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
             Uptade_Candidate_xDocks();
-            Print_Distance_Matrix();
+          //  Print_Distance_Matrix();
         }
 
         private void Print_Distance_Matrix()
         {
-            StreamWriter file = new StreamWriter("C:/NETWORK DESIGN/FMLMDelivery/FMLMDelivery/bin/Debug/netcoreapp2.1" + _whole_demand_points[0].Get_City() + "--dist_matrix--" + ".csv");
+            StreamWriter file = new StreamWriter("C:/Workspace/FMLMDelivery/FMLMDelivery/bin/Debug" + _whole_demand_points[0].Get_City() + "--dist_matrix--" + ".csv");
             for (int i = 0; i < _num_of_demand_points; i++)
             {
                 for (int j = 0; j < _num_of_demand_points; j++)
