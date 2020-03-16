@@ -19,7 +19,19 @@ namespace FMLMDelivery
         private List<Seller> _regular_small_seller;
         private List<Seller> _regular_big_seller;
         private double total_demand;
+        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA ", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR ", "BURSA ","ANTALYA " });
         private List<String> writer_seller = new List<String>();
+        private List<xDocks>  new_xDocks = new List<xDocks>();
+        private List<Hub> potential_hub_locations = new List<Hub>();
+        private List<String> writer_xdocks = new List<string>();
+        private List<DemandPoint> city_points = new List<DemandPoint>();
+        private List<xDocks> pot_xDock_loc = new List<xDocks>();
+        private List<String> temp_writer = new List<String>();
+        private List<xDocks> temp_xDocks = new List<xDocks>();
+        private List<Hub> temp_hubs = new List<Hub>();
+
+        
+
 
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
@@ -94,23 +106,39 @@ namespace FMLMDelivery
             {
                 for (int i = 0; i < demand_Points.Count; i++)
                 {
-                    if (demand_Points[i].Get_Region() == key && demand_Points[i].Get_City() != "İSTANBUL ASYA" && demand_Points[i].Get_City() != "İSTANBUL AVRUPA" && demand_Points[i].Get_City() != "ANKARA " && demand_Points[i].Get_City() != "İZMİR " && demand_Points[i].Get_City() != "BURSA ")
+                    var already_assigned = false;
+                    for (int j = 0; j < partial_run_cities.Count; j++)
+                    {
+                        if (demand_Points[i].Get_City() == partial_run_cities[j])
+                        {
+                            already_assigned = true;
+                        }
+                    }
+                    if (demand_Points[i].Get_Region() == key && !already_assigned)
                     {
                         city_points.Add(demand_Points[i]);
                     }
                 }
                 for (int j = 0; j < xDocks.Count; j++)
                 {
-                    if (key == "İç Anadolu")
+                    var already_assigned = false;
+                    for (int k = 0; k < partial_run_cities.Count; k++)
                     {
-                        if (xDocks[j].Get_Region() == "İçAnadolu" && xDocks[j].Get_City() != "İSTANBUL ASYA" && xDocks[j].Get_City() != "İSTANBUL AVRUPA" && xDocks[j].Get_City() != "ANKARA " && xDocks[j].Get_City() != "İZMİR " && xDocks[j].Get_City() != "BURSA ")
+                        if (xDocks[j].Get_City() == partial_run_cities[k])
+                        {
+                            already_assigned = true;
+                        }
+                    }
+                    if (key == "İç Anadolu" )
+                    {
+                        if (xDocks[j].Get_Region() == "İçAnadolu" && !already_assigned)
                         {
                             pot_xDock_loc.Add(xDocks[j]);
                         }
                     }
                     else
                     {
-                        if (xDocks[j].Get_Region() == key && xDocks[j].Get_City() != "İSTANBUL ASYA" && xDocks[j].Get_City() != "İSTANBUL AVRUPA" && xDocks[j].Get_City() != "ANKARA " && xDocks[j].Get_City() != "İZMİR " && xDocks[j].Get_City() != "BURSA ")
+                        if (xDocks[j].Get_Region() == key && !already_assigned)
                         {
                             pot_xDock_loc.Add(xDocks[j]);
                         }
@@ -122,6 +150,20 @@ namespace FMLMDelivery
             return Tuple.Create(city_points, pot_xDock_loc);
         }
 
+        private void Partial_Run(string key, bool partial_city_run, double distance_threshold, double min_xDock_capacity, double demand_coverage)
+        {
+            (city_points, pot_xDock_loc) = Get_City_Information(key, partial_city_run);
+            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, distance_threshold, min_xDock_capacity);
+            elimination_phase.Run();
+            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
+
+            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage);
+            new_xDocks.AddRange(temp_xDocks);
+            potential_hub_locations.AddRange(temp_hubs);
+            writer_xdocks.AddRange(temp_writer);
+        }
+
+
         public Tuple<List<xDocks>, List<Hub>> Run()
         {
             /* This method firstly calls Demand-xDock model with the minimum xDock objective in given demand covarage. After solving the model with this object, the method takes the number of xDock
@@ -129,175 +171,20 @@ namespace FMLMDelivery
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
 
-
-            var new_xDocks = new List<xDocks>();
-            var writer_xdocks = new List<String>();
-            var potential_hub_locations = new List<Hub>();
-            var key = "ANKARA ";
-            var city_points = new List<DemandPoint>();
-            var pot_xDock_loc = new List<xDocks>();
-            var temp_writer = new List<String>();
-            var temp_xDocks = new List<xDocks>();
-            var temp_hubs = new List<Hub>();
-
-
-
-
-            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
-
-            // city_points = city_points.Take(0).ToList();
-            // pot_xDock_loc = pot_xDock_loc.Take(0).ToList();
-
-            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
-            elimination_phase.Run();
-            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-
-            (new_xDocks, potential_hub_locations, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
-            writer_xdocks.AddRange(temp_writer);
-
-
-            String csv = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_Latitude()};{d.Get_Longitude()};{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\ankara.csv", csv, Encoding.UTF8);
-
-            key = "İSTANBUL AVRUPA";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
-
-            //  city_points = city_points.Take(100).ToList();
-            //  pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
-            elimination_phase.Run();
-            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-            key = "İSTANBUL ASYA";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
-
-            //  city_points = city_points.Take(100).ToList();
-            //  pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-
-            elimination_phase.Run();
-            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-
-            key = "İZMİR ";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
-
-            //   city_points = city_points.Take(100).ToList();
-            //  pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
-            elimination_phase.Run();
-            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-
-            key = "BURSA ";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, false);
-
-            //   city_points = city_points.Take(100).ToList();
-            //   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 20, 2500);
-            elimination_phase.Run();
-            pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.95);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-            key = "Akdeniz";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
-
-         //   city_points = city_points.Take(100).ToList();
-         //   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
-            elimination_phase.Run();
-            (temp_xDocks, temp_hubs,temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-            key = "Ege";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
-
-            //   city_points = city_points.Take(100).ToList();
-            //   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
-            elimination_phase.Run();
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.67);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-            key = "Güneydoğu Anadolu";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
-
-            //   city_points = city_points.Take(100).ToList();
-            //   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
-            elimination_phase.Run();
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-            key = "İç Anadolu";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
-
-            //   city_points = city_points.Take(100).ToList();
-            //   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
-            elimination_phase.Run();
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.90);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
-
-            //key = "Karadeniz";
-            //(city_points, pot_xDock_loc) = Get_City_Information(key, true);
-
-            ////   city_points = city_points.Take(100).ToList();
-            ////   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            //elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
-            //elimination_phase.Run();
-            //(temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.80);
-            //new_xDocks.AddRange(temp_xDocks);
-            //potential_hub_locations.AddRange(temp_hubs);
-            //writer_xdocks.AddRange(temp_writer);
-
-            key = "Marmara";
-            (city_points, pot_xDock_loc) = Get_City_Information(key, true);
-
-            //   city_points = city_points.Take(100).ToList();
-            //   pot_xDock_loc = pot_xDock_loc.Take(100).ToList();
-
-            elimination_phase = new PointEliminator(city_points, pot_xDock_loc, 30, 1250);
-            elimination_phase.Run();
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, 0.75);
-            new_xDocks.AddRange(temp_xDocks);
-            potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
+            
+            Partial_Run("ANKARA ", false, 20, 2500, 0.95);
+            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
+            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95);
+            Partial_Run("İZMİR ", false, 20, 2500, 0.90);
+            Partial_Run("BURSA ", false, 20, 2500, 0.95);
+            Partial_Run("ANTALYA ", true, 20, 2500, 0.90);
+            Partial_Run("Akdeniz", true, 30, 1250, 0.90);
+            Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
+            Partial_Run("Ege", true, 30, 1250, 0.67);
+            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
+            
+            // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
+            Partial_Run("Marmara", true, 30, 1250, 0.75);
 
             var header_xdock_county = "#Xdock,xDocks City,xDocks İlçe,xDock ID,xDocks_Lat,xDokcs_long,Assigned_ilçe,Talep Noktası ID,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_county);
