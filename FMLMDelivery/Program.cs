@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using FMLMDelivery;
 
 
@@ -19,7 +20,7 @@ namespace FMLMDelivery
 
             //Provide the month index (1-January, 12-December)
             var month = 10;
-            var reader = new CSVReader("Demand_Points.csv", "Potential_Xdocks.csv", "Potential_Seller_Data_New.csv", month);
+            var reader = new CSVReader("Demand_Points.csv", "Potential_Xdocks.csv", "Potential_Seller_Data_2019_Ty.csv", month);
             reader.Read();
             demand_point = reader.Get_County();
             potential_xDocks = reader.Get_XDocks();
@@ -33,6 +34,7 @@ namespace FMLMDelivery
             var runner = new Runner(demand_point,potential_xDocks,agency,prior_small_sellers,regular_small_sellers,prior_big_sellers,regular_big_sellers);
             (xDocks , hubs)=runner.Run();
             Console.ReadKey();
+
         }
     }
 }

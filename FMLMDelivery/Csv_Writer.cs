@@ -21,7 +21,7 @@ namespace FMLMDelivery
             _records = records_of_outcomes;
             _header = Header;
             _filename = filename;
-            var filepath = @"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\" + filename + ".csv";
+            var filepath = @"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\" + filename + ".csv";
             _w = new StreamWriter(filepath,false,Encoding.UTF8);
             _w.WriteLine(Header);
         }

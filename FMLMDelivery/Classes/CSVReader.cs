@@ -72,19 +72,19 @@ public class CSVReader
     private void Create_xDock_Region_Threshold()
     {
         var s_1 = "Akdeniz";
-        var value = 320;
+        var value = 180;
         var s_2 = "Marmara";
-        var value_2 = 300;
+        var value_2 = 150;
         var s_3 = "İçAnadolu";
-        var value_3 = 300;
+        var value_3 = 180;
         var s_4 = "Ege";
-        var value_4 = 300;
+        var value_4 = 180;
         var s_5 = "Güneydoğu";
         var value_5 = 320;
         var s_6 = "Karadeniz";
-        var value_6 = 300;
+        var value_6 = 320;
         var s_7 = "Güneydoğu Anadolu";
-        var value_7 = 300;
+        var value_7 = 320;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
@@ -195,7 +195,11 @@ public class CSVReader
                 var xDock_Capacity = Convert.ToDouble(line[_month + 1]);
                 if (xDock_Capacity != 0.0)
                 {
-                    xDock_Capacity = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
+                    if (!type_value)
+                    {
+                        xDock_Capacity = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
+                    }
+                    
                 }
                 if (xDock_Capacity > 10.0)
                 {
@@ -211,7 +215,7 @@ public class CSVReader
                 }
                 
 
-                if (Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000) > 1)
+                if ((Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000) > 1) && !type_value )
                 {
                     for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000); i++)
                     {
