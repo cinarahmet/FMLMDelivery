@@ -511,7 +511,7 @@ public class DemandxDockModel
             {
                 count += 1;
                 var xdock_city = _xDocks[j].Get_City();
-                var xdock_county = _xDocks[j].Get_District();
+                var xdock_district = _xDocks[j].Get_District();
                 var xdock_lat = _xDocks[j].Get_Latitude();
                 var xdock_long = _xDocks[j].Get_Longitude();
                 var xdock_id = _xDocks[j].Get_Id();
@@ -523,7 +523,7 @@ public class DemandxDockModel
                         var demand_point_id = _demandpoint[i].Get_Id();
                         var demand = _demandpoint[i].Get_Demand();
                         var distance_xdock_county = d[i][j];
-                        var result = $"{x_dock_ranking},{xdock_city},{xdock_county},{xdock_id},{xdock_lat},{xdock_long},{district_name},{demand_point_id},{distance_xdock_county},{demand}";                                            
+                        var result = $"{x_dock_ranking},{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{district_name},{demand_point_id},{distance_xdock_county},{demand}";                                            
                         record_list.Add(result);
                     }                    
                 }

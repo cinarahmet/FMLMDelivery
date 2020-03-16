@@ -243,7 +243,7 @@ namespace FMLMDelivery.Classes
                     {
                         var xdock_rank = "Xdock" + count ;
                         var xdock_city = _xDocks[j].Get_City();
-                        var xdock_county = _xDocks[j].Get_District();
+                        var xdock_district = _xDocks[j].Get_District();
                         var xdock_lat = _xDocks[j].Get_Latitude();
                         var xdock_long = _xDocks[j].Get_Longitude();
                         var xdock_id = _xDocks[j].Get_Id();
@@ -253,7 +253,7 @@ namespace FMLMDelivery.Classes
                         var seller_id = _small_seller[i].Get_Id();
                         var seller_demand = _small_seller[i].Get_Demand();
                         var seller_distance = distance_matrix[i][j];
-                        var result = $"{xdock_rank},{xdock_city},{xdock_county},{xdock_id},{xdock_lat},{xdock_long},{seller_name},{seller_id},{seller_city},{seller_district},{seller_distance},{seller_demand}";
+                        var result = $"{xdock_rank},{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{seller_name},{seller_city},{seller_district},{seller_distance},{seller_demand}";
                         record.Add(result);
                     }
                 }

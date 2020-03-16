@@ -23,13 +23,13 @@ public class Seller
     private Double _dist_thres;
 
     private String _type;
-    public Seller(String name,String city, String id, String region, Double priority, Double longitude, Double latitude, Double dist_thres, Double demand, String type)
+    public Seller(String name, String id, String city, String district, Double priority, Double longitude, Double latitude, Double demand, Double dist_thres, String type)
     {
         _name = name;
         _city = city;
         _Id = id;
         _priority = priority;
-        _district = region;
+        _district = district;
         _longitude = longitude;
         _latitude = latitude;
         _dist_thres = dist_thres;
