@@ -457,6 +457,7 @@ namespace FMLMDelivery
         private void Get_Hub_Xdock_Seller()
         {
             var count = 0;
+            var count2 = 0;
             for (int j = 0; j < _hubs.Count; j++)
             {
                 if (_solver.GetValue(y[j]) > 0.9)
@@ -470,30 +471,33 @@ namespace FMLMDelivery
 
                     for (int i = 0; i < _xDocks.Count; i++)
                     {
+                        count2 += 1;
                         if (_solver.GetValue(x[i][j]) > 0.9)
                         {                            
                             var type = "xDock";
+                            var number_of_xdock = "xDock" + count2;
                             var xdock_city = _xDocks[i].Get_City();
                             var xdock_county = _xDocks[i].Get_District();
                             var xdock_demand = _xDocks[i].Get_Demand();
                             var xdock_id = _xDocks[i].Get_Id();
                             var xdock_distance = d[i][j];
-                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{xdock_city},{xdock_county},{xdock_id},{xdock_demand},{xdock_distance}";
+                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{number_of_xdock},{xdock_city},{xdock_county},{xdock_id},{xdock_demand},{xdock_distance}";
                             records.Add(result);
                         }
                     }
+                    count2 = 0;
                     for (int k = 0; k < _sellers.Count; k++)
                     {
                         if (_solver.GetValue(s[k][j]) > 0.9)
                         {
                             var type = "Big Seller";
                             var seller_name = _sellers[k].Get_Name();
-                            var seller_id = _sellers[k].Get_Id();
-                            var seller_city = _sellers[k].Get_City();
                             var seller_district = _sellers[k].Get_District();
+                            var seller_city = _sellers[k].Get_City();
+                            var seller_id = "";
                             var seller_demand = _sellers[k].Get_Demand();
                             var seller_distance = d_seller[k][j];
-                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_long},{hub_lat},{type},{seller_name},{seller_id},{seller_city},{seller_district},{seller_demand},{seller_distance}";
+                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{seller_name},{seller_city},{seller_district},{seller_id},{seller_demand},{seller_distance}";
                             records.Add(result);
                         }
                     }
