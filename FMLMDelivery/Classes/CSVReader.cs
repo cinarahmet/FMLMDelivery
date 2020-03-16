@@ -7,7 +7,7 @@ using FMLMDelivery;
 
 public class CSVReader
 {
-    private readonly List<DemandPoint> _county = new List<DemandPoint>();
+    private readonly List<DemandPoint> _demand_point = new List<DemandPoint>();
 
     private readonly List<xDocks> _xDocks = new List<xDocks>();
 
@@ -23,7 +23,7 @@ public class CSVReader
 
     private readonly List<Seller> _total_seller = new List<Seller>();
 
-    private readonly string _county_file;
+    private readonly string _demand_point_file;
 
     private readonly string _xDocks_file;
 
@@ -38,7 +38,7 @@ public class CSVReader
 
     public CSVReader(string county_file, string xDock_file, string Seller_file, Int32 month)
     {
-        _county_file = county_file;
+        _demand_point_file = county_file;
         _xDocks_file = xDock_file;
         _month = month + 7;
         _seller_file = Seller_file;
@@ -105,53 +105,53 @@ public class CSVReader
 
     private void Read_Demand_Point()
     {
-        using (var sr = File.OpenText(_county_file))
+        using (var sr = File.OpenText(_demand_point_file))
         {
             String s = sr.ReadLine();
             while ((s = sr.ReadLine()) != null)
             {
                 var line = s.Split(',');
-                var county_City = line[0];
-                var county_district = line[1];
-                var county_ID = line[2];
-                var county_Region = line[3];
+                var demand_point_City = line[0];
+                var demand_point_district = line[1];
+                var demand_point_ID = line[2];
+                var demand_point_region = line[3];
                 var type_value = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
                 if (!type_value)
                 {
-                    var county_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                    var county_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                    var county_dis_thres = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
-                    if (county_dis_thres == 0.0)
+                    var demand_point_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var demand_point_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                    var demand_point_dis_thres = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                    if (demand_point_dis_thres == 0.0)
                     {
-                        county_dis_thres = region_county_threshold[county_Region];
+                        demand_point_dis_thres = region_county_threshold[demand_point_region];
                     }
-                    var county_Demand = Convert.ToDouble(line[_month]);
-                    if (county_Demand != 0.0)
+                    var demand_point_Demand = Convert.ToDouble(line[_month]);
+                    if (demand_point_Demand != 0.0)
                     {
-                        county_Demand = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
+                        demand_point_Demand = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
                     }
-                    if (county_Demand > 10.0)
+                    if (demand_point_Demand > 10.0)
                     {
-                        var county = new DemandPoint(county_City, county_district, county_ID, county_Region, county_long, county_lat, county_dis_thres, county_Demand);
-                        _county.Add(county);
+                        var demand_point = new DemandPoint(demand_point_City, demand_point_district, demand_point_ID, demand_point_region, demand_point_long, demand_point_lat, demand_point_dis_thres, demand_point_Demand);
+                        _demand_point.Add(demand_point);
                     }
 
                     if (Math.Ceiling(Convert.ToDouble(line[_month]) / 4000) > 1)
                     {
                         for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month]) / 4000); i++)
                         {
-                            var county_City_ = line[0];
-                            var county_district_ = line[1];
-                            var county_ID_ = line[2] + " " + i;
-                            var county_Region_ = line[3];
-                            var county_long_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                            var county_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                            var county_dis_thres_ = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
-                            var county_Demand_ = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
-                            if (county_Demand_ > 10.0)
+                            var demand_point_City_ = line[0];
+                            var demand_point_district_ = line[1];
+                            var demand_point_ID_ = line[2] + " " + i;
+                            var demand_point_Region_ = line[3];
+                            var demand_point_long_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                            var demand_point_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                            var demand_point_dis_thres_ = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                            var demand_point_Demand_ = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
+                            if (demand_point_Demand_ > 10.0)
                             {
-                                var county_ = new DemandPoint(county_City_, county_district_, county_ID_, county_Region_, county_long_, county_lat_, county_dis_thres_, county_Demand_);
-                                _county.Add(county_);
+                                var demand_point_ = new DemandPoint(demand_point_City_, demand_point_district_, demand_point_ID_, demand_point_Region_, demand_point_long_, demand_point_lat_, demand_point_dis_thres_, demand_point_Demand_);
+                                _demand_point.Add(demand_point_);
                             }
                             
                         }
@@ -312,7 +312,7 @@ public class CSVReader
 
     public List<DemandPoint> Get_County()
     {
-        return _county;
+        return _demand_point;
     }
 
     public List<xDocks> Get_Agency()

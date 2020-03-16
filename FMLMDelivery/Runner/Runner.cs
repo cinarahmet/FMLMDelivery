@@ -30,8 +30,6 @@ namespace FMLMDelivery
         private List<xDocks> temp_xDocks = new List<xDocks>();
         private List<Hub> temp_hubs = new List<Hub>();
 
-        
-
 
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
@@ -170,15 +168,14 @@ namespace FMLMDelivery
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
-
-            
+             
+            Partial_Run("ANTALYA ", false, 20, 1250, 0.95);
+            Partial_Run("Akdeniz", true, 30, 1250, 0.90);
             Partial_Run("ANKARA ", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95);
             Partial_Run("İZMİR ", false, 20, 2500, 0.90);
             Partial_Run("BURSA ", false, 20, 2500, 0.95);
-            Partial_Run("ANTALYA ", true, 20, 2500, 0.90);
-            Partial_Run("Akdeniz", true, 30, 1250, 0.90);
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
             Partial_Run("Ege", true, 30, 1250, 0.67);
             Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
@@ -186,8 +183,8 @@ namespace FMLMDelivery
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
             Partial_Run("Marmara", true, 30, 1250, 0.75);
 
-            var header_xdock_county = "#Xdock,xDocks City,xDocks İlçe,xDock ID,xDocks_Lat,xDokcs_long,Assigned_ilçe,Talep Noktası ID,Uzaklık,İlçe_Demand";
-            var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_county);
+            var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
+            var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
             write_the_xdocks.Write_Records();
 
             Modify_xDocks(new_xDocks);
@@ -213,8 +210,8 @@ namespace FMLMDelivery
             second_phase.Run();
             var assigned_regular_sellers = second_phase.Return_Assigned_Seller();
             var cov_demand = second_phase.Return_Covered_Demand();
-            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());           
-            var header = "#Xdock,xDocks City,xDocks İlçe,xDocks ID,xDocks_Lat,xDokcs_long, Seller_City,Seller_District,Distance,Seller_Demand";
+            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+            var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
             var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
             writer_small_seller.Write_Records();
 
@@ -237,7 +234,7 @@ namespace FMLMDelivery
             var objVal = third_phase.GetObjVal();
             var new_hubs = third_phase.Return_New_Hubs();
             var assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-            var header_hub = "#Hub,Hub City, Hub County,Hub ID, Hub_Long, Hub_Lat, Type_of_Assignment,City,County,ID,Demand,Distance";
+            var header_hub = "#Hub,Hub İl, Hub İlçe,Hub Mahalle, Hub_Long, Hub_Lat, Type_of_Assignment,Distinct Id, İl, İlçe, Mahalle, Talep/Gönderi, Distance";    
             var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
             writer_hub_seller.Write_Records();
 
