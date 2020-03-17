@@ -503,24 +503,26 @@ namespace FMLMDelivery
                         var valueslat = _hubs[j].Get_Latitude();
                         var valueslong = _hubs[j].Get_Longitude();
                         var dist = _hubs[j].Get_Distance_Threshold();
-                        var production = 0.0;
+                        var lm_distribution = 0.0;
                         for (int i = 0; i < _numOfXdocks; i++)
                         {
                             if (_solver.GetValue(x[i][j]) > 0.9)
                             {
-                                production += _xDocks[i].Get_Demand();
+                                lm_distribution += _xDocks[i].Get_Demand();
                             }
                         }
+                        var fm_distribution = 0.0;
                         for (int i = 0; i < _numOfSeller; i++)
                         {
                             if (_solver.GetValue(s[i][j]) > 0.9)
                             {
-                                production += _sellers[i].Get_Demand();
+                                fm_distribution += _sellers[i].Get_Demand();
                             }
                         }
                         var already_opened = _hubs[j].If_Already_Opened();
 
-                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist, production, already_opened);
+                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist, lm_distribution, already_opened);
+                        new_hub.Set_FM_Capacity(fm_distribution);
                         new_hubs.Add(new_hub);
                     }
                 }
