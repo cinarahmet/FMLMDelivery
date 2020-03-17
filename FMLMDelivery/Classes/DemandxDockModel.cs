@@ -26,12 +26,7 @@ public class DemandxDockModel
     private Int32 min_num_demand_point_assigned = 2;
    
 
-    /// <summary>
-    /// Min amount that xDock can be opened.
-    /// </summary>
-    private Double min_xDock_capacity = 1250;
 
-    private Double big_city_min_xDock_capacity = 2500;
 
     /// <summary>
     /// Max amount that xDock can be opened.
@@ -227,9 +222,11 @@ public class DemandxDockModel
 
     private  List<String> record_list = new List<String>();
 
+    private Double _min_xDock_cap;
 
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Double P,Boolean second_part, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
@@ -247,6 +244,7 @@ public class DemandxDockModel
         _demand_covarage = Demand_Covarage;
         _initial_solution = new List<double>();
         _second_part = second_part;
+        _min_xDock_cap = min_xdock_cap;
 
         x = new List<List<INumVar>>();
         y = new List<INumVar>();
@@ -716,15 +714,9 @@ public class DemandxDockModel
             {
                 constraint.AddTerm(x[i][j], a[i][j] * demand_of_demand_point[i]);
             }
-            if (_xDocks[j].Get_City() == "İSTANBUL ASYA" || _xDocks[j].Get_City() == "İSTANBUL AVRUPA" || _xDocks[j].Get_City() == "ANKARA " || _xDocks[j].Get_City() == "İZMİR ")
-            {
-                constraint.AddTerm(y[j], -big_city_min_xDock_capacity);
-            }
-            else
-            {
-                constraint.AddTerm(y[j], -min_xDock_capacity);
-            }
             
+            constraint.AddTerm(y[j], -_min_xDock_cap);
+           
             _solver.AddGe(constraint, 0);
         }
 

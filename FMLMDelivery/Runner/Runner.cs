@@ -42,7 +42,7 @@ namespace FMLMDelivery
             _regular_small_seller = regular_small; 
         }
 
-        private Tuple<List<xDocks>, List<Hub>, List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov)
+        private Tuple<List<xDocks>, List<Hub>, List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap)
         {
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
@@ -55,7 +55,7 @@ namespace FMLMDelivery
             var new_xDocks = new List<xDocks>();
             var potential_Hubs = new List<Hub>();
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, p, false);
+            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
 
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -69,7 +69,7 @@ namespace FMLMDelivery
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true);
+            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true);
             first_phase.Provide_Initial_Solution(opened_xDocks);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -155,7 +155,7 @@ namespace FMLMDelivery
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
 
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage);
+            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
             writer_xdocks.AddRange(temp_writer);
