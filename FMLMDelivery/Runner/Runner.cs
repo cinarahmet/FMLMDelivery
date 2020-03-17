@@ -19,7 +19,7 @@ namespace FMLMDelivery
         private List<Seller> _regular_small_seller;
         private List<Seller> _regular_big_seller;
         private double total_demand;
-        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA ", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR ", "BURSA ","ANTALYA " });
+        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR", "BURSA","ANTALYA" });
         private List<String> writer_seller = new List<String>();
         private List<xDocks>  new_xDocks = new List<xDocks>();
         private List<Hub> potential_hub_locations = new List<Hub>();
@@ -127,21 +127,10 @@ namespace FMLMDelivery
                             already_assigned = true;
                         }
                     }
-                    if (key == "İç Anadolu" )
+                    if (xDocks[j].Get_Region() == key && !already_assigned)
                     {
-                        if (xDocks[j].Get_Region() == "İçAnadolu" && !already_assigned)
-                        {
-                            pot_xDock_loc.Add(xDocks[j]);
-                        }
+                        pot_xDock_loc.Add(xDocks[j]);
                     }
-                    else
-                    {
-                        if (xDocks[j].Get_Region() == key && !already_assigned)
-                        {
-                            pot_xDock_loc.Add(xDocks[j]);
-                        }
-                    }
-                    
                 }
             }
             
@@ -169,13 +158,13 @@ namespace FMLMDelivery
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
              
-            Partial_Run("ANTALYA ", false, 20, 1250, 0.95);
+            Partial_Run("ANTALYA", false, 20, 1250, 0.95);
             Partial_Run("Akdeniz", true, 30, 1250, 0.90);
-            Partial_Run("ANKARA ", false, 20, 2500, 0.95);
+            Partial_Run("ANKARA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95);
-            Partial_Run("İZMİR ", false, 20, 2500, 0.90);
-            Partial_Run("BURSA ", false, 20, 2500, 0.95);
+            Partial_Run("İZMİR", false, 20, 2500, 0.90);
+            Partial_Run("BURSA", false, 20, 2500, 0.95);
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
             Partial_Run("Ege", true, 30, 1250, 0.67);
             Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
