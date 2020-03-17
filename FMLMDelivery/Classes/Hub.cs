@@ -20,7 +20,9 @@ public class Hub
 
     private readonly Double _dist_thres;
 
-    private readonly Double _capacity;
+    private readonly Double _lm_capacity;
+
+    private readonly Double _fm_capacity;
 
     private readonly Boolean _already_opened;
 
@@ -33,7 +35,8 @@ public class Hub
         _longitude = longitude;
         _latitude = latitude;
         _dist_thres = dist_thres;
-        _capacity = capacity;
+        _lm_capacity = capacity;
+        _fm_capacity = capacity;
         _already_opened = already_opened;
     }
 
@@ -80,6 +83,6 @@ public class Hub
 
     public Double Get_Capacity()
     {
-        return _capacity;
+        return _lm_capacity;
     }
 }

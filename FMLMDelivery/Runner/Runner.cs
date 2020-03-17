@@ -157,7 +157,7 @@ namespace FMLMDelivery
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
-             
+
             Partial_Run("ANTALYA", false, 20, 1250, 0.95);
             Partial_Run("Akdeniz", true, 30, 1250, 0.90);
             Partial_Run("ANKARA", false, 20, 2500, 0.95);
@@ -168,7 +168,6 @@ namespace FMLMDelivery
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
             Partial_Run("Ege", true, 30, 1250, 0.67);
             Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
-            
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
             Partial_Run("Marmara", true, 30, 1250, 0.75);
 
