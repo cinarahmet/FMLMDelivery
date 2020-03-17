@@ -75,7 +75,7 @@ public class CSVReader
         var value = 180;
         var s_2 = "Marmara";
         var value_2 = 150;
-        var s_3 = "İçAnadolu";
+        var s_3 = "İç Anadolu";
         var value_3 = 180;
         var s_4 = "Ege";
         var value_4 = 180;

@@ -22,12 +22,6 @@ public class DemandxDockModel
     /// </summary>
     private Double max_num_demand_point_assigned = 400;
 
-
-    private Int32 min_num_demand_point_assigned = 2;
-   
-
-
-
     /// <summary>
     /// Max amount that xDock can be opened.
     /// </summary>

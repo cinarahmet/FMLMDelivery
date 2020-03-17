@@ -12,11 +12,6 @@ namespace FMLMDelivery
     class xDockHubModel
     {
         /// <summary>
-        /// The maximum distance that a XDock can be assigned to a Hub 
-        /// </summary>
-        private Double distance_threshold = 100;
-
-        /// <summary>
         /// Maximum number of XDock that can be assigned to a single Hub.
         /// </summary>
         private Double max_num_xdock_assigned = 400;
@@ -213,16 +208,6 @@ namespace FMLMDelivery
         private Boolean _demand_weighted;
 
         /// <summary>
-        /// List of opened hubs latitude and longitude
-        /// </summary>
-        //private List<Latitude_Longtitude> lat_long;
-
-        /// <summary>
-        /// demand normalization proportion 
-        /// </summary>
-        private List<Double> normalized_demand;
-
-        /// <summary>
         /// Total demand of the xdocks
         /// </summary>
         private Double total_demand = 0;
@@ -301,23 +286,6 @@ namespace FMLMDelivery
 
             return sCoord.GetDistanceTo(eCoord)/1000;
         }
-
-        //Currently unused. The proportion of the demand of xDock i to whole demand.
-        private void Get_Demand_Weight()
-        {
-            double totalweight = 0;
-            for (int i = 0; i < _numOfXdocks; i++)
-            {
-                totalweight = x_dock_demand[i] + totalweight;
-            }
-            for (int i = 0; i < _numOfXdocks; i++)
-            {
-                var dp2 = new List<Double>();
-                double proportion = x_dock_demand[i]/totalweight;
-                normalized_demand.Add(proportion);
-            }
-        }
-
 
         private void Get_Distance_Matrix()
         {
@@ -700,7 +668,6 @@ namespace FMLMDelivery
             Create_Distance_Threshold_Matrix();
             Create_Distance_Threshold_Seller();
             Get_Demand_Parameters();
-          //  Get_Demand_Weight();
             Get_Total_Demand();
         }
 
@@ -774,7 +741,7 @@ namespace FMLMDelivery
                 {
                     TotalHubConstraint();
                     Capacity_Constraint();
-                   // Min_X_Dock_Constraint();
+                    Min_X_Dock_Constraint();
                 }
                 if (phase_2)
                 {
