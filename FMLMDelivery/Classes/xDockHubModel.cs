@@ -893,10 +893,26 @@ namespace FMLMDelivery
         //If any hub is already open
         private void MainHubConstraint()
         {
-          //  var constraint = _solver.LinearNumExpr();
-          //  constraint.AddTerm(y[39], 1);
-          //  constraint.AddTerm(y[40], 1);
-          //  _solver.AddEq(constraint, 2);
+            
+            for (int i = 0; i < _numOfHubs; i++)
+            {
+                var constraint = _solver.LinearNumExpr();
+                constraint.AddTerm(y[i], 1);
+                if (_hubs[i].Get_District() == "ÇAYIROVA" && _hubs[i].Get_Id() == "AKSE")
+                {
+                    _solver.AddEq(constraint, 1);
+                }
+                else if (_hubs[i].Get_District() == "YÜREĞİR" && _hubs[i].Get_Id() == "İNCİRLİK CUMHURİYET")
+                {
+                    _solver.AddEq(constraint, 1);
+                }
+                else
+                {
+                    _solver.AddLe(constraint, 1);
+                }
+            }
+           
+          
         }
 
         //y[j]*alfa >= ∑x[i,j]*a[i,j]*demand[i]
