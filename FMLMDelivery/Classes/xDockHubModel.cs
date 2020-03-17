@@ -163,7 +163,7 @@ namespace FMLMDelivery
         /// <summary>
         /// Time limit is given in seconds.
         /// </summary>
-        private readonly long _timeLimit = 6000;
+        private readonly long _timeLimit = 150;
 
         /// <summary>
         /// Gap limit is given in percentage
@@ -233,6 +233,8 @@ namespace FMLMDelivery
 
         private List<String> records;
 
+        private List<String> record_stats = new List<String>();
+
 
         public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
@@ -274,6 +276,7 @@ namespace FMLMDelivery
             new_hubs = new List<Hub>();
             assigned_seller = new List<Seller>();
             records = new List<String>();
+            record_stats = new List<String>();
         }
 
         public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -398,6 +401,7 @@ namespace FMLMDelivery
             Solve();
             if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
             {
+                Get_Stats();
                 Create_Country_Names();
                 Get_Num_Hubs();
                 Get_new_Hubs();
@@ -477,6 +481,20 @@ namespace FMLMDelivery
         public List<String> Get_Hub_Xdock_Seller_Info()
         {
             return records;
+        }
+        private void Get_Stats()
+        {
+            var type = "All";
+            var time = _solutionTime;
+            var gap_to_optimal = _solver.GetMIPRelativeGap();
+            var status = _status;
+            var result = $"{type},{status},{time},{gap_to_optimal}";
+            record_stats.Add(result);
+
+        }
+        public List<String> Get_Xdock_Hub_Stats()
+        {
+            return record_stats;
         }
         public List<Seller> Return_Assigned_Big_Sellers()
         {
