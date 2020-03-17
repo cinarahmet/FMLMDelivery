@@ -270,19 +270,20 @@ namespace FMLMDelivery.Classes
         }
         private void Get_Status()
         {
-            var type = "";
+            var part = "All";
+            var model= "";
             var time = _solutionTime;
             var status = _status;
             var gap_to_optimal = _solver.GetMIPRelativeGap();
             if (_prior == true)
             {
-                type = "Prior Small Seller Model";
+                model = "Prior Small Seller Model";
             }
             else
             {
-                type = "Other Small Seller Model";
+                model = "Other Small Seller Model";
             }
-            var result = $"{type},{status},{time},{gap_to_optimal}";
+            var result = $"{part},{model},{status},{time},{gap_to_optimal}";
             record_stats.Add(result);
         }
 

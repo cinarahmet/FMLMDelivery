@@ -484,11 +484,12 @@ namespace FMLMDelivery
         }
         private void Get_Stats()
         {
-            var type = "All";
+            var part = "All";
+            var model="xDock_Hub_Seller Model"
             var time = _solutionTime;
             var gap_to_optimal = _solver.GetMIPRelativeGap();
             var status = _status;
-            var result = $"{type},{status},{time},{gap_to_optimal}";
+            var result = $"{part},{model},{status},{time},{gap_to_optimal}";
             record_stats.Add(result);
 
         }
