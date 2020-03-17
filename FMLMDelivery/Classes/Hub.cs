@@ -22,7 +22,7 @@ public class Hub
 
     private readonly Double _lm_capacity;
 
-    private readonly Double _fm_capacity;
+    private Double _fm_capacity;
 
     private readonly Boolean _already_opened;
 
@@ -84,5 +84,10 @@ public class Hub
     public Double Get_Capacity()
     {
         return _lm_capacity;
+    }
+
+    public void Set_FM_Capacity(double capacity)
+    {
+        _fm_capacity = capacity;
     }
 }
