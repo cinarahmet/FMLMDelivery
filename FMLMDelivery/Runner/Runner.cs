@@ -28,8 +28,9 @@ namespace FMLMDelivery
         private List<xDocks> pot_xDock_loc = new List<xDocks>();
         private List<String> temp_writer = new List<String>();
         private List<xDocks> temp_xDocks = new List<xDocks>();
-        private List<Hub> temp_hubs = new List<Hub>();
-
+        private List<Hub> temp_hubs = new List<Hub>();       
+        private List<String> temp_stats = new List<String>();
+        private List<String> stats_writer = new List<String>();
 
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
@@ -42,10 +43,11 @@ namespace FMLMDelivery
             _regular_small_seller = regular_small; 
         }
 
-        private Tuple<List<xDocks>, List<Hub>, List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap)
-        {
+        private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key)
+        {   var stats = new List<String>();
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
+            var _key = key;
             var min_model_model = true;
             var demand_weighted_model = false;
             //Phase 2 takes the solution of min_model as an input and solve same question with demand weighted objective
@@ -53,13 +55,14 @@ namespace FMLMDelivery
             var demand_covarage = demand_cov;
             var objVal = 0.0;
             var new_xDocks = new List<xDocks>();
-            var potential_Hubs = new List<Hub>();
+            var potential_Hubs = new List<Hub>(); 
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
+            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
 
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             new_xDocks = first_phase.Return_XDock();
+            stats.AddRange(first_phase.Get_Model_Stats_Info());
             var min_num = first_phase.Return_Num_Xdock();
             var opened_xDocks = first_phase.Return_Opened_xDocks();
 
@@ -69,14 +72,15 @@ namespace FMLMDelivery
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true);
+            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true);
             first_phase.Provide_Initial_Solution(opened_xDocks);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             //xDocks are assigned
             new_xDocks = first_phase.Return_XDock();
-            potential_Hubs = first_phase.Return_Potential_Hubs();           
-            return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info());
+            potential_Hubs = first_phase.Return_Potential_Hubs();
+            stats.AddRange(first_phase.Get_Model_Stats_Info());
+            return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info(),stats);
         }
 
         private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key,bool other_cities )
@@ -143,8 +147,8 @@ namespace FMLMDelivery
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, distance_threshold, min_xDock_capacity);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-
-            (temp_xDocks, temp_hubs, temp_writer) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity);
+            (temp_xDocks, temp_hubs, temp_writer,temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity,key);
+            stats_writer.AddRange(temp_stats);          
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
             writer_xdocks.AddRange(temp_writer);
@@ -160,7 +164,7 @@ namespace FMLMDelivery
              
             Partial_Run("ANTALYA", false, 20, 1250, 0.95);
             Partial_Run("Akdeniz", true, 30, 1250, 0.90);
-            Partial_Run("ANKARA", false, 20, 2500, 0.95);
+            /*Partial_Run("ANKARA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95);
             Partial_Run("İZMİR", false, 20, 2500, 0.90);
@@ -168,14 +172,15 @@ namespace FMLMDelivery
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
             Partial_Run("Ege", true, 30, 1250, 0.67);
             Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
-            
+            */
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
             Partial_Run("Marmara", true, 30, 1250, 0.75);
-
+            
             var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
             write_the_xdocks.Write_Records();
 
+           
             Modify_xDocks(new_xDocks);
 
 
@@ -194,12 +199,14 @@ namespace FMLMDelivery
             var covered_demand = second_phase.Return_Covered_Demand();
             var remaining_demand = total_demand - covered_demand;
             writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+            stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
 
             second_phase = new SmallSellerxDockModel(_regular_small_seller, new_xDocks, false, remaining_demand);
             second_phase.Run();
             var assigned_regular_sellers = second_phase.Return_Assigned_Seller();
             var cov_demand = second_phase.Return_Covered_Demand();
             writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+            stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
             var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
             var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
             writer_small_seller.Write_Records();
@@ -223,10 +230,13 @@ namespace FMLMDelivery
             var objVal = third_phase.GetObjVal();
             var new_hubs = third_phase.Return_New_Hubs();
             var assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-            var header_hub = "#Hub,Hub İl, Hub İlçe,Hub Mahalle, Hub_Long, Hub_Lat, Type_of_Assignment,Distinct Id, İl, İlçe, Mahalle, Talep/Gönderi, Distance";    
+            var header_hub = "#Hub,Hub İl, Hub İlçe,Hub Mahalle, Hub_Long, Hub_Lat, Type_of_Assignment,Distinct Id, İl, İlçe, Mahalle, Talep/Gönderi, Distance";
+            var stats_header = "Part,Model,Status,Time,Gap";
+            stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
             var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
-            writer_hub_seller.Write_Records();
-
+            var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
+            writer_hub_seller.Write_Records();                     
+            stat_writer.Write_Records();
 
             String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_Capacity()};{d.Get_Latitude()};{d.Get_Longitude()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_hubs.csv", csv7, Encoding.UTF8);

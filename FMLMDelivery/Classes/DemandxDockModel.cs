@@ -141,7 +141,11 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =1800;
+    private readonly long _timeLimit =150;
+    /// <summary>
+    /// The starting time of the model
+    /// </summary>
+    private readonly DateTime Start;
 
     /// <summary>
     /// Gap limit is given in percentage
@@ -224,9 +228,11 @@ public class DemandxDockModel
 
     private Double _min_xDock_cap;
 
+    private List<String> record_stats = new List<String>();
 
+    private String _location;
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
@@ -262,7 +268,8 @@ public class DemandxDockModel
         new_XDocks = new List<xDocks>();
         potential_Hubs = new List<Hub>();
         normalized_demand = new List<double>();
-
+        record_stats = new List<String>();
+        _location = key;
     }
 
     public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -464,6 +471,8 @@ public class DemandxDockModel
             Get_Potential_Hubs();
             Get_Num_XDocks();
             Get_Csv_Information();
+            Get_Model_Status();
+
         }
         Print();
         ClearModel();
@@ -529,13 +538,34 @@ public class DemandxDockModel
         }
                         
     }
-
     public List<String> Get_Xdock_County_Info()
     {
         return record_list;
     }
 
-
+    private void Get_Model_Status()
+    {
+        var location = _location;
+        var status = _status;
+        var time = _solutionTime;
+        var gap_to_optimal = _solver.GetMIPRelativeGap();
+        var type = "";
+        if (phase_2 == false)
+        {
+            type = "Min model";
+        }
+        else
+        {
+            type = "Demand Weighted";
+        }
+        var result = $"{location},{type},{status},{time},{gap_to_optimal}";
+        record_stats.Add(result);
+    }
+    
+    public List<String> Get_Model_Stats_Info()
+    {
+        return record_stats;
+    }
     private void Print()
     {
         if (!(_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))

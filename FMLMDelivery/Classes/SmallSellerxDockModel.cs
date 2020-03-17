@@ -56,7 +56,7 @@ namespace FMLMDelivery.Classes
         /// <summary>
         /// Time limit is given in seconds.
         /// </summary>
-        private readonly long _timeLimit = 6000;
+        private readonly long _timeLimit = 150;
 
         /// <summary>
         /// Gap limit is given in percentage
@@ -74,6 +74,8 @@ namespace FMLMDelivery.Classes
         private Double _remaining_demand;
 
         private List<String> record = new List<String>();
+
+        private List<String> record_stats = new List<String>();
 
 
         public SmallSellerxDockModel(List<Seller> small_seller, List<xDocks> xDocks,Boolean prior,double remaining_demand = 0)
@@ -95,7 +97,7 @@ namespace FMLMDelivery.Classes
             record = new List<String>();
             _num_of_xDocks = _xDocks.Count;
             _num_of_Seller = _small_seller.Count;
-
+            record_stats = new List<String>();
             _prior = prior;
         }
 
@@ -179,6 +181,7 @@ namespace FMLMDelivery.Classes
             Solve();
             if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
             {
+                Get_Status();
                 Calculate_Covered_Demand();
                 Assigned_Seller_List();
                 Get_Seller_Csv();
@@ -265,6 +268,28 @@ namespace FMLMDelivery.Classes
         {
             return record;
         }
+        private void Get_Status()
+        {
+            var type = "";
+            var time = _solutionTime;
+            var status = _status;
+            var gap_to_optimal = _solver.GetMIPRelativeGap();
+            if (_prior == true)
+            {
+                type = "Prior Small Seller Model";
+            }
+            else
+            {
+                type = "Other Small Seller Model";
+            }
+            var result = $"{type},{status},{time},{gap_to_optimal}";
+            record_stats.Add(result);
+        }
+
+        public List<String> Get_Small_Seller_Model_Stat()
+        {
+            return record_stats;
+        }        
 
         public void ClearModel()
         {
