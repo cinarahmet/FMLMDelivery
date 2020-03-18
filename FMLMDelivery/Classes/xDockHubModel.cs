@@ -163,7 +163,7 @@ namespace FMLMDelivery
         /// <summary>
         /// Time limit is given in seconds.
         /// </summary>
-        private readonly long _timeLimit = 150;
+        private readonly long _timeLimit = 1800;
 
         /// <summary>
         /// Gap limit is given in percentage

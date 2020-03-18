@@ -9,6 +9,7 @@ using ILOG.Concert;
 using System.Device.Location;
 using System.Linq;
 using FMLMDelivery;
+using System.Collections.Concurrent;
 
 /// <summary>
 /// IMPORTANT !!!!!!!!!
@@ -186,12 +187,12 @@ public class DemandxDockModel
     /// <summary>
     /// List of opened xDocks latitude and longitude
     /// </summary>
-    private List<xDocks> new_XDocks;
+    private ConcurrentBag<xDocks> new_XDocks;
 
     /// <summary>
     /// List of potential Hub locations
     /// </summary>
-    private List<Hub> potential_Hubs;
+    private ConcurrentBag<Hub> potential_Hubs;
 
     /// <summary>
     /// demand normalization proportion 
@@ -218,7 +219,7 @@ public class DemandxDockModel
 
     private List<Double> result = new List<Double>();
 
-    private  List<String> record_list = new List<String>();
+    private  ConcurrentBag<String> record_list = new ConcurrentBag<String>();
 
     private Double _min_xDock_cap;
 
@@ -256,11 +257,11 @@ public class DemandxDockModel
         d = new List<List<double>>();
         c = new List<double>();
 
-        record_list = new List<String>();
+        record_list = new ConcurrentBag<String>();
         xDock_names = new Dictionary<int, string>();
         demand_of_demand_point = new List<double>();
-        new_XDocks = new List<xDocks>();
-        potential_Hubs = new List<Hub>();
+        new_XDocks = new ConcurrentBag<xDocks>();
+        potential_Hubs = new ConcurrentBag<Hub>();
         normalized_demand = new List<double>();
         record_stats = new List<String>();
         _location = key;
@@ -329,13 +330,13 @@ public class DemandxDockModel
         {
             for (int i = 0; i < new_XDocks.Count; i++)
             {
-                var city = new_XDocks[i].Get_City();
-                var district = new_XDocks[i].Get_District();
-                var id = new_XDocks[i].Get_Id();
-                var region = new_XDocks[i].Get_Region();
-                var longitude = new_XDocks[i].Get_Longitude();
-                var latitude = new_XDocks[i].Get_Latitude();
-                var dist_thres = new_XDocks[i].Get_Distance_Threshold();
+                var city = new_XDocks.ToList()[i].Get_City();
+                var district = new_XDocks.ToList()[i].Get_District();
+                var id = new_XDocks.ToList()[i].Get_Id();
+                var region = new_XDocks.ToList()[i].Get_Region();
+                var longitude = new_XDocks.ToList()[i].Get_Longitude();
+                var latitude = new_XDocks.ToList()[i].Get_Latitude();
+                var dist_thres = new_XDocks.ToList()[i].Get_Distance_Threshold();
                 var capacity = max_hub_capacity;
                 var already_opened = false;
                 var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
@@ -365,12 +366,12 @@ public class DemandxDockModel
         return result;
     }
 
-    public List<Hub> Return_Potential_Hubs()
+    public ConcurrentBag<Hub> Return_Potential_Hubs()
     {
         return potential_Hubs;
     }
 
-    public List<xDocks> Return_XDock()
+    public ConcurrentBag<xDocks> Return_XDock()
     {
         return new_XDocks;
     }
@@ -532,7 +533,7 @@ public class DemandxDockModel
         }
                         
     }
-    public List<String> Get_Xdock_County_Info()
+    public ConcurrentBag<String> Get_Xdock_County_Info()
     {
         return record_list;
     }

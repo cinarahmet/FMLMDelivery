@@ -5,7 +5,8 @@ using System.Text;
 using FMLMDelivery;
 using FMLMDelivery.Classes;
 using System.IO;
-
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace FMLMDelivery
 {
@@ -26,11 +27,14 @@ namespace FMLMDelivery
         private List<String> writer_xdocks = new List<string>();
         private List<DemandPoint> city_points = new List<DemandPoint>();
         private List<xDocks> pot_xDock_loc = new List<xDocks>();
-        private List<String> temp_writer = new List<String>();
-        private List<xDocks> temp_xDocks = new List<xDocks>();
-        private List<Hub> temp_hubs = new List<Hub>();       
-        private List<String> temp_stats = new List<String>();
+        private ConcurrentBag<String> temp_writer = new ConcurrentBag<String>();
+        private ConcurrentBag<xDocks> temp_xDocks = new ConcurrentBag<xDocks>();
+        private ConcurrentBag<Hub> temp_hubs = new ConcurrentBag<Hub>();       
+        private ConcurrentBag<String> temp_stats = new ConcurrentBag<String>();
         private List<String> stats_writer = new List<String>();
+        private List<String> run_list = new List<String>();
+
+
 
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
@@ -43,8 +47,9 @@ namespace FMLMDelivery
             _regular_small_seller = regular_small; 
         }
 
-        private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key)
-        {   var stats = new List<String>();
+        private Tuple<ConcurrentBag<xDocks>, ConcurrentBag<Hub>, ConcurrentBag<String>,ConcurrentBag<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key)
+        {   var stats = new ConcurrentBag<String>();
+            var xdock_county_ınfo = new ConcurrentBag<String>();
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
             var _key = key;
@@ -54,15 +59,15 @@ namespace FMLMDelivery
             var phase_2 = false;
             var demand_covarage = demand_cov;
             var objVal = 0.0;
-            var new_xDocks = new List<xDocks>();
-            var potential_Hubs = new List<Hub>(); 
+            var new_xDocks = new ConcurrentBag<xDocks>();
+            var potential_Hubs = new ConcurrentBag<Hub>(); 
             var p = 0;
             var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
 
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             new_xDocks = first_phase.Return_XDock();
-            stats.AddRange(first_phase.Get_Model_Stats_Info());
+            stats.ToList().AddRange(first_phase.Get_Model_Stats_Info());
             var min_num = first_phase.Return_Num_Xdock();
             var opened_xDocks = first_phase.Return_Opened_xDocks();
 
@@ -79,8 +84,9 @@ namespace FMLMDelivery
             //xDocks are assigned
             new_xDocks = first_phase.Return_XDock();
             potential_Hubs = first_phase.Return_Potential_Hubs();
-            stats.AddRange(first_phase.Get_Model_Stats_Info());
-            return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info(),stats);
+            stats.ToList().AddRange(first_phase.Get_Model_Stats_Info());
+            xdock_county_ınfo = first_phase.Get_Xdock_County_Info();
+            return Tuple.Create(new_xDocks, potential_Hubs, xdock_county_ınfo, stats);
         }
 
         private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key,bool other_cities )
@@ -190,16 +196,41 @@ namespace FMLMDelivery
             }
            
         }
-
+        
         public Tuple<List<xDocks>, List<Hub>> Run()
         {
             /* This method firstly calls Demand-xDock model with the minimum xDock objective in given demand covarage. After solving the model with this object, the method takes the number of xDock
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
-
+            
+            var run_dict = new Dictionary<String, Tuple<bool, double, double, double>>();
+            var run1 = Tuple.Create(false, 20.0, 1250.0, 0.95);
+            var run2 = Tuple.Create(true, 30.0, 1250.0, 0.90);
+            var run3 = Tuple.Create(false, 20.0, 2500.0, 0.95);
+            var run4 = Tuple.Create(false, 20.0, 2500.0, 0.95);
+            var run5 = Tuple.Create(false, 20.0, 2500.0, 0.95);
+            var run6 = Tuple.Create(false, 20.0, 2500.0, 0.90);
+            var run7 = Tuple.Create(false, 20.0, 2500.0, 0.95);
+            var run8 = Tuple.Create(true, 30.0, 1250.0, 0.90);
+            var run9 = Tuple.Create(true, 30.0, 1250.0, 0.67);
+            var run10 = Tuple.Create(true, 30.0, 1250.0, 0.90);
+            var run11 = Tuple.Create(true, 30.0, 1250.0, 0.75);
+            var run12 = Tuple.Create(true, 30.0, 1250.0, 0.90);
+;           run_dict.Add("ANTALYA", run1);
+            run_dict.Add("Akdeniz", run2);
+            run_dict.Add("ANKARA", run3);
+            run_dict.Add("İSTANBUL AVRUPA",run4);
+            run_dict.Add("İSTANBUL ASYA",run5);
+            run_dict.Add("İZMİR",run6);
+            run_dict.Add("BURSA",run7);
+            run_dict.Add("İç Anadolu",run8);
+            run_dict.Add("Ege", run9);
+            run_dict.Add("Güneydoğu Anadolu", run10);
+            run_dict.Add("Marmara", run11);
+            run_dict.Add("Karadeniz", run12);
             Add_Already_Open_Main_Hubs();
-            Partial_Run("ANTALYA", false, 20, 1250, 0.95);
+            /*Partial_Run("ANTALYA", false, 20, 1250, 0.95);
             Partial_Run("Akdeniz", true, 30, 1250, 0.90);
             Partial_Run("ANKARA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
@@ -209,10 +240,17 @@ namespace FMLMDelivery
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
             Partial_Run("Ege", true, 30, 1250, 0.67);
             Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
-            
-            // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
             Partial_Run("Marmara", true, 30, 1250, 0.75);
+            // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
+            */
             
+           Parallel.ForEach(run_dict, run =>
+            {
+              
+                Partial_Run(run.Key,run.Value.Item1,run.Value.Item2,run.Value.Item3,run.Value.Item4);
+
+            });
+
             var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
             write_the_xdocks.Write_Records();
