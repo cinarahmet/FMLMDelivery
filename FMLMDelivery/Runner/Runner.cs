@@ -154,6 +154,42 @@ namespace FMLMDelivery
             writer_xdocks.AddRange(temp_writer);
         }
 
+        private void Add_Already_Open_Main_Hubs()
+        {
+            for (int i = 0; i < xDocks.Count; i++)
+            {
+                if (xDocks[i].Get_District() == "ÇAYIROVA" && xDocks[i].Get_Id() == "AKSE")
+                {
+                    var city = xDocks[i].Get_City();
+                    var district = xDocks[i].Get_District();
+                    var id = xDocks[i].Get_Id();
+                    var region = xDocks[i].Get_Region();
+                    var longitude = xDocks[i].Get_Longitude();
+                    var latitude = xDocks[i].Get_Latitude();
+                    var dist_thres = xDocks[i].Get_Distance_Threshold();
+                    var capacity = 400000;
+                    var already_opened = true;
+                    var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                    potential_hub_locations.Add(open_hub);
+
+                }
+                else if (xDocks[i].Get_District() == "YÜREĞİR" && xDocks[i].Get_Id() == "İNCİRLİK CUMHURİYET")
+                {
+                    var city = xDocks[i].Get_City();
+                    var district = xDocks[i].Get_District();
+                    var id = xDocks[i].Get_Id();
+                    var region = xDocks[i].Get_Region();
+                    var longitude = xDocks[i].Get_Longitude();
+                    var latitude = xDocks[i].Get_Latitude();
+                    var dist_thres = xDocks[i].Get_Distance_Threshold();
+                    var capacity = 400000;
+                    var already_opened = true;
+                    var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                    potential_hub_locations.Add(open_hub);
+                }
+            }
+           
+        }
 
         public Tuple<List<xDocks>, List<Hub>> Run()
         {
@@ -161,10 +197,11 @@ namespace FMLMDelivery
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
-             
+
+            Add_Already_Open_Main_Hubs();
             Partial_Run("ANTALYA", false, 20, 1250, 0.95);
             Partial_Run("Akdeniz", true, 30, 1250, 0.90);
-            /*Partial_Run("ANKARA", false, 20, 2500, 0.95);
+            Partial_Run("ANKARA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95);
             Partial_Run("İZMİR", false, 20, 2500, 0.90);
@@ -172,7 +209,7 @@ namespace FMLMDelivery
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
             Partial_Run("Ege", true, 30, 1250, 0.67);
             Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
-            */
+            
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
             Partial_Run("Marmara", true, 30, 1250, 0.75);
             

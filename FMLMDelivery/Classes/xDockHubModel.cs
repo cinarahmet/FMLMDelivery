@@ -485,7 +485,7 @@ namespace FMLMDelivery
         private void Get_Stats()
         {
             var part = "All";
-            var model="xDock_Hub_Seller Model"
+            var model = "xDock_Hub_Seller Model";
             var time = _solutionTime;
             var gap_to_optimal = _solver.GetMIPRelativeGap();
             var status = _status;
@@ -725,7 +725,7 @@ namespace FMLMDelivery
         private void CreateConstraints()
         {
             CoverageConstraints();
-            MainHubConstraint();
+            Open_Hub_Constraint();
             Nonnegativity_Constraint();
             if (_cost_incurred)
             {
@@ -879,18 +879,14 @@ namespace FMLMDelivery
         }
 
         //If any hub is already open
-        private void MainHubConstraint()
+        private void Open_Hub_Constraint()
         {
             
             for (int i = 0; i < _numOfHubs; i++)
             {
                 var constraint = _solver.LinearNumExpr();
                 constraint.AddTerm(y[i], 1);
-                if (_hubs[i].Get_District() == "ÇAYIROVA" && _hubs[i].Get_Id() == "AKSE")
-                {
-                    _solver.AddEq(constraint, 1);
-                }
-                else if (_hubs[i].Get_District() == "YÜREĞİR" && _hubs[i].Get_Id() == "İNCİRLİK CUMHURİYET")
+                if (_hubs[i].If_Already_Opened())
                 {
                     _solver.AddEq(constraint, 1);
                 }
