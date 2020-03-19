@@ -56,7 +56,7 @@ namespace FMLMDelivery.Classes
         /// <summary>
         /// Time limit is given in seconds.
         /// </summary>
-        private readonly long _timeLimit = 150;
+        private readonly long _timeLimit = 1200;
 
         /// <summary>
         /// Gap limit is given in percentage

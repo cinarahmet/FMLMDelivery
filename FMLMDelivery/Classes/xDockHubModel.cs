@@ -163,7 +163,7 @@ namespace FMLMDelivery
         /// <summary>
         /// Time limit is given in seconds.
         /// </summary>
-        private readonly long _timeLimit = 150;
+        private readonly long _timeLimit = 3600;
 
         /// <summary>
         /// Gap limit is given in percentage
@@ -509,12 +509,14 @@ namespace FMLMDelivery
 
         private void Get_new_Hubs()
         {
+            
             for (int j = 0; j < _numOfHubs; j++)
             {
                 if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
                 {
                     if (_solver.GetValue(y[j]) > 0.9)
                     {
+                        
                         var city = _hubs[j].Get_City();
                         var district = _hubs[j].Get_District();
                         var id = _hubs[j].Get_Id();
@@ -835,7 +837,7 @@ namespace FMLMDelivery
                 for (int i = 0; i < _numOfSeller; i++)
                 {
                     constraint.AddTerm(s[i][j], a_seller[i][j]);
-                    constraint.AddTerm(y[j], -200000);
+                    constraint.AddTerm(y[j], -(_hubs[j].Get_FM_Capacity()));
                 }
                 _solver.AddLe(constraint, 0);
             }
@@ -910,7 +912,7 @@ namespace FMLMDelivery
                     var demand_included = x_dock_demand[i] * a[i][j];
                     constraint.AddTerm(x[i][j], demand_included);
                 }
-                constraint.AddTerm(y[j], -max_hub_capaticity);
+                constraint.AddTerm(y[j], -_hubs[j].Get_LM_Capacity());
                 _solver.AddLe(constraint, 0);
             }
 

@@ -228,6 +228,7 @@ public class DemandxDockModel
 
     public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
+        _gap = Gap;
         _solver = new Cplex();
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
         _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
@@ -245,7 +246,7 @@ public class DemandxDockModel
         _initial_solution = new List<double>();
         _second_part = second_part;
         _min_xDock_cap = min_xdock_cap;
-        _gap = Gap;
+        
 
         x = new List<List<INumVar>>();
         y = new List<INumVar>();
