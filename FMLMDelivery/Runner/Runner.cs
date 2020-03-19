@@ -31,6 +31,7 @@ namespace FMLMDelivery
         private List<Hub> temp_hubs = new List<Hub>();       
         private List<String> temp_stats = new List<String>();
         private List<String> stats_writer = new List<String>();
+        private List<Double> gap_list = new List<double>();
 
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
         {
@@ -43,7 +44,7 @@ namespace FMLMDelivery
             _regular_small_seller = regular_small; 
         }
 
-        private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key)
+        private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
         {   var stats = new List<String>();
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
@@ -57,7 +58,7 @@ namespace FMLMDelivery
             var new_xDocks = new List<xDocks>();
             var potential_Hubs = new List<Hub>(); 
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
+            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false,gap);
 
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -72,7 +73,7 @@ namespace FMLMDelivery
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true);
+            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true,gap);
             first_phase.Provide_Initial_Solution(opened_xDocks);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -141,13 +142,13 @@ namespace FMLMDelivery
             return Tuple.Create(city_points, pot_xDock_loc);
         }
 
-        private void Partial_Run(string key, bool partial_city_run, double distance_threshold, double min_xDock_capacity, double demand_coverage)
+        private void Partial_Run(string key, bool partial_city_run, double distance_threshold, double min_xDock_capacity, double demand_coverage, double gap)
         {
             (city_points, pot_xDock_loc) = Get_City_Information(key, partial_city_run);
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, distance_threshold, min_xDock_capacity);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-            (temp_xDocks, temp_hubs, temp_writer,temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity,key);
+            (temp_xDocks, temp_hubs, temp_writer,temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity,key,gap);
             stats_writer.AddRange(temp_stats);          
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
@@ -198,20 +199,20 @@ namespace FMLMDelivery
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
 
+            gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01,0.02,0.025});
             Add_Already_Open_Main_Hubs();
-            Partial_Run("ANTALYA", false, 20, 1250, 0.99);
-            Partial_Run("Akdeniz", true, 30, 1250, 0.90);
-            Partial_Run("ANKARA", false, 20, 2500, 0.95);
-            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
-            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95);
-            Partial_Run("İZMİR", false, 20, 2500, 0.90);
-            Partial_Run("BURSA", false, 20, 2500, 0.95);
-            Partial_Run("İç Anadolu", true, 30, 1250, 0.90);
-            Partial_Run("Ege", true, 30, 1250, 0.67);
-            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90);
-            
+            Partial_Run("ANTALYA", false, 20, 1250, 0.95, gap_list[0]);
+            Partial_Run("Akdeniz", true, 30, 1250, 0.90, gap_list[2]);
+            Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);
+            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);
+            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
+            Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
+            Partial_Run("BURSA", false, 20, 2500, 0.95, gap_list[0]);
+            Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
+            Partial_Run("Ege", true, 30, 1250, 0.67, gap_list[0]);
+            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90, gap_list[0]);
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-            Partial_Run("Marmara", true, 30, 1250, 0.75);
+            Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);
             
             var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
