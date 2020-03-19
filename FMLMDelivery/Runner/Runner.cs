@@ -199,7 +199,7 @@ namespace FMLMDelivery
              */
 
             Add_Already_Open_Main_Hubs();
-            Partial_Run("ANTALYA", false, 20, 1250, 0.95);
+            Partial_Run("ANTALYA", false, 20, 1250, 0.99);
             Partial_Run("Akdeniz", true, 30, 1250, 0.90);
             Partial_Run("ANKARA", false, 20, 2500, 0.95);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95);
@@ -275,19 +275,19 @@ namespace FMLMDelivery
             writer_hub_seller.Write_Records();                     
             stat_writer.Write_Records();
 
-            String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_Capacity()};{d.Get_Latitude()};{d.Get_Longitude()}"));
+            String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Latitude()};{d.Get_Longitude()};{d.Get_LM_Capacity()};{d.Get_FM_Capacity()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_hubs.csv", csv7, Encoding.UTF8);
 
-            String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_XDocks.csv", csv2, Encoding.UTF8);
 
-            String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()};{d.Get_Id()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\assigned_prior_small_sellers.csv", csv3, Encoding.UTF8);
 
-            String csv4 = String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            String csv4 = String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()};{d.Get_Id()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\assigned_regular_small_sellers.csv", csv4, Encoding.UTF8);
 
-            String csv5 = String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Id()};{d.Get_Demand()};{d.Get_Longitude()};{d.Get_Latitude()}"));
+            String csv5 = String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Name()};{d.Get_Id()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\assigned_big_sellers.csv", csv5, Encoding.UTF8);
 
 

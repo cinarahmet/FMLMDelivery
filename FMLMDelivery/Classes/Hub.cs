@@ -81,9 +81,14 @@ public class Hub
         return _latitude;
     }
 
-    public Double Get_Capacity()
+    public Double Get_LM_Capacity()
     {
         return _lm_capacity;
+    }
+
+    public Double Get_FM_Capacity()
+    {
+        return _fm_capacity;
     }
 
     public void Set_FM_Capacity(double capacity)

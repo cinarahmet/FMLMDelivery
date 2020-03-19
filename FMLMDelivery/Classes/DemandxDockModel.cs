@@ -135,7 +135,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =1800;
+    private readonly long _timeLimit =3600;
     /// <summary>
     /// The starting time of the model
     /// </summary>
@@ -144,7 +144,7 @@ public class DemandxDockModel
     /// <summary>
     /// Gap limit is given in percentage
     /// </summary>
-    private readonly double _gap = 0.025;
+    private readonly double _gap = 0.001;
 
     /// <summary>
     /// if cost is incurred

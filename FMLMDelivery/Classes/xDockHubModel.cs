@@ -336,7 +336,7 @@ namespace FMLMDelivery
         {
             for (int j = 0; j < _numOfHubs; j++)
             {
-                var c_j = _hubs[j].Get_Capacity();
+                var c_j = _hubs[j].Get_LM_Capacity();
                 c.Add(c_j);
             }
         }
