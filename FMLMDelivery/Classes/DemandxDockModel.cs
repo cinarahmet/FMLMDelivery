@@ -308,6 +308,7 @@ public class DemandxDockModel
                     var distance_threshold = _xDocks[j].Get_Distance_Threshold();
                     var demand = 0.0;
                     var already_opened = _xDocks[j].If_Already_Opened();
+                    var is_agency = _xDocks[j].If_Agency();
                     for (int i = 0; i < _num_of_demand_point; i++)
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
@@ -315,7 +316,7 @@ public class DemandxDockModel
                             demand += _demandpoint[i].Get_Demand();
                         }
                     }
-                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold,demand,already_opened);
+                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold,demand,already_opened,is_agency);
                     new_XDocks.Add(x_Dock);
 
                 }

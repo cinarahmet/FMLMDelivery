@@ -203,7 +203,7 @@ public class CSVReader
                 }
                 if (xDock_Capacity > 10.0)
                 {
-                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened);
+                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened,type_value);
                     if (type_value)
                     {
                         _agency.Add(xDock);
@@ -240,7 +240,7 @@ public class CSVReader
                         var xDock_Capacity_ = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
                         if (xDock_Capacity > 10.0)
                         {
-                            var xDock_ = new xDocks(xDock_city_, xDock_district_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_, xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_);
+                            var xDock_ = new xDocks(xDock_city_, xDock_district_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_, xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_,type_value_);
                             if (type_value_)
                             {
                                 _agency.Add(xDock_);

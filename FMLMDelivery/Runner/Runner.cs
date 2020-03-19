@@ -201,8 +201,8 @@ namespace FMLMDelivery
 
             gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01,0.02,0.025});
             Add_Already_Open_Main_Hubs();
-            Partial_Run("ANTALYA", false, 20, 1250, 0.95, gap_list[0]);
-            Partial_Run("Akdeniz", true, 30, 1250, 0.90, gap_list[2]);
+            Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
+            Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
             Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);
             Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);
             Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
@@ -279,7 +279,7 @@ namespace FMLMDelivery
             String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Latitude()};{d.Get_Longitude()};{d.Get_LM_Capacity()};{d.Get_FM_Capacity()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_hubs.csv", csv7, Encoding.UTF8);
 
-            String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()}"));
+            String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()};{d.If_Already_Opened()};{d.If_Agency()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_XDocks.csv", csv2, Encoding.UTF8);
 
             String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()};{d.Get_Id()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()}"));
