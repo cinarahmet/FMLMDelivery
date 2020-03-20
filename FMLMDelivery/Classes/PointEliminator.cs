@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Text;
@@ -13,9 +14,9 @@ namespace FMLMDelivery.Classes
     {
         private List<INumVar> x;
 
-        private List<DemandPoint> _whole_demand_points;
+        private ConcurrentBag<DemandPoint> _whole_demand_points;
 
-        private List<xDocks> _whole_xDocks;
+        private ConcurrentBag<xDocks> _whole_xDocks;
 
         private List<List<double>> d;
 
@@ -46,7 +47,7 @@ namespace FMLMDelivery.Classes
 
         private Double _objVal;
 
-        public PointEliminator(List<DemandPoint> demandPoints, List<xDocks> xDocks, double distance_threshold, double threshold_demand)
+        public PointEliminator(ConcurrentBag<DemandPoint> demandPoints, ConcurrentBag<xDocks> xDocks, double distance_threshold, double threshold_demand)
         {
 
             _whole_demand_points = demandPoints;
@@ -71,13 +72,13 @@ namespace FMLMDelivery.Classes
                 if (demand_list[i] <= _threshold_demand)
                 {
                     count += 1;
-                    var item_to_remove = _whole_xDocks.SingleOrDefault(x => (x.Get_Id() == _whole_demand_points[i].Get_Id()) && (x.Get_District() == _whole_demand_points[i].Get_District()) && x.Get_City() == _whole_demand_points[i].Get_City());
-                    _whole_xDocks.Remove(item_to_remove);
+                    var item_to_remove = _whole_xDocks.SingleOrDefault(x => (x.Get_Id() == _whole_demand_points.ToList()[i].Get_Id()) && (x.Get_District() == _whole_demand_points.ToList()[i].Get_District()) && x.Get_City() == _whole_demand_points.ToList()[i].Get_City());
+                    _whole_xDocks.ToList().Remove(item_to_remove);
                 }
             }
         }
 
-        public List<xDocks> Return_Filtered_xDocx_Locations()
+        public ConcurrentBag<xDocks> Return_Filtered_xDocx_Locations()
         {
             return _whole_xDocks;
         }
@@ -91,7 +92,7 @@ namespace FMLMDelivery.Classes
                 { 
                     if (a[i][j] > 0.9)
                     {
-                        demand += _whole_demand_points[j].Get_Demand();
+                        demand += _whole_demand_points.ToList()[j].Get_Demand();
                     }
                 }
                 demand_list.Add(demand);        
@@ -117,7 +118,7 @@ namespace FMLMDelivery.Classes
 
         private void Print_Distance_Matrix()
         {
-            StreamWriter file = new StreamWriter("C:/Workspace/FMLMDelivery/FMLMDelivery/bin/Debug" + _whole_demand_points[0].Get_City() + "--dist_matrix--" + ".csv");
+            StreamWriter file = new StreamWriter("C:/Workspace/FMLMDelivery/FMLMDelivery/bin/Debug" + _whole_demand_points.ToList()[0].Get_City() + "--dist_matrix--" + ".csv");
             for (int i = 0; i < _num_of_demand_points; i++)
             {
                 for (int j = 0; j < _num_of_demand_points; j++)
@@ -138,10 +139,10 @@ namespace FMLMDelivery.Classes
                 var d_i = new List<double>();
                 for (int j = 0; j < _num_of_demand_points; j++)
                 {
-                    var long_1 = _whole_demand_points[i].Get_Longitude();
-                    var lat_1 = _whole_demand_points[i].Get_Latitude();
-                    var long_2 = _whole_demand_points[j].Get_Longitude();
-                    var lat_2 = _whole_demand_points[j].Get_Latitude();
+                    var long_1 = _whole_demand_points.ToList()[i].Get_Longitude();
+                    var lat_1 = _whole_demand_points.ToList()[i].Get_Latitude();
+                    var long_2 = _whole_demand_points.ToList()[j].Get_Longitude();
+                    var lat_2 = _whole_demand_points.ToList()[j].Get_Latitude();
                     count += 1;
                     var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
                     d_i.Add(d_ij);
@@ -155,7 +156,7 @@ namespace FMLMDelivery.Classes
             //Create a[i,j] matrix
             for (int i = 0; i < _num_of_demand_points; i++)
             {
-                var threshold = _whole_demand_points[i].Get_Distance_Threshold();
+                var threshold = _whole_demand_points.ToList()[i].Get_Distance_Threshold();
                 var a_i = new List<Double>();
                 for (int j = 0; j < _num_of_demand_points; j++)
                 {

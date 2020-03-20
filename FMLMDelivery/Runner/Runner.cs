@@ -25,12 +25,12 @@ namespace FMLMDelivery
         private List<xDocks>  new_xDocks = new List<xDocks>();
         private List<Hub> potential_hub_locations = new List<Hub>();
         private List<String> writer_xdocks = new List<string>();
-        private List<DemandPoint> city_points = new List<DemandPoint>();
-        private List<xDocks> pot_xDock_loc = new List<xDocks>();
-        private ConcurrentBag<String> temp_writer = new ConcurrentBag<String>();
-        private ConcurrentBag<xDocks> temp_xDocks = new ConcurrentBag<xDocks>();
-        private ConcurrentBag<Hub> temp_hubs = new ConcurrentBag<Hub>();       
-        private ConcurrentBag<String> temp_stats = new ConcurrentBag<String>();
+        private ConcurrentDictionary<String, List<DemandPoint>> city_points = new ConcurrentDictionary<String, List<DemandPoint>>();
+        private ConcurrentDictionary<String, List<xDocks>> pot_xDock_loc = new ConcurrentDictionary<String, List<xDocks>>();
+        //private ConcurrentBag<String> temp_writer = new ConcurrentBag<String>();
+        //private ConcurrentBag<xDocks> temp_xDocks = new ConcurrentBag<xDocks>();
+        //private ConcurrentBag<Hub> temp_hubs = new ConcurrentBag<Hub>();       
+        //private ConcurrentBag<String> temp_stats = new ConcurrentBag<String>();
         private List<String> stats_writer = new List<String>();
         private List<String> run_list = new List<String>();
 
@@ -47,8 +47,9 @@ namespace FMLMDelivery
             _regular_small_seller = regular_small; 
         }
 
-        private Tuple<ConcurrentBag<xDocks>, ConcurrentBag<Hub>, ConcurrentBag<String>,ConcurrentBag<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key)
-        {   var stats = new ConcurrentBag<String>();
+        private Tuple<ConcurrentBag<xDocks>, ConcurrentBag<Hub>, ConcurrentBag<String>,ConcurrentBag<String>> Run_Demand_Point_xDock_Model(ConcurrentBag<DemandPoint> demandPoints, ConcurrentBag<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key)
+        {
+            var stats = new ConcurrentBag<String>();
             var xdock_county_ınfo = new ConcurrentBag<String>();
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
@@ -62,7 +63,7 @@ namespace FMLMDelivery
             var new_xDocks = new ConcurrentBag<xDocks>();
             var potential_Hubs = new ConcurrentBag<Hub>(); 
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
+            var first_phase = new DemandxDockModel(_demand_points.ToList(), _pot_xDocks.ToList(), _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false);
 
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -77,7 +78,7 @@ namespace FMLMDelivery
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true);
+            first_phase = new DemandxDockModel(_demand_points.ToList(), _pot_xDocks.ToList(), _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true);
             first_phase.Provide_Initial_Solution(opened_xDocks);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -89,10 +90,10 @@ namespace FMLMDelivery
             return Tuple.Create(new_xDocks, potential_Hubs, xdock_county_ınfo, stats);
         }
 
-        private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key,bool other_cities )
+        private Tuple<ConcurrentBag<DemandPoint>, ConcurrentBag<xDocks>> Get_City_Information(string key,bool other_cities )
         {
-            var city_points = new List<DemandPoint>();
-            var pot_xDock_loc = new List<xDocks>();
+            var city_points = new ConcurrentBag<DemandPoint>();
+            var pot_xDock_loc = new ConcurrentBag<xDocks>();
             if (!other_cities)
             {
                 for (int i = 0; i < demand_Points.Count; i++)
@@ -149,15 +150,105 @@ namespace FMLMDelivery
 
         private void Partial_Run(string key, bool partial_city_run, double distance_threshold, double min_xDock_capacity, double demand_coverage)
         {
-            (city_points, pot_xDock_loc) = Get_City_Information(key, partial_city_run);
+
+            var city_points = new ConcurrentBag<DemandPoint>();
+            var pot_xDock_loc = new ConcurrentBag<xDocks>();
+            if (!partial_city_run)
+            {
+                for (int i = 0; i < demand_Points.Count; i++)
+                {
+                    if (demand_Points[i].Get_City() == key)
+                    {
+                        city_points.Add(demand_Points[i]);
+                    }
+                }
+                for (int j = 0; j < xDocks.Count; j++)
+                {
+                    if (xDocks[j].Get_City() == key)
+                    {
+                        pot_xDock_loc.Add(xDocks[j]);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < demand_Points.Count; i++)
+                {
+                    var already_assigned = false;
+                    for (int j = 0; j < partial_run_cities.Count; j++)
+                    {
+                        if (demand_Points[i].Get_City() == partial_run_cities[j])
+                        {
+                            already_assigned = true;
+                        }
+                    }
+                    if (demand_Points[i].Get_Region() == key && !already_assigned)
+                    {
+                        city_points.Add(demand_Points[i]);
+                    }
+                }
+                for (int j = 0; j < xDocks.Count; j++)
+                {
+                    var already_assigned = false;
+                    for (int k = 0; k < partial_run_cities.Count; k++)
+                    {
+                        if (xDocks[j].Get_City() == partial_run_cities[k])
+                        {
+                            already_assigned = true;
+                        }
+                    }
+                    if (xDocks[j].Get_Region() == key && !already_assigned)
+                    {
+                        pot_xDock_loc.Add(xDocks[j]);
+                    }
+                }
+            }
+
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, distance_threshold, min_xDock_capacity);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-            (temp_xDocks, temp_hubs, temp_writer,temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity,key);
-            stats_writer.AddRange(temp_stats);          
-            new_xDocks.AddRange(temp_xDocks);
+
+            var stats = new ConcurrentBag<String>();
+            var xdock_county_ınfo = new ConcurrentBag<String>();
+            var _demand_points = city_points;
+            var _pot_xDocks = xDocks;
+            var _key = key;
+            var min_model_model = true;
+            var demand_weighted_model = false;
+            //Phase 2 takes the solution of min_model as an input and solve same question with demand weighted objective
+            var phase_2 = false;
+            var demand_covarage = demand_coverage;
+            var objVal = 0.0;
+            var new_xDocks = new ConcurrentBag<xDocks>();
+            var potential_Hubs = new ConcurrentBag<Hub>();
+            var p = 0;
+            var first_phase = new DemandxDockModel(_demand_points.ToList(), _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_capacity, phase_2, p, false);
+
+            first_phase.Run();
+            objVal = first_phase.GetObjVal();
+            new_xDocks = first_phase.Return_XDock();
+            stats.ToList().AddRange(first_phase.Get_Model_Stats_Info());
+            var min_num = first_phase.Return_Num_Xdock();
+            var opened_xDocks = first_phase.Return_Opened_xDocks();
+
+            //Part 2 for county-xDock pair
+            min_model_model = false;
+            demand_weighted_model = true;
+            phase_2 = true;
+            first_phase = new DemandxDockModel(_demand_points.ToList(), _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_capacity, phase_2, min_num, true);
+            first_phase.Provide_Initial_Solution(opened_xDocks);
+            first_phase.Run();
+            objVal = first_phase.GetObjVal();
+            //xDocks are assigned
+            var temp_xDocks = first_phase.Return_XDock();
+            var temp_hubs = first_phase.Return_Potential_Hubs();
+            stats.ToList().AddRange(first_phase.Get_Model_Stats_Info());
+            xdock_county_ınfo = first_phase.Get_Xdock_County_Info();
+
+            stats_writer.AddRange(stats);          
+            new_xDocks.ToList().AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
-            writer_xdocks.AddRange(temp_writer);
+            writer_xdocks.AddRange(xdock_county_ınfo);
         }
 
         private void Add_Already_Open_Main_Hubs()
@@ -245,9 +336,105 @@ namespace FMLMDelivery
             */
             
            Parallel.ForEach(run_dict, run =>
-            {
-              
-                Partial_Run(run.Key,run.Value.Item1,run.Value.Item2,run.Value.Item3,run.Value.Item4);
+           {
+                var city_points = new ConcurrentBag<DemandPoint>();
+                var pot_xDock_loc = new ConcurrentBag<xDocks>();
+                if (!run.Value.Item1)
+                {
+                    for (int i = 0; i < demand_Points.Count; i++)
+                    {
+                        if (demand_Points[i].Get_City() == run.Key)
+                        {
+                            city_points.Add(demand_Points[i]);
+                        }
+                    }
+                    for (int j = 0; j < xDocks.Count; j++)
+                    {
+                        if (xDocks[j].Get_City() == run.Key)
+                        {
+                            pot_xDock_loc.Add(xDocks[j]);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < demand_Points.Count; i++)
+                    {
+                        var already_assigned = false;
+                        for (int j = 0; j < partial_run_cities.Count; j++)
+                        {
+                            if (demand_Points[i].Get_City() == partial_run_cities[j])
+                            {
+                                already_assigned = true;
+                            }
+                        }
+                        if (demand_Points[i].Get_Region() == run.Key && !already_assigned)
+                        {
+                            city_points.Add(demand_Points[i]);
+                        }
+                    }
+                    for (int j = 0; j < xDocks.Count; j++)
+                    {
+                        var already_assigned = false;
+                        for (int k = 0; k < partial_run_cities.Count; k++)
+                        {
+                            if (xDocks[j].Get_City() == partial_run_cities[k])
+                            {
+                                already_assigned = true;
+                            }
+                        }
+                        if (xDocks[j].Get_Region() == run.Key && !already_assigned)
+                        {
+                            pot_xDock_loc.Add(xDocks[j]);
+                        }
+                    }
+                }
+
+                var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, run.Value.Item2, run.Value.Item3);
+                elimination_phase.Run();
+                pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
+
+                var stats = new ConcurrentBag<String>();
+                var xdock_county_ınfo = new ConcurrentBag<String>();
+                var _demand_points = city_points;
+                var _pot_xDocks = xDocks;
+                var _key = run.Key;
+                var min_model_m = true;
+                var demand_weighted_m = false;
+                //Phase 2 takes the solution of min_model as an input and solve same question with demand weighted objective
+                var phase = false;
+                var demand_cov = run.Value.Item4;
+                var objValue = 0.0;
+                var new_xDocks = new ConcurrentBag<xDocks>();
+                var potential_Hubs = new ConcurrentBag<Hub>();
+                var p = 0;
+                var first_phase = new DemandxDockModel(_demand_points.ToList(), _pot_xDocks, _key, demand_weighted_m, min_model_m, demand_cov, run.Value.Item3, phase, p, false);
+
+                first_phase.Run();
+                objValue = first_phase.GetObjVal();
+                new_xDocks = first_phase.Return_XDock();
+                stats.ToList().AddRange(first_phase.Get_Model_Stats_Info());
+                var min_num = first_phase.Return_Num_Xdock();
+                var opened_xDocks = first_phase.Return_Opened_xDocks();
+
+                //Part 2 for county-xDock pair
+                min_model_m = false;
+                demand_weighted_m = true;
+                phase = true;
+                first_phase = new DemandxDockModel(_demand_points.ToList(), _pot_xDocks, _key, demand_weighted_m, min_model_m, demand_cov, run.Value.Item3, phase, min_num, true);
+                first_phase.Provide_Initial_Solution(opened_xDocks);
+                first_phase.Run();
+                objValue = first_phase.GetObjVal();
+                //xDocks are assigned
+                var temp_xDocks = first_phase.Return_XDock();
+                var temp_hubs = first_phase.Return_Potential_Hubs();
+                stats.ToList().AddRange(first_phase.Get_Model_Stats_Info());
+                xdock_county_ınfo = first_phase.Get_Xdock_County_Info();
+
+                stats_writer.AddRange(stats);
+                new_xDocks.ToList().AddRange(temp_xDocks);
+                potential_hub_locations.AddRange(temp_hubs);
+                writer_xdocks.AddRange(xdock_county_ınfo);
 
             });
 
