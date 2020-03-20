@@ -50,7 +50,7 @@ public class CSVReader
         var value = 30;
         var s_2 = "Marmara";
         var value_2 = 30;
-        var s_3 = "İçAnadolu";
+        var s_3 = "İç Anadolu";
         var value_3 = 30;
         var s_4 = "Ege";
         var value_4 = 30;
@@ -180,12 +180,12 @@ public class CSVReader
                 var type_value = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
                 var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                 if (xDock_dist_threshold == 0.0)
                 {
                     xDock_dist_threshold = region_xDock_threshold[xDock_region];
                 }
-                var Already_Opened = Convert.ToDouble(line[8]);
+                var Already_Opened = Convert.ToDouble(line[7]);
                 var xDock_Already_Opened = false;
                 if (Already_Opened == 1.0)
                 {
@@ -226,12 +226,12 @@ public class CSVReader
                         var type_value_ = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
                         var xDock_long_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                         var xDock_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                        var xDock_dist_threshold_ = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                        var xDock_dist_threshold_ = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                         if (xDock_dist_threshold_ == 0.0)
                         {
                             xDock_dist_threshold_ = region_xDock_threshold[xDock_region];
                         }
-                        var Already_Opened_ = Convert.ToDouble(line[8]);
+                        var Already_Opened_ = Convert.ToDouble(line[7]);
                         var xDock_Already_Opened_ = false;
                         if (Already_Opened_ == 1.0)
                         {

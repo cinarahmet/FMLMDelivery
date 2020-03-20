@@ -19,7 +19,7 @@ namespace FMLMDelivery
         private List<Seller> _regular_small_seller;
         private List<Seller> _regular_big_seller;
         private double total_demand;
-        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR", "BURSA","ANTALYA" });
+        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR", "BURSA","ANTALYA","HATAY" });
         private List<String> writer_seller = new List<String>();
         private List<xDocks>  new_xDocks = new List<xDocks>();
         private List<Hub> potential_hub_locations = new List<Hub>();
@@ -148,8 +148,8 @@ namespace FMLMDelivery
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, distance_threshold, min_xDock_capacity);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-            (temp_xDocks, temp_hubs, temp_writer,temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage,min_xDock_capacity,key,gap);
-            stats_writer.AddRange(temp_stats);          
+            (temp_xDocks, temp_hubs, temp_writer, temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage, min_xDock_capacity, key, gap);
+            stats_writer.AddRange(temp_stats);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
             writer_xdocks.AddRange(temp_writer);
@@ -213,27 +213,29 @@ namespace FMLMDelivery
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
 
-            gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01,0.02,0.025});
+            gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
             Add_Already_Open_Main_Hubs();
             Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
-           Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
-            Partial_Run("ANKARA", false, 20, 2500, 0.97, gap_list[3]);
-            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.98, gap_list[4]);
-            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.99, gap_list[1]);
+            Partial_Run("HATAY", false, 20, 1250, 0.99, gap_list[0]);
+            Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
+            Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);
+            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);
+            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
             Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
-            Partial_Run("BURSA", false, 20, 2500, 0.95, gap_list[0]);
-            Partial_Run("İç Anadolu", true, 30, 1250, 0.97, gap_list[0]);
-            Partial_Run("Ege", true, 30, 1250, 0.69, gap_list[0]);
-            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.93, gap_list[0]);
+            Partial_Run("BURSA", false, 20, 1250, 0.95, gap_list[0]);
+            Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
+            Partial_Run("Ege", true, 30, 1250, 0.67, gap_list[0]);
+            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90, gap_list[0]);
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-            Partial_Run("Marmara", true, 30, 1250, 0.82, gap_list[0]);
-            
+            Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);
+
             var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
             write_the_xdocks.Write_Records();
 
-           
+
             Modify_xDocks(new_xDocks);
+
 
 
             //Seller-xDock Assignment
@@ -309,7 +311,7 @@ namespace FMLMDelivery
             Console.WriteLine("Hello World!");
 
 
-            return Tuple.Create(new_xDocks, new_hubs);
+                return Tuple.Create(new_xDocks, new_hubs);
 
         }
 

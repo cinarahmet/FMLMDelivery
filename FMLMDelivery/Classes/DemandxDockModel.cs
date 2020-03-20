@@ -451,8 +451,23 @@ public class DemandxDockModel
         }
     }
 
+    private void Get_Model_Info()
+    {
+        var type = "";
+        if (phase_2 == false)
+        {
+            type = "Min model";
+        }
+        else
+        {
+            type = "Demand Weighted";
+        }
+        Console.WriteLine("The model runs for the key {0}, and the model is {1}", _location, type);
+    }
+
     public void Run()
     {
+        Get_Model_Info();
         Get_Parameters();
         Build_Model();
         if (_second_part)
@@ -565,6 +580,7 @@ public class DemandxDockModel
     }
     private void Print()
     {
+        
         if (!(_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
         {
             Console.WriteLine("Solution is neither optimal nor feasible!");
@@ -719,15 +735,11 @@ public class DemandxDockModel
     {
         for (int j = 0; j < _numOfXdocks; j++)
         {
-            var constraint = _solver.LinearNumExpr();
-            constraint.AddTerm(y[j], 1);
             if (_xDocks[j].If_Already_Opened())
             {
+                var constraint = _solver.LinearNumExpr();
+                constraint.AddTerm(y[j], 1);
                 _solver.AddEq(constraint, 1);
-            }
-            else
-            {
-                _solver.AddLe(constraint, 1);
             }
         }
     }

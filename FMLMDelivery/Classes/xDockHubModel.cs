@@ -227,7 +227,7 @@ namespace FMLMDelivery
 
         private double total_demand_seller = 0;
 
-        private double seller_demand_coverage = 0.90;
+        private double seller_demand_coverage = 1.0;
 
         private List<Seller> assigned_seller;
 
@@ -310,12 +310,12 @@ namespace FMLMDelivery
             for (int i = 0; i < _numOfSeller; i++)
             {
                 var d_k = new List<double>();
-                for (int j = 0; j < _numOfXdocks; j++)
+                for (int j = 0; j < _numOfHubs; j++)
                 {
                     var long_1 = _sellers[i].Get_Longitude();
                     var lat_1 = _sellers[i].Get_Latitude();
-                    var long_2 = _xDocks[j].Get_Longitude();
-                    var lat_2 = _xDocks[j].Get_Latitude();
+                    var long_2 = _hubs[j].Get_Longitude();
+                    var lat_2 = _hubs[j].Get_Latitude();
                     var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
 
                     d_k.Add(d_ij);
@@ -738,7 +738,7 @@ namespace FMLMDelivery
             {
                 TotalHubConstraint();
                 Capacity_Constraint();
-                Min_X_Dock_Constraint();
+                //Min_X_Dock_Constraint();
             }
             if (_demand_weighted)
             {
@@ -746,7 +746,7 @@ namespace FMLMDelivery
                 {
                     TotalHubConstraint();
                     Capacity_Constraint();
-                    Min_X_Dock_Constraint();
+                  //  Min_X_Dock_Constraint();
                 }
                 if (phase_2)
                 {
@@ -826,7 +826,7 @@ namespace FMLMDelivery
                 {
                     constraint.AddTerm(s[i][j], a_seller[i][j]);
                 }
-                _solver.AddLe(constraint, 1);
+                _solver.AddEq(constraint, 1);
             }
         }
         private void Seller_Capacity_Constraint()
@@ -1088,13 +1088,13 @@ namespace FMLMDelivery
 
                     }
                 }
-                /*for (int i = 0; i < _numOfSeller; i++)
+                for (int i = 0; i < _numOfSeller; i++)
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
-                        _objective.AddTerm(s[i][j], d_sellerhub[i][j] * seller_demand[i]);
-                    }
-                }*/
+                        _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]);
+                    }   
+                }
 
 
             }
