@@ -215,19 +215,20 @@ namespace FMLMDelivery
 
             gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01,0.02,0.025});
             Add_Already_Open_Main_Hubs();
-            Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
-           Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
+            //Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
+            //Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
             Partial_Run("ANKARA", false, 20, 2500, 0.97, gap_list[3]);
-            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.98, gap_list[4]);
-            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.99, gap_list[1]);
-            Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
-            Partial_Run("BURSA", false, 20, 2500, 0.95, gap_list[0]);
-            Partial_Run("İç Anadolu", true, 30, 1250, 0.97, gap_list[0]);
-            Partial_Run("Ege", true, 30, 1250, 0.69, gap_list[0]);
-            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.93, gap_list[0]);
+            /*Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.98, gap_list[4]);
+            Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.97, gap_list[1]);
+            Partial_Run("İZMİR", false, 20, 2500, 0.89, gap_list[4]);
+            Partial_Run("BURSA", false, 20, 1250, 0.94, gap_list[0]);
+            Partial_Run("İç Anadolu", true, 30, 1250, 0.95, gap_list[0]);
+            Partial_Run("Ege", true, 30, 1250, 0.67, gap_list[0]);
+            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90, gap_list[0]);
             // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-            Partial_Run("Marmara", true, 30, 1250, 0.82, gap_list[0]);
+            Partial_Run("Marmara", true, 30, 1250, 0.82, gap_list[0]);*/
             
+
             var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
             write_the_xdocks.Write_Records();

@@ -135,7 +135,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =3600;
+    private readonly long _timeLimit =4500;
     /// <summary>
     /// The starting time of the model
     /// </summary>
@@ -718,17 +718,14 @@ public class DemandxDockModel
     private void Already_Opened()
     {
         for (int j = 0; j < _numOfXdocks; j++)
-        {
-            var constraint = _solver.LinearNumExpr();
-            constraint.AddTerm(y[j], 1);
+        {        
+            
             if (_xDocks[j].If_Already_Opened())
             {
+                var constraint = _solver.LinearNumExpr();
+                constraint.AddTerm(y[j], 1);
                 _solver.AddEq(constraint, 1);
-            }
-            else
-            {
-                _solver.AddLe(constraint, 1);
-            }
+            }           
         }
     }
 

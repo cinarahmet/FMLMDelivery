@@ -826,7 +826,7 @@ namespace FMLMDelivery
                 {
                     constraint.AddTerm(s[i][j], a_seller[i][j]);
                 }
-                _solver.AddLe(constraint, 1);
+                _solver.AddEq(constraint, 1);
             }
         }
         private void Seller_Capacity_Constraint()
@@ -886,15 +886,13 @@ namespace FMLMDelivery
             
             for (int i = 0; i < _numOfHubs; i++)
             {
-                var constraint = _solver.LinearNumExpr();
-                constraint.AddTerm(y[i], 1);
+                
+                
                 if (_hubs[i].If_Already_Opened())
                 {
+                    var constraint = _solver.LinearNumExpr();
+                    constraint.AddTerm(y[i], 1);
                     _solver.AddEq(constraint, 1);
-                }
-                else
-                {
-                    _solver.AddLe(constraint, 1);
                 }
             }
            
@@ -1088,13 +1086,13 @@ namespace FMLMDelivery
 
                     }
                 }
-                /*for (int i = 0; i < _numOfSeller; i++)
+                for (int i = 0; i < _numOfSeller; i++)
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
-                        _objective.AddTerm(s[i][j], d_sellerhub[i][j] * seller_demand[i]);
+                        _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]);
                     }
-                }*/
+                }
 
 
             }
