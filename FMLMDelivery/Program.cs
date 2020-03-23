@@ -16,7 +16,10 @@ namespace FMLMDelivery
             var xDocks = new List<xDocks>();
             var agency = new List<xDocks>();
             var hubs = new List<Hub>();
-           
+            var potential_hubs = new List<Hub>();
+            var partial_xDocks = new List<xDocks>();
+
+
 
             //Provide the month index (1-January, 12-December)
             var month = 12;
@@ -29,11 +32,30 @@ namespace FMLMDelivery
             var regular_small_sellers = reader.Get_Regular_Small_Sellers();
             var prior_big_sellers = reader.Get_Prior_Big_Sellers();
             var regular_big_sellers = reader.Get_Regular_Big_Sellers();
+            var partial_solution = true;
+            if (!partial_solution)
+            {
+                var runner = new Runner(demand_point, potential_xDocks,partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers,partial_solution);
+                (xDocks, hubs) = runner.Run();
+                Console.ReadKey();
+            }
+            else
+            {
+                var partial_reader = new CSVReader("", "Temporary_xDcoks.csv", "", month);
+                partial_reader.Read_Partial_Soution_Xdocks();
+                partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
+                //partial_xDocks = partial_reader.Get_();
+                var runner_partial = new Runner(demand_point, potential_xDocks,partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers,partial_solution);
+                (xDocks, hubs) = runner_partial.Run();
+                Console.ReadKey();
+            }
+
+          
+
+            
 
 
-            var runner = new Runner(demand_point,potential_xDocks,agency,prior_small_sellers,regular_small_sellers,prior_big_sellers,regular_big_sellers);
-            (xDocks , hubs)=runner.Run();
-            Console.ReadKey();
+            
 
         }
     }

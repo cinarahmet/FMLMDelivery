@@ -32,16 +32,20 @@ namespace FMLMDelivery
         private List<String> temp_stats = new List<String>();
         private List<String> stats_writer = new List<String>();
         private List<Double> gap_list = new List<double>();
+        private List<xDocks> partial_xdocks = new List<xDocks>();
+        private Boolean partial_run = new Boolean();
 
-        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big)
+        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,Boolean _partial_run)
         {
+            partial_xdocks=_partial_xdocks;
             xDocks = _xDocks;
             demand_Points = _demand_points;
             agency = _agency;
             _prior_big_seller = prior_big;
             _prior_small_seller = prior_small;
             _regular_big_seller = regular_big;
-            _regular_small_seller = regular_small; 
+            _regular_small_seller = regular_small;
+            partial_run = _partial_run;
         }
 
         private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
@@ -207,88 +211,159 @@ namespace FMLMDelivery
         }
 
         public Tuple<List<xDocks>, List<Hub>> Run()
-        {
+        {   var new_hubs = new List<Hub>();
+            var assigned_prior_sellers = new List<Seller>();
+            var assigned_regular_sellers = new List<Seller>();
+            var assigned_big_sellers = new List<Seller>();
             /* This method firstly calls Demand-xDock model with the minimum xDock objective in given demand covarage. After solving the model with this object, the method takes the number of xDock
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
 
-            gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
-            Add_Already_Open_Main_Hubs();
-            /*Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
-            Partial_Run("HATAY", false, 20, 1250, 0.99, gap_list[0]);
-            Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
-            Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);*/
-            Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);
-            /*Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
-            Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
-            Partial_Run("BURSA", false, 20, 1250, 0.95, gap_list[0]);
-            Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
-            Partial_Run("Ege", true, 30, 1250, 0.61, gap_list[0]);
-            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.9, gap_list[0]);
-            //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-            Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);*/
-
-            var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
-            var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
-            write_the_xdocks.Write_Records();
-
-            
-            Modify_xDocks(new_xDocks);
-            
-            //Seller-xDock Assignment
-            total_demand = 0;
-
-       
-
-            for (int i = 0; i < _prior_small_seller.Count; i++)
+            if (!partial_run)
             {
-                total_demand += _prior_small_seller[i].Get_Demand();
+                gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
+                Add_Already_Open_Main_Hubs();
+                /*Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
+                Partial_Run("HATAY", false, 20, 1250, 0.99, gap_list[0]);
+                Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
+                Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);
+                Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);*/
+                Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
+                /*Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
+                Partial_Run("BURSA", false, 20, 1250, 0.95, gap_list[0]);
+                Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
+                Partial_Run("Ege", true, 30, 1250, 0.61, gap_list[0]);
+                Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.9, gap_list[0]);
+                //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
+                Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);*/
+
+                var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
+                var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
+                write_the_xdocks.Write_Records();
+
+                Modify_xDocks(new_xDocks);
+
+                String csv_new = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()};{d.Get_District()};{d.Get_Id()};{d.Get_Region()};{d.If_Agency()};{d.Get_Longitude()};{d.Get_Latitude()};{d.If_Already_Opened()};{d.Get_Distance_Threshold()};{d.Get_Demand()}"));
+                System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\Temporary_xDcoks.csv", csv_new, Encoding.UTF8);
+
+                //Seller-xDock Assignment
+
+
+
+                total_demand = 0;
+                for (int i = 0; i < _prior_small_seller.Count; i++)
+                {
+                    total_demand += _prior_small_seller[i].Get_Demand();
+                }
+                var second_phase = new SmallSellerxDockModel(_prior_small_seller, new_xDocks, true);
+                second_phase.Run();
+                assigned_prior_sellers = second_phase.Return_Assigned_Seller();
+                var covered_demand = second_phase.Return_Covered_Demand();
+                var remaining_demand = total_demand - covered_demand;
+                writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+                stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
+
+                second_phase = new SmallSellerxDockModel(_regular_small_seller, new_xDocks, false, remaining_demand);
+                second_phase.Run();
+                assigned_regular_sellers = second_phase.Return_Assigned_Seller();
+                var cov_demand = second_phase.Return_Covered_Demand();
+                writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+                stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
+                var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
+                var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
+                writer_small_seller.Write_Records();
+
+                var demand_covarage = 0.90;
+                var min_model_model = true;
+                var demand_weighted_model = false;
+                var phase_2 = false;
+
+
+
+                //xDock-Seller-Hub Assignment
+                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, 0);
+                third_phase.Run();
+                var num_clusters = third_phase.Return_num_Hubs();
+                min_model_model = false;
+                demand_weighted_model = true;
+                phase_2 = true;
+                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+                third_phase.Run();
+                var objVal = third_phase.GetObjVal();
+                new_hubs = third_phase.Return_New_Hubs();
+                assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
+                var header_hub = "#Hub,Hub İl, Hub İlçe,Hub Mahalle, Hub_Long, Hub_Lat, Type_of_Assignment,Distinct Id, İl, İlçe, Mahalle, Talep/Gönderi, Distance";
+                var stats_header = "Part,Model,Status,Time,Gap";
+                stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
+                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
+                var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
+                writer_hub_seller.Write_Records();
+                stat_writer.Write_Records();
+
             }
-            var second_phase = new SmallSellerxDockModel(_prior_small_seller, new_xDocks, true);
-            second_phase.Run();
-            var assigned_prior_sellers = second_phase.Return_Assigned_Seller();
-            var covered_demand = second_phase.Return_Covered_Demand();
-            var remaining_demand = total_demand - covered_demand;
-            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
-            stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
+            else {
 
-            second_phase = new SmallSellerxDockModel(_regular_small_seller, new_xDocks, false, remaining_demand);
-            second_phase.Run();
-            var assigned_regular_sellers = second_phase.Return_Assigned_Seller();
-            var cov_demand = second_phase.Return_Covered_Demand();
-            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
-            stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
-            var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
-            var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
-            writer_small_seller.Write_Records();
+                //Seller-xDock Assignment
+                potential_hub_locations =Convert_to_Potential_Hubs(partial_xdocks);
+                Add_Already_Open_Main_Hubs();
+                total_demand = 0;
+                for (int i = 0; i < _prior_small_seller.Count; i++)
+                {
+                    total_demand += _prior_small_seller[i].Get_Demand();
+                }
+                var second_phase = new SmallSellerxDockModel(_prior_small_seller, partial_xdocks, true);
+                second_phase.Run();
+                assigned_prior_sellers = second_phase.Return_Assigned_Seller();
+                var covered_demand = second_phase.Return_Covered_Demand();
+                var remaining_demand = total_demand - covered_demand;
+                writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+                stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
 
-            var demand_covarage = 0.90;
-            var min_model_model = true;
-            var demand_weighted_model = false;
-            var phase_2 = false;
+                second_phase = new SmallSellerxDockModel(_regular_small_seller, partial_xdocks, false, remaining_demand);
+                second_phase.Run();
+                assigned_regular_sellers = second_phase.Return_Assigned_Seller();
+                var cov_demand = second_phase.Return_Covered_Demand();
+                writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+                stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
+                var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
+                var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
+                writer_small_seller.Write_Records();
+
+                var demand_covarage = 0.90;
+                var min_model_model = true;
+                var demand_weighted_model = false;
+                var phase_2 = false;
 
 
 
-            //xDock-Seller-Hub Assignment
-            var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, 0);
-            third_phase.Run();
-            var num_clusters = third_phase.Return_num_Hubs();
-            min_model_model = false;
-            demand_weighted_model = true;
-            phase_2 = true;
-            third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
-            third_phase.Run();
-            var objVal = third_phase.GetObjVal();
-            var new_hubs = third_phase.Return_New_Hubs();
-            var assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-            var header_hub = "#Hub,Hub İl, Hub İlçe,Hub Mahalle, Hub_Long, Hub_Lat, Type_of_Assignment,Distinct Id, İl, İlçe, Mahalle, Talep/Gönderi, Distance";
-            var stats_header = "Part,Model,Status,Time,Gap";
-            stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
-            var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
-            var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
-            writer_hub_seller.Write_Records();                     
-            stat_writer.Write_Records();
+                //xDock-Seller-Hub Assignment
+                var third_phase = new xDockHubModel(partial_xdocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, 0);
+                third_phase.Run();
+                var num_clusters = third_phase.Return_num_Hubs();
+                min_model_model = false;
+                demand_weighted_model = true;
+                phase_2 = true;
+                third_phase = new xDockHubModel(partial_xdocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+                third_phase.Run();
+                var objVal = third_phase.GetObjVal();
+                new_hubs = third_phase.Return_New_Hubs();
+                assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
+                var header_hub = "#Hub,Hub İl, Hub İlçe,Hub Mahalle, Hub_Long, Hub_Lat, Type_of_Assignment,Distinct Id, İl, İlçe, Mahalle, Talep/Gönderi, Distance";
+                var stats_header = "Part,Model,Status,Time,Gap";
+                stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
+                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
+                var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
+                writer_hub_seller.Write_Records();
+                stat_writer.Write_Records();
+            }
+
+
+            //Seller-xDock Assignment
+
+
+
+            
 
             String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Latitude()};{d.Get_Longitude()};{d.Get_LM_Capacity()};{d.Get_FM_Capacity()}"));
             System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_hubs.csv", csv7, Encoding.UTF8);
@@ -312,7 +387,27 @@ namespace FMLMDelivery
                 return Tuple.Create(new_xDocks, new_hubs);
 
         }
+        
+        private List<Hub> Convert_to_Potential_Hubs(List<xDocks> new_XDocks)
+        {
+            var potential_Hubs = new List<Hub>();
+            for (int i = 0; i < new_XDocks.Count; i++)
+            {
+                var city = new_XDocks[i].Get_City();
+                var district = new_XDocks[i].Get_District();
+                var id = new_XDocks[i].Get_Id();
+                var region = new_XDocks[i].Get_Region();
+                var longitude = new_XDocks[i].Get_Longitude();
+                var latitude = new_XDocks[i].Get_Latitude();
+                var dist_thres = new_XDocks[i].Get_Distance_Threshold();
+                var capacity = 4000000;
+                var already_opened = false;
+                var potential_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                potential_Hubs.Add(potential_hub);
+            }
 
+            return potential_Hubs;
+        }
         private void Modify_xDocks(List<xDocks> new_xDocks)
         {
             for (int i = 0; i < agency.Count; i++)

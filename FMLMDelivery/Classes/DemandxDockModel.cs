@@ -135,7 +135,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =3600;
+    private readonly long _timeLimit =100;
     /// <summary>
     /// The starting time of the model
     /// </summary>

@@ -15,6 +15,8 @@ public class CSVReader
 
     private readonly List<Seller> _prior_small_seller = new List<Seller>();
 
+    private readonly List<xDocks> _partial_xdocks = new List<xDocks>();
+
     private List<Seller> _regular_small_seller = new List<Seller>();
 
     private readonly List<Seller> _prior_big_seller = new List<Seller>();
@@ -162,7 +164,30 @@ public class CSVReader
         }
     }
 
+    public void Read_Partial_Soution_Xdocks()
+    {
+        using(var sr = File.OpenText(_xDocks_file))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(',');
+                var xDock_City = line[0];
+                var xDock_District = line[1];
+                var xDock_Id = line[2];
+                var xDock_region = line[3];
+                var type_value = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
+                var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var Already_Opened = Convert.ToBoolean(Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture));
+                var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                var xdock_demand= Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);
+                _partial_xdocks.Add(xDock);
+            }
+        }
 
+    }
 
 
     private void Read_XDock()
@@ -305,6 +330,7 @@ public class CSVReader
 
     }
 
+
     public List<xDocks> Get_XDocks()
     {
         return _xDocks;
@@ -339,5 +365,9 @@ public class CSVReader
     public List<Seller> Get_Total_Sellers()
     {
         return _total_seller;
+    }
+    public List<xDocks> Get_Partial_Solution_Xdocks()
+    {
+        return _partial_xdocks;
     }
 }
