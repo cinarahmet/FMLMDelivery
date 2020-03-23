@@ -560,7 +560,7 @@ public class DemandxDockModel
         var location = _location;
         var status = _status;
         var time = _solutionTime;
-        var gap_to_optimal = _solver.GetMIPRelativeGap();
+        var gap_to_optimal = (_solver.GetMIPRelativeGap())*100;
         var type = "";
         if (phase_2 == false)
         {
@@ -679,7 +679,7 @@ public class DemandxDockModel
         var startTime = DateTime.Now;
 
         _solver.Solve();
-        _solutionTime = (DateTime.Now - startTime).Seconds;
+        _solutionTime =( (DateTime.Now - startTime).Hours*60*60 + (DateTime.Now - startTime).Minutes*60 + (DateTime.Now - startTime).Seconds);
         _status = _solver.GetStatus();
         Console.WriteLine("Algorithm stops running at {0}", DateTime.Now);
     }

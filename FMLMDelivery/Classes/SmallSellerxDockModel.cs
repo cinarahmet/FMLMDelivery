@@ -274,7 +274,7 @@ namespace FMLMDelivery.Classes
             var model= "";
             var time = _solutionTime;
             var status = _status;
-            var gap_to_optimal = _solver.GetMIPRelativeGap();
+            var gap_to_optimal = (_solver.GetMIPRelativeGap())*100;
             if (_prior == true)
             {
                 model = "Prior Small Seller Model";
@@ -304,7 +304,7 @@ namespace FMLMDelivery.Classes
             var startTime = DateTime.Now;
 
             _solver.Solve();
-            _solutionTime = (DateTime.Now - startTime).Seconds;
+            _solutionTime = ((DateTime.Now - startTime).Hours * 60 * 60 + (DateTime.Now - startTime).Minutes * 60 + (DateTime.Now - startTime).Seconds);
             _status = _solver.GetStatus();
             Console.WriteLine("Algorithm stops running at {0}", DateTime.Now);
         }
