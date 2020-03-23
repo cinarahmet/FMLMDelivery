@@ -224,20 +224,20 @@ namespace FMLMDelivery
             Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
             Partial_Run("BURSA", false, 20, 1250, 0.95, gap_list[0]);
             Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
-            Partial_Run("Ege", true, 30, 1250, 0.67, gap_list[0]);
-            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.90, gap_list[0]);
-            // Partial_Run("Karadeniz", true, 30, 1250, 0.90);
+            Partial_Run("Ege", true, 30, 1250, 0.61, gap_list[0]);
+            Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.9, gap_list[0]);
+            //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
             Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);
 
             var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
             var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
             write_the_xdocks.Write_Records();
 
-
+            String csv10 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()};{d.Get_City()};{d.Get_District()};{d.Get_Longitude()};{d.Get_Latitude()};{d.Get_Demand()};{d.If_Already_Opened()};{d.If_Agency()}"));
+            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\ege.csv", csv10, Encoding.UTF8);
+            
             Modify_xDocks(new_xDocks);
-
-
-
+            
             //Seller-xDock Assignment
             total_demand = 0;
 

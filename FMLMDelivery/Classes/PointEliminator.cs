@@ -27,6 +27,8 @@ namespace FMLMDelivery.Classes
 
         private double _num_of_demand_points;
 
+        private double _num_of_xDocks;
+
         /// <summary>
         /// Objective instance which stores the objective function
         /// </summary>
@@ -43,6 +45,8 @@ namespace FMLMDelivery.Classes
         private Cplex.Status _status;
 
         private List<Double> demand_list;
+
+        private List<Double> already_open_demand_list = new List<double>();
 
         private Double _objVal;
 
@@ -61,6 +65,7 @@ namespace FMLMDelivery.Classes
             _threshold_demand = threshold_demand;
 
             _num_of_demand_points = _whole_demand_points.Count;
+            _num_of_xDocks = _whole_xDocks.Count();
         }
 
         private void Uptade_Candidate_xDocks()
@@ -75,11 +80,52 @@ namespace FMLMDelivery.Classes
                     _whole_xDocks.Remove(item_to_remove);
                 }
             }
+            var count_2 = 0;
+            for (int j = 0; j < _whole_xDocks.Count; j++)
+            {
+                if (_whole_xDocks[j].If_Already_Opened())
+                {
+                    if (already_open_demand_list[count_2] <= _threshold_demand)
+                    {
+                        var remove_item = _whole_xDocks.SingleOrDefault(x => (x.Get_Id() == _whole_xDocks[j].Get_Id()) && (x.Get_District() == _whole_xDocks[j].Get_District()) && x.Get_City() == _whole_xDocks[j].Get_City());
+                        _whole_xDocks.Remove(remove_item);
+                    }
+                    count_2 += 1;
+                }
+                
+            }
+            
+            
         }
 
         public List<xDocks> Return_Filtered_xDocx_Locations()
         {
             return _whole_xDocks;
+        }
+
+        private void Get_Demand_of_Already_Open_Hubs()
+        {
+            for (int j = 0; j < _num_of_xDocks; j++)
+            {
+                if (_whole_xDocks[j].If_Already_Opened())
+                {
+                    var lat1 = _whole_xDocks[j].Get_Latitude();
+                    var long1 = _whole_xDocks[j].Get_Longitude();
+                    var demand = 0.0;
+                    for (int i = 0; i < _num_of_demand_points; i++)
+                    {
+                        var lat2 = _whole_demand_points[i].Get_Latitude();
+                        var long2 = _whole_demand_points[i].Get_Longitude();
+                        var distance = Calculate_Distances(long1, lat1, long2, lat2);
+                        var threshold = _whole_demand_points[i].Get_Distance_Threshold();
+                        if (distance <= threshold)
+                        {
+                            demand += _whole_demand_points[i].Get_Demand();
+                        }
+                    }
+                    already_open_demand_list.Add(demand);
+                }
+            }
         }
 
         private void Get_Total_Demand()
@@ -96,6 +142,7 @@ namespace FMLMDelivery.Classes
                 }
                 demand_list.Add(demand);        
             }
+            
         }
 
         public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -111,6 +158,7 @@ namespace FMLMDelivery.Classes
             Get_Distance_Matrix();
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
+            Get_Demand_of_Already_Open_Hubs();
             Uptade_Candidate_xDocks();
           //  Print_Distance_Matrix();
         }
