@@ -78,7 +78,7 @@ public class CSVReader
         var s_3 = "İç Anadolu";
         var value_3 = 180;
         var s_4 = "Ege";
-        var value_4 = 180;
+        var value_4 = 220;
         var s_5 = "Güneydoğu";
         var value_5 = 320;
         var s_6 = "Karadeniz";
