@@ -19,7 +19,9 @@ public class xDocks
 
     private readonly Double _distance_threshold;
 
-    private readonly Double _demand;
+    private readonly Double _lm_demand;
+
+    private Double _fm_demand;
 
     private readonly Boolean _already_opened;
 
@@ -36,7 +38,8 @@ public class xDocks
         _longitude = longitude;
         _latitude = latitude;
         _distance_threshold = distance_threshold;
-        _demand = demand;
+        _lm_demand = demand;
+        _fm_demand = 0;
         _already_opened = already_opened;
         _type_value = type_value;
     }
@@ -86,9 +89,19 @@ public class xDocks
         return _latitude;
     }
 
-    public Double Get_Demand()
+    public Double Get_LM_Demand()
     {
-        return _demand;
+        return _lm_demand;
+    }
+
+    public Double Get_FM_Demand()
+    {
+        return _fm_demand;
+    }
+
+    public void Set_FM_Demand(double demand)
+    {
+        _fm_demand = demand;
     }
    
 }

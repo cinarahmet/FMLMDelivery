@@ -32,7 +32,7 @@ namespace FMLMDelivery
             var regular_small_sellers = reader.Get_Regular_Small_Sellers();
             var prior_big_sellers = reader.Get_Prior_Big_Sellers();
             var regular_big_sellers = reader.Get_Regular_Big_Sellers();
-            var partial_solution = true;
+            var partial_solution = false;
             if (!partial_solution)
             {
                 var runner = new Runner(demand_point, potential_xDocks,partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers,partial_solution);
@@ -41,7 +41,7 @@ namespace FMLMDelivery
             }
             else
             {
-                var partial_reader = new CSVReader("", "Temporary_xDcoks.csv", "", month);
+                var partial_reader = new CSVReader("", "Output/Temporary_xDocks.csv", "", month);
                 partial_reader.Read_Partial_Soution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();

@@ -176,10 +176,10 @@ public class CSVReader
                 var xDock_District = line[1];
                 var xDock_Id = line[2];
                 var xDock_region = line[3];
-                var type_value = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
+                var type_value = Convert.ToBoolean(line[4], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                var Already_Opened = Convert.ToBoolean(Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture));
+                var Already_Opened = Convert.ToBoolean(line[7], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                 var xdock_demand= Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);

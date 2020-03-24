@@ -198,9 +198,12 @@ namespace FMLMDelivery
         private Int32 p;
 
         /// <summary>
-        /// Demand of each xDock
+        /// LM Demand of each xDock
         /// </summary>
-        private List<Double> x_dock_demand;
+        private List<Double> x_dock_LM_demand;
+
+
+        private List<Double> x_dock_FM_demand;
 
         /// <summary>
         /// Weigted demand for 
@@ -208,9 +211,11 @@ namespace FMLMDelivery
         private Boolean _demand_weighted;
 
         /// <summary>
-        /// Total demand of the xdocks
+        /// Total LM demand of the xdocks
         /// </summary>
-        private Double total_demand = 0;
+        private Double total_LM_demand = 0;
+
+        private Double xDocks_FM_total_demand = 0;
 
         /// <summary>
         /// Total demand coverage that is required from the system
@@ -271,7 +276,8 @@ namespace FMLMDelivery
             d_sellerhub = new List<List<double>>();
             c = new List<double>();
             country_names = new Dictionary<int, string>();
-            x_dock_demand = new List<double>();
+            x_dock_LM_demand = new List<double>();
+            x_dock_FM_demand = new List<double>();
             seller_demand = new List<double>();
             new_hubs = new List<Hub>();
             assigned_seller = new List<Seller>();
@@ -450,10 +456,11 @@ namespace FMLMDelivery
                             var number_of_xdock = "xDock" + count2;
                             var xdock_city = _xDocks[i].Get_City();
                             var xdock_county = _xDocks[i].Get_District();
-                            var xdock_demand = _xDocks[i].Get_Demand();
+                            var xdock_lm_demand = _xDocks[i].Get_LM_Demand();
+                            var xdock_fm_demand = _xDocks[i].Get_FM_Demand();
                             var xdock_id = _xDocks[i].Get_Id();
                             var xdock_distance = d[i][j];
-                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{number_of_xdock},{xdock_city},{xdock_county},{xdock_id},{xdock_demand},{xdock_distance}";
+                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{number_of_xdock},{xdock_city},{xdock_county},{xdock_id},{xdock_lm_demand},{xdock_fm_demand},{xdock_distance}";
                             records.Add(result);
                         }
                     }
@@ -467,9 +474,10 @@ namespace FMLMDelivery
                             var seller_district = _sellers[k].Get_District();
                             var seller_city = _sellers[k].Get_City();
                             var seller_id = "";
-                            var seller_demand = _sellers[k].Get_Demand();
+                            var seller_lm_demand = "";
+                            var seller_fm_demand = _sellers[k].Get_Demand();
                             var seller_distance = d_seller[k][j];
-                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{seller_name},{seller_city},{seller_district},{seller_id},{seller_demand},{seller_distance}";
+                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{seller_name},{seller_city},{seller_district},{seller_id},{seller_lm_demand},{seller_fm_demand},{seller_distance}";
                             records.Add(result);
                         }
                     }
@@ -525,14 +533,15 @@ namespace FMLMDelivery
                         var valueslong = _hubs[j].Get_Longitude();
                         var dist = _hubs[j].Get_Distance_Threshold();
                         var lm_distribution = 0.0;
+                        var fm_distribution = 0.0;
                         for (int i = 0; i < _numOfXdocks; i++)
                         {
                             if (_solver.GetValue(x[i][j]) > 0.9)
                             {
-                                lm_distribution += _xDocks[i].Get_Demand();
+                                lm_distribution += _xDocks[i].Get_LM_Demand();
+                                fm_distribution += _xDocks[i].Get_FM_Demand();
                             }
                         }
-                        var fm_distribution = 0.0;
                         for (int i = 0; i < _numOfSeller; i++)
                         {
                             if (_solver.GetValue(s[i][j]) > 0.9)
@@ -680,7 +689,8 @@ namespace FMLMDelivery
         {
             for (int i = 0; i < _numOfXdocks; i++)
             {
-                total_demand = x_dock_demand[i] + total_demand;
+                total_LM_demand = x_dock_LM_demand[i] + total_LM_demand;
+                xDocks_FM_total_demand += x_dock_FM_demand[i];
             }
             for (int j = 0; j < _numOfSeller; j++)
             {
@@ -691,8 +701,10 @@ namespace FMLMDelivery
         {
             for (int i = 0; i < _numOfXdocks; i++)
             {
-                var d_i = _xDocks[i].Get_Demand();
-                x_dock_demand.Add(d_i);
+                var lm_i = _xDocks[i].Get_LM_Demand();
+                var fm_i = _xDocks[i].Get_FM_Demand();
+                x_dock_LM_demand.Add(lm_i);
+                x_dock_FM_demand.Add(fm_i);
             }
 
             for (int i = 0; i < _numOfSeller; i++)
@@ -799,7 +811,7 @@ namespace FMLMDelivery
                 var constraint = _solver.LinearNumExpr();
                 for (int i = 0; i < _numOfXdocks; i++)
                 {
-                    constraint.AddTerm(x[i][j], a[i][j]*x_dock_demand[i]);
+                    constraint.AddTerm(x[i][j], a[i][j]*(x_dock_LM_demand[i]+ x_dock_FM_demand[i]));
                 }
                 constraint.AddTerm(y[j], -min_hub_capacity);
                 _solver.AddGe(constraint,0);
@@ -836,12 +848,18 @@ namespace FMLMDelivery
                 var constraint = _solver.LinearNumExpr();
                 for (int i = 0; i < _numOfSeller; i++)
                 {
-                    constraint.AddTerm(s[i][j], a_seller[i][j]);
-                    constraint.AddTerm(y[j], -(_hubs[j].Get_FM_Capacity()));
+                    constraint.AddTerm(s[i][j], a_seller[i][j]*_sellers[i].Get_Demand());
                 }
+                for (int k = 0; k < _numOfXdocks; k++)
+                {
+                    constraint.AddTerm(x[k][j], a[k][j]* _xDocks[k].Get_FM_Demand());
+                }
+                constraint.AddTerm(y[j], -(_hubs[j].Get_FM_Capacity()));
                 _solver.AddLe(constraint, 0);
             }
         }
+
+
         private void Seller_Demand_Satisfaction_Constraint()
         {
             var constraint = _solver.LinearNumExpr();
@@ -850,7 +868,6 @@ namespace FMLMDelivery
                 for (int j = 0; j < _numOfHubs; j++)
                 {
                     constraint.AddTerm(s[i][j], a_seller[i][j] * seller_demand[i]);
-
                 }
             }
             _solver.AddGe(constraint, total_demand_seller*seller_demand_coverage);
@@ -864,10 +881,20 @@ namespace FMLMDelivery
             {
                 for (int j = 0; j < _numOfHubs; j++)
                 {
-                    constraint.AddTerm(x[i][j], x_dock_demand[i]*a[i][j]);
+                    constraint.AddTerm(x[i][j], x_dock_LM_demand[i]*a[i][j]);
                 }
             }
-            _solver.AddGe(constraint, total_demand*_demand_covarage);
+            _solver.AddGe(constraint, total_LM_demand*_demand_covarage);
+
+            var constraint_2 = _solver.LinearNumExpr();
+            for (int i = 0; i < _numOfXdocks; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    constraint_2.AddTerm(x[i][j], x_dock_FM_demand[i] * a[i][j]);
+                }
+            }
+            _solver.AddGe(constraint_2, xDocks_FM_total_demand * _demand_covarage);
         }
         //∑y[j]=num_of_cluster
         private void TotalHubConstraint()
@@ -909,7 +936,7 @@ namespace FMLMDelivery
                 var constraint = _solver.LinearNumExpr();
                 for (int i = 0; i < _numOfXdocks; i++)
                 {
-                    var demand_included = x_dock_demand[i] * a[i][j];
+                    var demand_included = x_dock_LM_demand[i] * a[i][j];
                     constraint.AddTerm(x[i][j], demand_included);
                 }
                 constraint.AddTerm(y[j], -_hubs[j].Get_LM_Capacity());
@@ -1084,7 +1111,7 @@ namespace FMLMDelivery
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
-                        _objective.AddTerm(x[i][j], d[i][j] * x_dock_demand[i]);
+                        _objective.AddTerm(x[i][j], d[i][j] * (x_dock_LM_demand[i] + x_dock_FM_demand[i]));
 
                     }
                 }

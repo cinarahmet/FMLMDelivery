@@ -184,10 +184,32 @@ namespace FMLMDelivery.Classes
                 Get_Status();
                 Calculate_Covered_Demand();
                 Assigned_Seller_List();
+                Set_xDock_FM_Demand();
                 Get_Seller_Csv();
             }  
             Print();
             ClearModel();
+        }
+
+        private void Set_xDock_FM_Demand()
+        {
+            for (int j = 0; j < _num_of_xDocks; j++)
+            {
+                var fm_demand = _xDocks[j].Get_FM_Demand();
+                for (int i = 0; i < _num_of_Seller; i++)
+                {
+                    if (_solver.GetValue(x[i][j]) > 0.9)
+                    {
+                        fm_demand += _small_seller[i].Get_Demand();
+                    }
+                }
+                _xDocks[j].Set_FM_Demand(fm_demand);
+            }
+        }
+
+        public List<xDocks> Return_Updated_xDocks()
+        {
+            return _xDocks;
         }
 
         public List<Seller> Return_Assigned_Seller()
