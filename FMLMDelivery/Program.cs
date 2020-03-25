@@ -42,7 +42,7 @@ namespace FMLMDelivery
             else
             {
                 var partial_reader = new CSVReader("", "Output/Temporary_xDocks.csv", "", month);
-                partial_reader.Read_Partial_Soution_Xdocks();
+                partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();
                 var runner_partial = new Runner(demand_point, potential_xDocks,partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers,partial_solution);
