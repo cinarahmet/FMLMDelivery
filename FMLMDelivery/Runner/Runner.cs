@@ -192,7 +192,7 @@ namespace FMLMDelivery
                     var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
                     potential_hub_locations.Add(open_hub);
                 }
-                else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "XDOCK SPECİAL")
+                else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
                     var city = xDocks[i].Get_City();
                     var district = xDocks[i].Get_District();
@@ -223,19 +223,19 @@ namespace FMLMDelivery
             if (!partial_run)
             {
                 gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
-                /*Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
+                Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
                 Partial_Run("HATAY", false, 20, 1250, 0.99, gap_list[0]);
                 Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
                 Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);
-                Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);*/
+                Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);
                 Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
-                /*Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
+                Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
                 Partial_Run("BURSA", false, 20, 1250, 0.95, gap_list[0]);
                 Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
                 Partial_Run("Ege", true, 30, 1250, 0.61, gap_list[0]);
                 Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.9, gap_list[0]);
                 //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-                Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);*/
+                Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);
 
                 var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
                 var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
