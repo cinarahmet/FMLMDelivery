@@ -135,7 +135,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =3600;
+    private readonly long _timeLimit =100;
     /// <summary>
     /// The starting time of the model
     /// </summary>
@@ -212,11 +212,13 @@ public class DemandxDockModel
 
     private Int32 xDock_count = 0;
 
-    private List<Double> _initial_solution;
+    private List<Double> _initial_xDocks;
+
+    private List<Double> _initial_assignments;
 
     private Boolean _second_part;
 
-    private List<Double> result = new List<Double>();
+    private List<Double> opened_xdocks = new List<Double>();
 
     private  List<String> record_list = new List<String>();
 
@@ -225,6 +227,7 @@ public class DemandxDockModel
     private List<String> record_stats = new List<String>();
 
     private String _location;
+
 
     public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
@@ -243,7 +246,8 @@ public class DemandxDockModel
         p = P;
         _demand_weighted = Demandweight;
         _demand_covarage = Demand_Covarage;
-        _initial_solution = new List<double>();
+        _initial_xDocks = new List<double>();
+        _initial_assignments = new List<double>();
         _second_part = second_part;
         _min_xDock_cap = min_xdock_cap;
         
@@ -354,18 +358,37 @@ public class DemandxDockModel
         for (int j = 0; j < _numOfXdocks; j++)
         {
             var value = Math.Round(_solver.GetValue(y[j]));
-            result.Add(value);
+            opened_xdocks.Add(value);
         }
     }
 
-    public void Provide_Initial_Solution(List<Double> init)
+    private void Get_Assignments()
     {
-        _initial_solution = init;
+        for (int i = 0; i < _num_of_demand_point; i++)
+        {
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                var value = Math.Round(_solver.GetValue(x[i][j]));
+                _initial_assignments.Add(value);
+            }
+        }
+    }
+
+    public void Provide_Initial_Solution(List<Double> opened_xDocks, List<Double> assignments)
+    {
+        _initial_xDocks = opened_xDocks;
+        _initial_assignments = assignments;
+
     }
 
     public List<Double> Return_Opened_xDocks()
     {
-        return result;
+        return opened_xdocks;
+    }
+
+    public List<Double> Return_Assignments()
+    {
+        return _initial_assignments;
     }
 
     public List<Hub> Return_Potential_Hubs()
@@ -478,6 +501,7 @@ public class DemandxDockModel
         if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
         {
             Get_Opened_xDocks();
+            Get_Assignments();
             Create_XDock_Names();
             Get_xDock();
             Get_Potential_Hubs();
@@ -490,13 +514,40 @@ public class DemandxDockModel
         ClearModel();
     }
 
+    public Boolean Return_Status()
+    {
+        if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     private void Add_Initial_Solution()
     {
-        if (_initial_solution.Count > 0)
+        if (_initial_xDocks.Count > 0)
         {
-            _solver.AddMIPStart(y.ToArray(), _initial_solution.ToArray());
+            _solver.AddMIPStart(y.ToArray(), _initial_xDocks.ToArray());
         }
-        
+
+        var xArray = new List<INumVar>();
+        for (int i = 0; i < _num_of_demand_point; i++)
+        {
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                xArray.Add(x[i][j]);
+            }
+        }
+
+        if (_initial_assignments.Count > 0)
+        {
+            _solver.AddMIPStart(xArray.ToArray(), _initial_assignments.ToArray());
+        }
+
+
     }
 
     private void Create_XDock_Names()
@@ -571,7 +622,7 @@ public class DemandxDockModel
         {
             type = "Demand Weighted";
         }
-        var result = $"{location},{type},{status},{time},{gap_to_optimal}";
+        var result = $"{location},{type},{_demand_covarage},{status},{time},{gap_to_optimal}";
         record_stats.Add(result);
     }
     
@@ -678,7 +729,6 @@ public class DemandxDockModel
     {
         Console.WriteLine("Algorithm starts running at {0}", DateTime.Now);
         var startTime = DateTime.Now;
-
         _solver.Solve();
         _solutionTime =( (DateTime.Now - startTime).Hours*60*60 + (DateTime.Now - startTime).Minutes*60 + (DateTime.Now - startTime).Seconds);
         _status = _solver.GetStatus();
@@ -813,7 +863,7 @@ public class DemandxDockModel
                 var demand_included = demand_of_demand_point[i] * a[i][j];
                 constraint.AddTerm(x[i][j], demand_included);
             }
-            constraint.AddTerm(y[j], -max_xDock_capaticity);
+            constraint.AddTerm(y[j], -_xDocks[j].Get_LM_Demand());
             _solver.AddLe(constraint, 0);
         }
 

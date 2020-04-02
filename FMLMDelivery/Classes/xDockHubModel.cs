@@ -163,7 +163,7 @@ namespace FMLMDelivery
         /// <summary>
         /// Time limit is given in seconds.
         /// </summary>
-        private readonly long _timeLimit = 3600;
+        private readonly long _timeLimit = 7200;
 
         /// <summary>
         /// Gap limit is given in percentage
@@ -497,7 +497,7 @@ namespace FMLMDelivery
             var time = _solutionTime;
             var gap_to_optimal = (_solver.GetMIPRelativeGap())*100;
             var status = _status;
-            var result = $"{part},{model},{status},{time},{gap_to_optimal}";
+            var result = $"{part},{model},{_demand_covarage},{status},{time},{gap_to_optimal}";
             record_stats.Add(result);
 
         }

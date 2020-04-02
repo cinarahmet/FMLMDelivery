@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using FMLMDelivery;
+using FMLMDelivery.Classes;
 
 public class CSVReader
 {
@@ -31,19 +32,24 @@ public class CSVReader
 
     private readonly string _seller_file;
 
+    private readonly string _parameter_file;
+
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
     private Dictionary<String, Double> region_xDock_threshold = new Dictionary<string, double>();
 
     private Int32 _month;
 
+    private List<Parameters> _parameters = new List<Parameters>();
 
-    public CSVReader(string county_file, string xDock_file, string Seller_file, Int32 month)
+
+    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file, Int32 month)
     {
         _demand_point_file = county_file;
         _xDocks_file = xDock_file;
         _month = month + 7;
         _seller_file = Seller_file;
+        _parameter_file = parameter_file;
     }
 
     private void Create_County_Region_Threshold()
@@ -102,6 +108,7 @@ public class CSVReader
         Create_xDock_Region_Threshold();
         Read_XDock();
         Read_Demand_Point();
+        Read_Parameters();
         Read_Sellers();
     }
 
@@ -202,6 +209,25 @@ public class CSVReader
 
     }
 
+    private void Read_Parameters()
+    {
+        using (var sr = File.OpenText(_parameter_file))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(',');
+                var distinct_city = line[0];
+                var dist_thres = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);
+                var min_cap = Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture);
+                var max_cap = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var sol_gap = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var parameter = new Parameters(distinct_city, dist_thres, min_cap, sol_gap, max_cap);
+                _parameters.Add(parameter);
+            }
+        }
+    }
+
 
     private void Read_XDock()
     {
@@ -231,14 +257,7 @@ public class CSVReader
                 }
 
                 var xDock_Capacity = Convert.ToDouble(line[_month + 1]);
-                if (xDock_Capacity != 0.0)
-                {
-                    if (!type_value)
-                    {
-                        xDock_Capacity = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
-                    }
-                    
-                }
+                
                 if (xDock_Capacity > 10.0)
                 {
                     var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened,type_value);
@@ -252,47 +271,6 @@ public class CSVReader
                     }
                 }
                 
-
-                if ((Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000) > 1) && !type_value )
-                {
-                    for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000); i++)
-                    {
-                        var xDock_city_ = line[0];
-                        var xDock_district_ = line[1];
-                        var xDock_Id_ = line[2] + " " + i;
-                        var xDock_region_ = line[3];
-                        var type_value_ = Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
-                        var xDock_long_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                        var xDock_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                        var xDock_dist_threshold_ = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                        if (xDock_dist_threshold_ == 0.0)
-                        {
-                            xDock_dist_threshold_ = region_xDock_threshold[xDock_region];
-                        }
-                        var Already_Opened_ = Convert.ToDouble(line[7]);
-                        var xDock_Already_Opened_ = false;
-                        if (Already_Opened_ == 1.0)
-                        {
-                            xDock_Already_Opened_ = true;
-                        }
-                        var xDock_Capacity_ = Convert.ToDouble(line[_month + 1]) / Math.Ceiling(Convert.ToDouble(line[_month + 1]) / 4000);
-                        if (xDock_Capacity > 10.0)
-                        {
-                            var xDock_ = new xDocks(xDock_city_, xDock_district_, xDock_Id_, xDock_region_, xDock_long_, xDock_lat_, xDock_dist_threshold_, xDock_Capacity_, xDock_Already_Opened_,type_value_);
-                            if (type_value_)
-                            {
-                                _agency.Add(xDock_);
-                            }
-                            else
-                            {
-                                _xDocks.Add(xDock_);
-                            }
-                        }
-                        
-                    }
-                }
-
-
             }
         }
     }
@@ -382,5 +360,10 @@ public class CSVReader
     public List<xDocks> Get_Partial_Solution_Xdocks()
     {
         return _partial_xdocks;
+    }
+
+    public List<Parameters> Get_Parameter_List()
+    {
+        return _parameters;
     }
 }

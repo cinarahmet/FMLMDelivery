@@ -17,7 +17,7 @@ namespace FMLMDelivery.Classes
 
         private List<xDocks> _xDocks;
         
-        private Double distance_threshold = 40;
+        private Double distance_threshold = 30;
 
         private List<List<INumVar>> x;
 
@@ -297,15 +297,18 @@ namespace FMLMDelivery.Classes
             var time = _solutionTime;
             var status = _status;
             var gap_to_optimal = (_solver.GetMIPRelativeGap())*100;
+            var coverage = "Maximum coverage that distance threshold allows";
             if (_prior == true)
             {
                 model = "Prior Small Seller Model";
             }
             else
             {
-                model = "Other Small Seller Model";
+                model = "Regular Small Seller Model";
+                coverage = "Remaining demand from prior sellers";
             }
-            var result = $"{part},{model},{status},{time},{gap_to_optimal}";
+            
+            var result = $"{part},{model},{coverage},{status},{time},{gap_to_optimal}";
             record_stats.Add(result);
         }
 

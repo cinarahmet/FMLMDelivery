@@ -19,7 +19,7 @@ namespace FMLMDelivery
         private List<Seller> _regular_small_seller;
         private List<Seller> _regular_big_seller;
         private double total_demand;
-        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR", "BURSA","ANTALYA","HATAY" });
+        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR", "BURSA","ANTALYA","HATAY","YALOVA" });
         private List<String> writer_seller = new List<String>();
         private List<xDocks>  new_xDocks = new List<xDocks>();
         private List<Hub> potential_hub_locations = new List<Hub>();
@@ -34,8 +34,10 @@ namespace FMLMDelivery
         private List<Double> gap_list = new List<double>();
         private List<xDocks> partial_xdocks = new List<xDocks>();
         private Boolean partial_run = new Boolean();
+        private List<Parameters> _parameters;
+        private Boolean _discrete_solution;
 
-        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,Boolean _partial_run)
+        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution)
         {
             partial_xdocks=_partial_xdocks;
             xDocks = _xDocks;
@@ -45,7 +47,9 @@ namespace FMLMDelivery
             _prior_small_seller = prior_small;
             _regular_big_seller = regular_big;
             _regular_small_seller = regular_small;
+            _parameters = parameters;
             partial_run = _partial_run;
+            _discrete_solution = discrete_solution;
         }
 
         private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
@@ -62,14 +66,23 @@ namespace FMLMDelivery
             var new_xDocks = new List<xDocks>();
             var potential_Hubs = new List<Hub>(); 
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false,gap);
-
+            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false, gap);
             first_phase.Run();
+            var _status_check = first_phase.Return_Status();
+            while (!_status_check)
+            {
+                demand_covarage -= 0.01;
+                first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false, gap);
+                first_phase.Run();
+                _status_check = first_phase.Return_Status();
+            }
+            
             objVal = first_phase.GetObjVal();
             new_xDocks = first_phase.Return_XDock();
             stats.AddRange(first_phase.Get_Model_Stats_Info());
             var min_num = first_phase.Return_Num_Xdock();
             var opened_xDocks = first_phase.Return_Opened_xDocks();
+            var assignments = first_phase.Return_Assignments();
 
 
 
@@ -78,7 +91,7 @@ namespace FMLMDelivery
             demand_weighted_model = true;
             phase_2 = true;
             first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true,gap);
-            first_phase.Provide_Initial_Solution(opened_xDocks);
+            first_phase.Provide_Initial_Solution(opened_xDocks,assignments);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             //xDocks are assigned
@@ -210,6 +223,19 @@ namespace FMLMDelivery
            
         }
 
+        private List<String> Create_City_List()
+        {
+            var city_list = new List<String>();
+            for (int i = 0; i < demand_Points.Count; i++)
+            {
+                if (!(city_list.Contains(demand_Points[i].Get_City())))
+                {
+                    city_list.Add(demand_Points[i].Get_City());
+                }
+            }
+            return city_list;
+        }
+
         public Tuple<List<xDocks>, List<Hub>> Run()
         {   var new_hubs = new List<Hub>();
             var assigned_prior_sellers = new List<Seller>();
@@ -222,20 +248,31 @@ namespace FMLMDelivery
 
             if (!partial_run)
             {
-                gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
-                Partial_Run("ANTALYA", false, 20, 1250, 0.99, gap_list[0]);
-                Partial_Run("HATAY", false, 20, 1250, 0.99, gap_list[0]);
-                Partial_Run("Akdeniz", true, 30, 1250, 0.95, gap_list[2]);
-                Partial_Run("ANKARA", false, 20, 2500, 0.95, gap_list[3]);
-                Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 0.95, gap_list[4]);
-                Partial_Run("İSTANBUL ASYA", false, 20, 2500, 0.95, gap_list[1]);
-                Partial_Run("İZMİR", false, 20, 2500, 0.90, gap_list[4]);
-                Partial_Run("BURSA", false, 20, 1250, 0.95, gap_list[0]);
-                Partial_Run("İç Anadolu", true, 30, 1250, 0.90, gap_list[0]);
-                Partial_Run("Ege", true, 30, 1250, 0.61, gap_list[0]);
-                Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 0.9, gap_list[0]);
-                //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-                Partial_Run("Marmara", true, 30, 1250, 0.75, gap_list[0]);
+                if (_discrete_solution)
+                {
+                    for (int i = 0; i < _parameters.Count; i++)
+                    {
+                        Partial_Run(_parameters[i].Get_Key(), false, _parameters[i].Get_Dist_Thres(), _parameters[i].Get_Min_Cap(), 1.0, _parameters[i].Get_Gap());
+                    }
+                }
+                else
+                {
+                    gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
+                    Partial_Run("ANTALYA", false, 20, 1250, 1.0, gap_list[2]);
+                    Partial_Run("HATAY", false, 20, 1250, 1.0, gap_list[2]);
+                    Partial_Run("Akdeniz", true, 30, 1250, 1.0, gap_list[2]);
+                    Partial_Run("ANKARA", false, 20, 2500, 1.0, gap_list[3]);
+                    Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 1.0, gap_list[4]);
+                    Partial_Run("İSTANBUL ASYA", false, 20, 2500, 1.0, gap_list[2]);
+                    Partial_Run("İZMİR", false, 20, 2500, 1.0, gap_list[2]);
+                    Partial_Run("BURSA", false, 20, 1250, 1.0, gap_list[2]);
+                    Partial_Run("İç Anadolu", true, 30, 1250, 1.0, gap_list[2]);
+                    Partial_Run("Ege", true, 30, 1250, 1.0, gap_list[2]);
+                    Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 1.0, gap_list[2]);
+                    //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
+                    Partial_Run("YALOVA", false, 30, 1250, 1.0, gap_list[2]);
+                    Partial_Run("Marmara", true, 30, 1250, 1.0, gap_list[2]);
+                }
 
                 var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
                 var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
@@ -297,7 +334,7 @@ namespace FMLMDelivery
                 new_hubs = third_phase.Return_New_Hubs();
                 assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
                 var header_hub = "#Hub,Hub İl,Hub İlçe,Hub Mahalle,Hub_Long,Hub_Lat,Type_of_Assignment,Distinct Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
-                var stats_header = "Part,Model,Status,Time,Gap";
+                var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
                 var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
                 var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
