@@ -22,10 +22,7 @@ public class DemandxDockModel
     /// </summary>
     private Double max_num_demand_point_assigned = 400;
 
-    /// <summary>
-    /// Max amount that xDock can be opened.
-    /// </summary>
-    private Double max_xDock_capaticity = 4000;
+    
 
     private Double max_hub_capacity = 4000000;
     
@@ -135,7 +132,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =100;
+    private readonly long _timeLimit =3600;
     /// <summary>
     /// The starting time of the model
     /// </summary>

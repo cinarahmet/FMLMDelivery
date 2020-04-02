@@ -245,7 +245,7 @@ namespace FMLMDelivery
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
-
+            var hub_demand_covarage = 0.97;
             if (!partial_run)
             {
                 if (_discrete_solution)
@@ -314,7 +314,7 @@ namespace FMLMDelivery
                 var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
                 writer_small_seller.Write_Records();
 
-                var demand_covarage = 0.90;
+                
                 var min_model_model = true;
                 var demand_weighted_model = false;
                 var phase_2 = false;
@@ -322,13 +322,13 @@ namespace FMLMDelivery
 
 
                 //xDock-Seller-Hub Assignment
-                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, 0);
+                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, 0);
                 third_phase.Run();
                 var num_clusters = third_phase.Return_num_Hubs();
                 min_model_model = false;
                 demand_weighted_model = true;
                 phase_2 = true;
-                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, num_clusters);
                 third_phase.Run();
                 var objVal = third_phase.GetObjVal();
                 new_hubs = third_phase.Return_New_Hubs();
@@ -372,8 +372,7 @@ namespace FMLMDelivery
                 var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
                 var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
                 writer_small_seller.Write_Records();
-
-                var demand_covarage = 0.90;
+                
                 var min_model_model = true;
                 var demand_weighted_model = false;
                 var phase_2 = false;
@@ -381,13 +380,13 @@ namespace FMLMDelivery
 
                 new_xDocks = partial_xdocks;
                 //xDock-Seller-Hub Assignment
-                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, 0);
+                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, 0);
                 third_phase.Run();
                 var num_clusters = third_phase.Return_num_Hubs();
                 min_model_model = false;
                 demand_weighted_model = true;
                 phase_2 = true;
-                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, demand_covarage, phase_2, num_clusters);
+                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, num_clusters);
                 third_phase.Run();
                 var objVal = third_phase.GetObjVal();
                 new_hubs = third_phase.Return_New_Hubs();

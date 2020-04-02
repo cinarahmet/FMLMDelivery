@@ -24,8 +24,8 @@ namespace FMLMDelivery
             var discrete_solution = true;
             
             //Provide the month index (1-January, 12-December)
-            var month = 11;
-            var reader = new CSVReader("Demand_Points.csv", "Potential_xDocks.csv", "Potential_Seller_Data_LTM.csv","Parameters.csv", month);
+            var month = 10;
+            var reader = new CSVReader("Demand_Points.csv", "Potential_xDocks.csv", "2020_FM_Ekim.csv", "Parameters.csv", month);
             reader.Read();
             demand_point = reader.Get_County();
             potential_xDocks = reader.Get_XDocks();
@@ -35,7 +35,7 @@ namespace FMLMDelivery
             var prior_big_sellers = reader.Get_Prior_Big_Sellers();
             var regular_big_sellers = reader.Get_Regular_Big_Sellers();
             var parameter_list = reader.Get_Parameter_List();
-            var partial_solution = false;
+            var partial_solution = true;
             if (!partial_solution)
             {
                 var runner = new Runner(demand_point, potential_xDocks,partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers,parameter_list,partial_solution,discrete_solution);

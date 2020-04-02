@@ -52,7 +52,7 @@ public class CSVReader
         _parameter_file = parameter_file;
     }
 
-    private void Create_County_Region_Threshold()
+    private void Create_Demand_Point_Region_Threshold()
     {
         var s_1 = "Akdeniz";
         var value = 30;
@@ -104,7 +104,7 @@ public class CSVReader
 
     public void Read()
     {
-        Create_County_Region_Threshold();
+        Create_Demand_Point_Region_Threshold();
         Create_xDock_Region_Threshold();
         Read_XDock();
         Read_Demand_Point();
@@ -220,9 +220,8 @@ public class CSVReader
                 var distinct_city = line[0];
                 var dist_thres = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);
                 var min_cap = Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture);
-                var max_cap = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                var sol_gap = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                var parameter = new Parameters(distinct_city, dist_thres, min_cap, sol_gap, max_cap);
+                var sol_gap = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var parameter = new Parameters(distinct_city, dist_thres, min_cap, sol_gap);
                 _parameters.Add(parameter);
             }
         }
