@@ -221,7 +221,8 @@ public class CSVReader
                 var dist_thres = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);
                 var min_cap = Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture);
                 var sol_gap = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                var parameter = new Parameters(distinct_city, dist_thres, min_cap, sol_gap);
+                var active= Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
+                var parameter = new Parameters(distinct_city, dist_thres, min_cap, sol_gap, active);
                 _parameters.Add(parameter);
             }
         }

@@ -7,9 +7,9 @@ using FMLMDelivery.Classes;
 using System.IO;
 
 
-namespace FMLMDelivery
+namespace FMLMDelivery.Classes
 {
-    class Runner
+    public class Runner
     {
         private List<xDocks> xDocks;
         private List<DemandPoint> demand_Points;
@@ -252,16 +252,19 @@ namespace FMLMDelivery
                 {
                     for (int i = 0; i < _parameters.Count; i++)
                     {
-                        Partial_Run(_parameters[i].Get_Key(), false, _parameters[i].Get_Dist_Thres(), _parameters[i].Get_Min_Cap(), 1.0, _parameters[i].Get_Gap());
+                        if (_parameters[i].Get_Activation())
+                        {
+                            Partial_Run(_parameters[i].Get_Key(), false, _parameters[i].Get_Dist_Thres(), _parameters[i].Get_Min_Cap(), 1.0, _parameters[i].Get_Gap());
+                        }
                     }
                 }
                 else
                 {
                     gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
-                    Partial_Run("ANTALYA", false, 20, 1250, 1.0, gap_list[2]);
-                    Partial_Run("HATAY", false, 20, 1250, 1.0, gap_list[2]);
+                    //Partial_Run("ANTALYA", false, 20, 1250, 0.7, gap_list[2]);
+                    //Partial_Run("HATAY", false, 20, 1250, 1.0, gap_list[2]);
                     Partial_Run("Akdeniz", true, 30, 1250, 1.0, gap_list[2]);
-                    Partial_Run("ANKARA", false, 20, 2500, 1.0, gap_list[3]);
+                    //Partial_Run("ANKARA", false, 20, 2500, 1.0, gap_list[3]);
                     Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 1.0, gap_list[4]);
                     Partial_Run("İSTANBUL ASYA", false, 20, 2500, 1.0, gap_list[2]);
                     Partial_Run("İZMİR", false, 20, 2500, 1.0, gap_list[2]);
