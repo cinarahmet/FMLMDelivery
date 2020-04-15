@@ -47,8 +47,8 @@
             this.yes_button = new System.Windows.Forms.RadioButton();
             this.send_button = new System.Windows.Forms.Button();
             this.output_box = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.uotput_box = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.input_files_parameters.SuspendLayout();
             this.run_option_group_box.SuspendLayout();
             this.output_box.SuspendLayout();
@@ -68,106 +68,120 @@
             this.input_files_parameters.Controls.Add(this.seller_label);
             this.input_files_parameters.Controls.Add(this.pot_xDock_label);
             this.input_files_parameters.Controls.Add(this.demand_label);
-            this.input_files_parameters.Location = new System.Drawing.Point(33, 64);
+            this.input_files_parameters.Location = new System.Drawing.Point(50, 98);
+            this.input_files_parameters.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.input_files_parameters.Name = "input_files_parameters";
-            this.input_files_parameters.Size = new System.Drawing.Size(285, 274);
+            this.input_files_parameters.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.input_files_parameters.Size = new System.Drawing.Size(428, 422);
             this.input_files_parameters.TabIndex = 0;
             this.input_files_parameters.TabStop = false;
             this.input_files_parameters.Text = "Dökümanlar ve Parametreler";
             // 
             // Month_box
             // 
-            this.Month_box.Location = new System.Drawing.Point(168, 233);
+            this.Month_box.Location = new System.Drawing.Point(252, 358);
+            this.Month_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Month_box.Name = "Month_box";
-            this.Month_box.Size = new System.Drawing.Size(100, 20);
+            this.Month_box.Size = new System.Drawing.Size(148, 26);
             this.Month_box.TabIndex = 10;
             // 
             // month_label
             // 
             this.month_label.AutoSize = true;
-            this.month_label.Location = new System.Drawing.Point(6, 240);
+            this.month_label.Location = new System.Drawing.Point(9, 369);
+            this.month_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.month_label.Name = "month_label";
-            this.month_label.Size = new System.Drawing.Size(154, 13);
+            this.month_label.Size = new System.Drawing.Size(226, 20);
             this.month_label.TabIndex = 9;
             this.month_label.Text = "Çalışılan Ay (1: Ocak, 12:Aralık)";
             // 
             // presolved_box
             // 
-            this.presolved_box.Location = new System.Drawing.Point(168, 196);
+            this.presolved_box.Location = new System.Drawing.Point(252, 302);
+            this.presolved_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.presolved_box.Name = "presolved_box";
-            this.presolved_box.Size = new System.Drawing.Size(100, 20);
+            this.presolved_box.Size = new System.Drawing.Size(148, 26);
             this.presolved_box.TabIndex = 8;
             // 
             // parameter_box
             // 
-            this.parameter_box.Location = new System.Drawing.Point(168, 152);
+            this.parameter_box.Location = new System.Drawing.Point(252, 234);
+            this.parameter_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.parameter_box.Name = "parameter_box";
-            this.parameter_box.Size = new System.Drawing.Size(100, 20);
+            this.parameter_box.Size = new System.Drawing.Size(148, 26);
             this.parameter_box.TabIndex = 7;
             // 
             // seller_box
             // 
-            this.seller_box.Location = new System.Drawing.Point(168, 113);
+            this.seller_box.Location = new System.Drawing.Point(252, 174);
+            this.seller_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.seller_box.Name = "seller_box";
-            this.seller_box.Size = new System.Drawing.Size(100, 20);
+            this.seller_box.Size = new System.Drawing.Size(148, 26);
             this.seller_box.TabIndex = 6;
             // 
             // pot_xDock_box
             // 
-            this.pot_xDock_box.Location = new System.Drawing.Point(168, 74);
+            this.pot_xDock_box.Location = new System.Drawing.Point(252, 114);
+            this.pot_xDock_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pot_xDock_box.Name = "pot_xDock_box";
-            this.pot_xDock_box.Size = new System.Drawing.Size(100, 20);
+            this.pot_xDock_box.Size = new System.Drawing.Size(148, 26);
             this.pot_xDock_box.TabIndex = 5;
             // 
             // demand_box
             // 
-            this.demand_box.Location = new System.Drawing.Point(168, 36);
+            this.demand_box.Location = new System.Drawing.Point(252, 55);
+            this.demand_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.demand_box.Name = "demand_box";
-            this.demand_box.Size = new System.Drawing.Size(100, 20);
+            this.demand_box.Size = new System.Drawing.Size(148, 26);
             this.demand_box.TabIndex = 1;
             // 
             // presolved_xDock_label
             // 
             this.presolved_xDock_label.AutoSize = true;
-            this.presolved_xDock_label.Location = new System.Drawing.Point(6, 199);
+            this.presolved_xDock_label.Location = new System.Drawing.Point(9, 306);
+            this.presolved_xDock_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.presolved_xDock_label.Name = "presolved_xDock_label";
-            this.presolved_xDock_label.Size = new System.Drawing.Size(116, 13);
+            this.presolved_xDock_label.Size = new System.Drawing.Size(170, 20);
             this.presolved_xDock_label.TabIndex = 4;
             this.presolved_xDock_label.Text = "Açılmış xDock Dosyası:";
             // 
             // parameter_label
             // 
             this.parameter_label.AutoSize = true;
-            this.parameter_label.Location = new System.Drawing.Point(6, 155);
+            this.parameter_label.Location = new System.Drawing.Point(9, 238);
+            this.parameter_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.parameter_label.Name = "parameter_label";
-            this.parameter_label.Size = new System.Drawing.Size(98, 13);
+            this.parameter_label.Size = new System.Drawing.Size(147, 20);
             this.parameter_label.TabIndex = 3;
             this.parameter_label.Text = "Parametre Dosyası:";
             // 
             // seller_label
             // 
             this.seller_label.AutoSize = true;
-            this.seller_label.Location = new System.Drawing.Point(6, 116);
+            this.seller_label.Location = new System.Drawing.Point(9, 178);
+            this.seller_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.seller_label.Name = "seller_label";
-            this.seller_label.Size = new System.Drawing.Size(94, 13);
+            this.seller_label.Size = new System.Drawing.Size(136, 20);
             this.seller_label.TabIndex = 2;
             this.seller_label.Text = "Tedarikçi Dosyası:";
             // 
             // pot_xDock_label
             // 
             this.pot_xDock_label.AutoSize = true;
-            this.pot_xDock_label.Location = new System.Drawing.Point(6, 77);
+            this.pot_xDock_label.Location = new System.Drawing.Point(9, 118);
+            this.pot_xDock_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.pot_xDock_label.Name = "pot_xDock_label";
-            this.pot_xDock_label.Size = new System.Drawing.Size(132, 13);
+            this.pot_xDock_label.Size = new System.Drawing.Size(193, 20);
             this.pot_xDock_label.TabIndex = 1;
             this.pot_xDock_label.Text = "Potensiyel xDock Dosyası:";
             // 
             // demand_label
             // 
             this.demand_label.AutoSize = true;
-            this.demand_label.Location = new System.Drawing.Point(6, 39);
+            this.demand_label.Location = new System.Drawing.Point(9, 60);
+            this.demand_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.demand_label.Name = "demand_label";
-            this.demand_label.Size = new System.Drawing.Size(116, 13);
+            this.demand_label.Size = new System.Drawing.Size(169, 20);
             this.demand_label.TabIndex = 0;
             this.demand_label.Text = "Talep Noktası Dosyası:";
             // 
@@ -175,41 +189,46 @@
             // 
             this.run_option_group_box.Controls.Add(this.no_button);
             this.run_option_group_box.Controls.Add(this.yes_button);
-            this.run_option_group_box.Location = new System.Drawing.Point(443, 73);
+            this.run_option_group_box.Location = new System.Drawing.Point(486, 98);
+            this.run_option_group_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.run_option_group_box.Name = "run_option_group_box";
-            this.run_option_group_box.Size = new System.Drawing.Size(285, 71);
+            this.run_option_group_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.run_option_group_box.Size = new System.Drawing.Size(643, 123);
             this.run_option_group_box.TabIndex = 1;
             this.run_option_group_box.TabStop = false;
-            this.run_option_group_box.Text = "Talep Noktası - xDock Ataması gerçekleştirilsin mi ?";
+            this.run_option_group_box.Text = "Model Tipi Seçiniz";
             // 
             // no_button
             // 
             this.no_button.AutoSize = true;
-            this.no_button.Location = new System.Drawing.Point(157, 36);
+            this.no_button.Location = new System.Drawing.Point(391, 55);
+            this.no_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.no_button.Name = "no_button";
-            this.no_button.Size = new System.Drawing.Size(49, 17);
+            this.no_button.Size = new System.Drawing.Size(244, 24);
             this.no_button.TabIndex = 1;
             this.no_button.TabStop = true;
-            this.no_button.Text = "Hayır";
+            this.no_button.Text = "Xdock-Tedarikçi-Hub Ataması";
             this.no_button.UseVisualStyleBackColor = true;
             // 
             // yes_button
             // 
             this.yes_button.AutoSize = true;
-            this.yes_button.Location = new System.Drawing.Point(51, 36);
+            this.yes_button.Location = new System.Drawing.Point(8, 55);
+            this.yes_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.yes_button.Name = "yes_button";
-            this.yes_button.Size = new System.Drawing.Size(47, 17);
+            this.yes_button.Size = new System.Drawing.Size(348, 24);
             this.yes_button.TabIndex = 0;
             this.yes_button.TabStop = true;
-            this.yes_button.Text = "Evet";
+            this.yes_button.Text = "Talep Noktası-xDock-Tedarikçi-Hub Ataması ";
             this.yes_button.UseVisualStyleBackColor = true;
             this.yes_button.CheckedChanged += new System.EventHandler(this.yes_button_CheckedChanged);
             // 
             // send_button
             // 
-            this.send_button.Location = new System.Drawing.Point(534, 332);
+            this.send_button.Location = new System.Drawing.Point(801, 511);
+            this.send_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.send_button.Name = "send_button";
-            this.send_button.Size = new System.Drawing.Size(75, 23);
+            this.send_button.Size = new System.Drawing.Size(112, 35);
             this.send_button.TabIndex = 2;
             this.send_button.Text = "OK";
             this.send_button.UseVisualStyleBackColor = true;
@@ -219,39 +238,44 @@
             // 
             this.output_box.Controls.Add(this.uotput_box);
             this.output_box.Controls.Add(this.label1);
-            this.output_box.Location = new System.Drawing.Point(443, 198);
+            this.output_box.Location = new System.Drawing.Point(664, 305);
+            this.output_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.output_box.Name = "output_box";
-            this.output_box.Size = new System.Drawing.Size(285, 100);
+            this.output_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.output_box.Size = new System.Drawing.Size(465, 154);
             this.output_box.TabIndex = 3;
             this.output_box.TabStop = false;
             this.output_box.Text = "Hedef Dizin";
             this.output_box.Enter += new System.EventHandler(this.output_box_Enter);
             // 
+            // uotput_box
+            // 
+            this.uotput_box.Location = new System.Drawing.Point(14, 83);
+            this.uotput_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.uotput_box.Name = "uotput_box";
+            this.uotput_box.Size = new System.Drawing.Size(318, 26);
+            this.uotput_box.TabIndex = 1;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 25);
+            this.label1.Location = new System.Drawing.Point(9, 38);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(216, 13);
+            this.label1.Size = new System.Drawing.Size(322, 20);
             this.label1.TabIndex = 0;
             this.label1.Text = "Çıktıların yazdırılacağı hedef klasörü belirtiniz:";
             // 
-            // uotput_box
-            // 
-            this.uotput_box.Location = new System.Drawing.Point(9, 54);
-            this.uotput_box.Name = "uotput_box";
-            this.uotput_box.Size = new System.Drawing.Size(213, 20);
-            this.uotput_box.TabIndex = 1;
-            // 
             // Network_Design_Form
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1200, 692);
             this.Controls.Add(this.output_box);
             this.Controls.Add(this.send_button);
             this.Controls.Add(this.run_option_group_box);
             this.Controls.Add(this.input_files_parameters);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Network_Design_Form";
             this.Text = "Network Design Decision Making Tool";
             this.input_files_parameters.ResumeLayout(false);
