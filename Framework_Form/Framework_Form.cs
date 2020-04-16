@@ -15,6 +15,8 @@ namespace Framework_Form
         public Network_Design_Form()
         {
             InitializeComponent();
+            
+
         }
 
         private void send_button_Click(object sender, EventArgs e)
@@ -41,5 +43,7 @@ namespace Framework_Form
         {
 
         }
+
+       
     }
 }

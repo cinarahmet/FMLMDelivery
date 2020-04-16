@@ -26,15 +26,16 @@ namespace Core_Form
         {
             InitializeComponent();
             yes_button.Checked = false;
-            demand_box.Enabled = false;
-            pot_xDock_box.Enabled = false;
+            demand_combo.Enabled = false;
+            pot_xdock_combo.Enabled = false;
             yes_button.Enabled = false;
             no_button.Enabled = false;
-            seller_box.Enabled = false;
-            parameter_box.Enabled = false;
-            presolved_box.Enabled = false;
+            seller_combo.Enabled = false;
+            parameter_combo.Enabled = false;
+            presolved_combo.Enabled = false;
             comboBox1.Enabled = false;
             Month_box.Enabled = false;
+            textBox2.Enabled = false;
             send_button.Enabled = false;
         }
         private void output_box_Enter(object sender, EventArgs e)
@@ -45,12 +46,12 @@ namespace Core_Form
         {
             if (yes_button.Checked)
             {
-                presolved_box.Enabled = false;
+                presolved_combo.Enabled = false;
                 partial_solution = false;
             }
             else
             {
-                presolved_box.Enabled = true;
+                presolved_combo.Enabled = true;
                 partial_solution = true;
             }
         }
@@ -61,30 +62,42 @@ namespace Core_Form
         private void Directory_Name_Submit_Click(object sender, EventArgs e)
         {
             yes_button.Checked = false;
-            demand_box.Enabled = true;
-            pot_xDock_box.Enabled = true;
+            demand_combo.Enabled = true;
+            pot_xdock_combo.Enabled = true;
             yes_button.Enabled = true;
             no_button.Enabled = true;
-            seller_box.Enabled = true;
-            parameter_box.Enabled = true;
-            presolved_box.Enabled = true;
+            seller_combo.Enabled = true;
+            parameter_combo.Enabled = true;
+            presolved_combo.Enabled = true;
             comboBox1.Enabled = true;
             Month_box.Enabled = true;
+            textBox2.Enabled = true;
             send_button.Enabled = true;
             username.Enabled = false;
             DirectoryInfo obj = new DirectoryInfo("C:\\Users\\" + username.Text + "\\Desktop");
             DirectoryInfo[] folders = obj.GetDirectories();
             comboBox1.DataSource = folders;
+
+            string[] filePaths = Directory.GetFiles(@"C:\\Users\\" + username.Text + "\\Desktop\\Input Files\\", "*.csv");
+            foreach (string file in filePaths)
+            {
+                demand_combo.Items.Add(file);
+                pot_xdock_combo.Items.Add(file);
+                seller_combo.Items.Add(file);
+                presolved_combo.Items.Add(file);
+                parameter_combo.Items.Add(file);
+
+            }
         }
         private void send_button_Click(object sender, EventArgs e)
         {
-            demand_file = demand_box.Text + ".csv";
-            pot_xDock_file = pot_xDock_box.Text + ".csv";
-            seller_file = seller_box.Text + ".csv";
-            parameter_file = parameter_box.Text + ".csv";
-            presolved_xDock_file = presolved_box.Text + ".csv";
+            demand_file = demand_combo.Text ;
+            pot_xDock_file = pot_xdock_combo.Text;
+            seller_file = seller_combo.Text ;
+            parameter_file = parameter_combo.Text;
+            presolved_xDock_file = presolved_combo.Text ;
             var month = Convert.ToInt32(Month_box.Text);
-
+            var hub_demand_coverage = Convert.ToDouble(textBox2.Text);
             directory = comboBox1.Text;
             //Application.Run(new Form1());
             var demand_point = new List<DemandPoint>();
@@ -114,7 +127,7 @@ namespace Core_Form
             var parameter_list = reader.Get_Parameter_List();
             if (!partial_solution)
             {
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory);
+                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory, hub_demand_coverage);
                 (xDocks, hubs) = runner.Run();
                 Console.ReadKey();
             }
@@ -124,7 +137,7 @@ namespace Core_Form
                 partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory);
+                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory, hub_demand_coverage);
                 (xDocks, hubs) = runner_partial.Run();
                 Console.ReadKey();
 

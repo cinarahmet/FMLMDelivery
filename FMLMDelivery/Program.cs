@@ -25,7 +25,7 @@ namespace FMLMDelivery
 
             //This variable decides which solution methıd will be run. If true; every city individually assigned, else regions are assigned as a whole
             var discrete_solution = true;
-
+            var hub_demand_coverage = 0.97;
             //Provide the month index (1-January, 12-December)
             var month = 10;
             var reader = new CSVReader("Demand_Points.csv", "2020_Potential_xDocks_Case3.csv", "2020_FM_Ekim.csv", "Parameters.csv", month);
@@ -41,7 +41,7 @@ namespace FMLMDelivery
             var partial_solution = false;
             if (!partial_solution)
             {
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"");
+                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"",hub_demand_coverage);
                 (xDocks, hubs) = runner.Run();
                 Console.ReadKey();
             }
@@ -51,7 +51,7 @@ namespace FMLMDelivery
                 partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"");
+                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"",hub_demand_coverage);
                 (xDocks, hubs) = runner_partial.Run();
                 Console.ReadKey();
             }

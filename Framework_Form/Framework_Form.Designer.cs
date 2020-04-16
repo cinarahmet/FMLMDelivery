@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.input_files_parameters = new System.Windows.Forms.GroupBox();
-            this.Month_box = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.comboBox6 = new System.Windows.Forms.ComboBox();
+            this.comboBox5 = new System.Windows.Forms.ComboBox();
+            this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.month_label = new System.Windows.Forms.Label();
-            this.presolved_box = new System.Windows.Forms.TextBox();
-            this.parameter_box = new System.Windows.Forms.TextBox();
-            this.seller_box = new System.Windows.Forms.TextBox();
-            this.pot_xDock_box = new System.Windows.Forms.TextBox();
-            this.demand_box = new System.Windows.Forms.TextBox();
             this.presolved_xDock_label = new System.Windows.Forms.Label();
             this.parameter_label = new System.Windows.Forms.Label();
             this.seller_label = new System.Windows.Forms.Label();
@@ -47,11 +47,14 @@
             this.yes_button = new System.Windows.Forms.RadioButton();
             this.send_button = new System.Windows.Forms.Button();
             this.output_box = new System.Windows.Forms.GroupBox();
+            this.Directory_Name_Submit = new System.Windows.Forms.Button();
             this.username = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.Directory_Name_Submit = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.input_files_parameters.SuspendLayout();
             this.run_option_group_box.SuspendLayout();
             this.output_box.SuspendLayout();
@@ -59,13 +62,15 @@
             // 
             // input_files_parameters
             // 
-            this.input_files_parameters.Controls.Add(this.Month_box);
+            this.input_files_parameters.Controls.Add(this.textBox2);
+            this.input_files_parameters.Controls.Add(this.textBox1);
+            this.input_files_parameters.Controls.Add(this.label3);
+            this.input_files_parameters.Controls.Add(this.comboBox6);
+            this.input_files_parameters.Controls.Add(this.comboBox5);
+            this.input_files_parameters.Controls.Add(this.comboBox4);
+            this.input_files_parameters.Controls.Add(this.comboBox3);
+            this.input_files_parameters.Controls.Add(this.comboBox2);
             this.input_files_parameters.Controls.Add(this.month_label);
-            this.input_files_parameters.Controls.Add(this.presolved_box);
-            this.input_files_parameters.Controls.Add(this.parameter_box);
-            this.input_files_parameters.Controls.Add(this.seller_box);
-            this.input_files_parameters.Controls.Add(this.pot_xDock_box);
-            this.input_files_parameters.Controls.Add(this.demand_box);
             this.input_files_parameters.Controls.Add(this.presolved_xDock_label);
             this.input_files_parameters.Controls.Add(this.parameter_label);
             this.input_files_parameters.Controls.Add(this.seller_label);
@@ -75,18 +80,59 @@
             this.input_files_parameters.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.input_files_parameters.Name = "input_files_parameters";
             this.input_files_parameters.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.input_files_parameters.Size = new System.Drawing.Size(428, 443);
+            this.input_files_parameters.Size = new System.Drawing.Size(650, 499);
             this.input_files_parameters.TabIndex = 0;
             this.input_files_parameters.TabStop = false;
             this.input_files_parameters.Text = "Dökümanlar ve Parametreler";
             // 
-            // Month_box
+            // label3
             // 
-            this.Month_box.Location = new System.Drawing.Point(252, 358);
-            this.Month_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Month_box.Name = "Month_box";
-            this.Month_box.Size = new System.Drawing.Size(148, 26);
-            this.Month_box.TabIndex = 10;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 434);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(282, 20);
+            this.label3.TabIndex = 17;
+            this.label3.Text = "Xdock-Hub Talep Kapsamı(0.00 - 1.00)";
+            // 
+            // comboBox6
+            // 
+            this.comboBox6.FormattingEnabled = true;
+            this.comboBox6.Location = new System.Drawing.Point(209, 303);
+            this.comboBox6.Name = "comboBox6";
+            this.comboBox6.Size = new System.Drawing.Size(401, 28);
+            this.comboBox6.TabIndex = 14;
+            // 
+            // comboBox5
+            // 
+            this.comboBox5.FormattingEnabled = true;
+            this.comboBox5.Location = new System.Drawing.Point(209, 235);
+            this.comboBox5.Name = "comboBox5";
+            this.comboBox5.Size = new System.Drawing.Size(401, 28);
+            this.comboBox5.TabIndex = 13;
+            // 
+            // comboBox4
+            // 
+            this.comboBox4.FormattingEnabled = true;
+            this.comboBox4.Location = new System.Drawing.Point(209, 170);
+            this.comboBox4.Name = "comboBox4";
+            this.comboBox4.Size = new System.Drawing.Size(401, 28);
+            this.comboBox4.TabIndex = 12;
+            // 
+            // comboBox3
+            // 
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Location = new System.Drawing.Point(209, 115);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(401, 28);
+            this.comboBox3.TabIndex = 11;
+            // 
+            // comboBox2
+            // 
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Location = new System.Drawing.Point(209, 60);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(401, 28);
+            this.comboBox2.TabIndex = 10;
             // 
             // month_label
             // 
@@ -97,46 +143,6 @@
             this.month_label.Size = new System.Drawing.Size(226, 20);
             this.month_label.TabIndex = 9;
             this.month_label.Text = "Çalışılan Ay (1: Ocak, 12:Aralık)";
-            // 
-            // presolved_box
-            // 
-            this.presolved_box.Location = new System.Drawing.Point(252, 302);
-            this.presolved_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.presolved_box.Name = "presolved_box";
-            this.presolved_box.Size = new System.Drawing.Size(148, 26);
-            this.presolved_box.TabIndex = 8;
-            // 
-            // parameter_box
-            // 
-            this.parameter_box.Location = new System.Drawing.Point(252, 234);
-            this.parameter_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.parameter_box.Name = "parameter_box";
-            this.parameter_box.Size = new System.Drawing.Size(148, 26);
-            this.parameter_box.TabIndex = 7;
-            // 
-            // seller_box
-            // 
-            this.seller_box.Location = new System.Drawing.Point(252, 174);
-            this.seller_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.seller_box.Name = "seller_box";
-            this.seller_box.Size = new System.Drawing.Size(148, 26);
-            this.seller_box.TabIndex = 6;
-            // 
-            // pot_xDock_box
-            // 
-            this.pot_xDock_box.Location = new System.Drawing.Point(252, 114);
-            this.pot_xDock_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.pot_xDock_box.Name = "pot_xDock_box";
-            this.pot_xDock_box.Size = new System.Drawing.Size(148, 26);
-            this.pot_xDock_box.TabIndex = 5;
-            // 
-            // demand_box
-            // 
-            this.demand_box.Location = new System.Drawing.Point(252, 55);
-            this.demand_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.demand_box.Name = "demand_box";
-            this.demand_box.Size = new System.Drawing.Size(148, 26);
-            this.demand_box.TabIndex = 1;
             // 
             // presolved_xDock_label
             // 
@@ -192,7 +198,7 @@
             // 
             this.run_option_group_box.Controls.Add(this.no_button);
             this.run_option_group_box.Controls.Add(this.yes_button);
-            this.run_option_group_box.Location = new System.Drawing.Point(534, 210);
+            this.run_option_group_box.Location = new System.Drawing.Point(688, 210);
             this.run_option_group_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.run_option_group_box.Name = "run_option_group_box";
             this.run_option_group_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -252,6 +258,16 @@
             this.output_box.Text = "Hedef Dizin";
             this.output_box.Enter += new System.EventHandler(this.output_box_Enter);
             // 
+            // Directory_Name_Submit
+            // 
+            this.Directory_Name_Submit.Location = new System.Drawing.Point(655, 61);
+            this.Directory_Name_Submit.Name = "Directory_Name_Submit";
+            this.Directory_Name_Submit.Size = new System.Drawing.Size(142, 38);
+            this.Directory_Name_Submit.TabIndex = 2;
+            this.Directory_Name_Submit.Text = "Giriş";
+            this.Directory_Name_Submit.UseVisualStyleBackColor = true;
+            this.Directory_Name_Submit.Click += new System.EventHandler(this.Directory_Name_Submit_Click);
+            // 
             // username
             // 
             this.username.Location = new System.Drawing.Point(14, 83);
@@ -273,35 +289,43 @@
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(534, 448);
+            this.comboBox1.Location = new System.Drawing.Point(702, 508);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(532, 28);
             this.comboBox1.TabIndex = 4;
             // 
-            // Directory_Name_Submit
-            // 
-            this.Directory_Name_Submit.Location = new System.Drawing.Point(655, 61);
-            this.Directory_Name_Submit.Name = "Directory_Name_Submit";
-            this.Directory_Name_Submit.Size = new System.Drawing.Size(142, 38);
-            this.Directory_Name_Submit.TabIndex = 2;
-            this.Directory_Name_Submit.Text = "Giriş";
-            this.Directory_Name_Submit.UseVisualStyleBackColor = true;
-            this.Directory_Name_Submit.Click += new System.EventHandler(this.Directory_Name_Submit_Click);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(530, 408);
+            this.label2.Location = new System.Drawing.Point(698, 453);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(178, 20);
             this.label2.TabIndex = 5;
             this.label2.Text = "Kaydedilecek Lokasyon:";
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(415, 362);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 26);
+            this.textBox1.TabIndex = 18;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(415, 428);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(100, 26);
+            this.textBox2.TabIndex = 19;
+            // 
             // Network_Design_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1200, 755);
+            this.ClientSize = new System.Drawing.Size(1356, 803);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.output_box);
@@ -327,13 +351,7 @@
 
         private System.Windows.Forms.GroupBox input_files_parameters;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.TextBox Month_box;
         private System.Windows.Forms.Label month_label;
-        private System.Windows.Forms.TextBox presolved_box;
-        private System.Windows.Forms.TextBox parameter_box;
-        private System.Windows.Forms.TextBox seller_box;
-        private System.Windows.Forms.TextBox pot_xDock_box;
-        private System.Windows.Forms.TextBox demand_box;
         private System.Windows.Forms.Label presolved_xDock_label;
         private System.Windows.Forms.Label parameter_label;
         private System.Windows.Forms.Label seller_label;
@@ -349,6 +367,15 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Button Directory_Name_Submit;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox comboBox6;
+        private System.Windows.Forms.ComboBox comboBox5;
+        private System.Windows.Forms.ComboBox comboBox4;
+        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

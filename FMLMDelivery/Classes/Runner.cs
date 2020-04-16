@@ -37,8 +37,9 @@ namespace FMLMDelivery.Classes
         private List<Parameters> _parameters;
         private Boolean _discrete_solution;
         private String _output_files;
+        private double _hub_demand_coverage;
 
-        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files)
+        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files,double hub_demand_coverage)
         {
             partial_xdocks=_partial_xdocks;
             xDocks = _xDocks;
@@ -52,6 +53,7 @@ namespace FMLMDelivery.Classes
             partial_run = _partial_run;
             _discrete_solution = discrete_solution;
             _output_files = Output_files;
+            _hub_demand_coverage = hub_demand_coverage;
         }
 
         private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
@@ -247,7 +249,7 @@ namespace FMLMDelivery.Classes
              * and re-solved the model with demand-distance weighted objective given the number of xDocks and identifies the optimal locations for xDocks. After xDocks are identified, xDock-Hub model
              * is called with the minimum hub objective and after the model is solved, with the given numer of hub the model is resolved in order to obtain demand-distance weighted locations for hubs. 
              */
-            var hub_demand_covarage = 0.97;
+            
             if (!partial_run)
             {
                 if (_discrete_solution)
@@ -327,13 +329,13 @@ namespace FMLMDelivery.Classes
 
 
                 //xDock-Seller-Hub Assignment
-                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, 0);
+                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, _hub_demand_coverage, phase_2, 0);
                 third_phase.Run();
                 var num_clusters = third_phase.Return_num_Hubs();
                 min_model_model = false;
                 demand_weighted_model = true;
                 phase_2 = true;
-                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, num_clusters);
+                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, _hub_demand_coverage, phase_2, num_clusters);
                 third_phase.Run();
                 var objVal = third_phase.GetObjVal();
                 new_hubs = third_phase.Return_New_Hubs();
@@ -385,13 +387,13 @@ namespace FMLMDelivery.Classes
 
                 new_xDocks = partial_xdocks;
                 //xDock-Seller-Hub Assignment
-                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, 0);
+                var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, _hub_demand_coverage, phase_2, 0);
                 third_phase.Run();
                 var num_clusters = third_phase.Return_num_Hubs();
                 min_model_model = false;
                 demand_weighted_model = true;
                 phase_2 = true;
-                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, hub_demand_covarage, phase_2, num_clusters);
+                third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, _hub_demand_coverage, phase_2, num_clusters);
                 third_phase.Run();
                 var objVal = third_phase.GetObjVal();
                 new_hubs = third_phase.Return_New_Hubs();
