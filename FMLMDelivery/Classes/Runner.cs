@@ -36,8 +36,9 @@ namespace FMLMDelivery.Classes
         private Boolean partial_run = new Boolean();
         private List<Parameters> _parameters;
         private Boolean _discrete_solution;
+        private String _output_files;
 
-        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution)
+        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files)
         {
             partial_xdocks=_partial_xdocks;
             xDocks = _xDocks;
@@ -50,6 +51,7 @@ namespace FMLMDelivery.Classes
             _parameters = parameters;
             partial_run = _partial_run;
             _discrete_solution = discrete_solution;
+            _output_files = Output_files;
         }
 
         private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
@@ -278,7 +280,7 @@ namespace FMLMDelivery.Classes
                 }
 
                 var header_xdock_demand_point = "#Xdock,xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
-                var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point);
+                var write_the_xdocks = new Csv_Writer(writer_xdocks, "xDock_County", header_xdock_demand_point,_output_files);
                 write_the_xdocks.Write_Records();
 
                 Modify_xDocks(new_xDocks);
@@ -286,7 +288,7 @@ namespace FMLMDelivery.Classes
                 Add_Already_Open_Main_Hubs();
 
                 String csv_new = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Region()},{d.If_Agency()},{d.Get_Longitude()},{d.Get_Latitude()},{d.If_Already_Opened()},{d.Get_Distance_Threshold()},{d.Get_LM_Demand()},{d.Get_FM_Demand()}"));
-                System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\Temporary_xDocks.csv", csv_new, Encoding.UTF8);
+                System.IO.File.WriteAllText(@""+_output_files+"\\Temporary_xDocks.csv", csv_new, Encoding.UTF8);
 
                 //Seller-xDock Assignment
 
@@ -314,7 +316,7 @@ namespace FMLMDelivery.Classes
                 writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
                 stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
                 var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
-                var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
+                var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header,_output_files);
                 writer_small_seller.Write_Records();
 
                 
@@ -339,8 +341,8 @@ namespace FMLMDelivery.Classes
                 var header_hub = "#Hub,Hub İl,Hub İlçe,Hub Mahalle,Hub_Long,Hub_Lat,Type_of_Assignment,Distinct Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
                 var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
-                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
-                var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
+                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub,_output_files);
+                var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header,_output_files);
                 writer_hub_seller.Write_Records();
                 stat_writer.Write_Records();
 
@@ -373,7 +375,7 @@ namespace FMLMDelivery.Classes
                 writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
                 stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
                 var header = "#Xdock,xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
-                var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header);
+                var writer_small_seller = new Csv_Writer(writer_seller, "Small_Seller_xdock", header,_output_files);
                 writer_small_seller.Write_Records();
                 
                 var min_model_model = true;
@@ -397,8 +399,8 @@ namespace FMLMDelivery.Classes
                 var header_hub = "#Hub,Hub İl,Hub İlçe,Hub Mahalle,Hub_Long,Hub_Lat,Type_of_Assignment,Distinct Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
                 var stats_header = "Part,Model,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
-                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub);
-                var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header);
+                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Seller_xDock_Hub", header_hub,_output_files);
+                var stat_writer = new Csv_Writer(stats_writer, "Stats", stats_header,_output_files);
                 writer_hub_seller.Write_Records();
                 stat_writer.Write_Records();
             }
@@ -406,19 +408,19 @@ namespace FMLMDelivery.Classes
             //Seller-xDock Assignment
             
             String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()},{d.Get_City()},{d.Get_District()},{d.Get_Latitude()},{d.Get_Longitude()},{d.Get_LM_Capacity()},{d.Get_FM_Capacity()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_hubs.csv", csv7, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"" + _output_files +"\\new_hubs.csv", csv7, Encoding.UTF8);
 
             String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()},{d.Get_City()},{d.Get_District()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()},{d.If_Agency()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\new_XDocks.csv", csv2, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"" + _output_files +"\\new_XDocks.csv", csv2, Encoding.UTF8);
 
             String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\assigned_prior_small_sellers.csv", csv3, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"" + _output_files +"\\assigned_prior_small_sellers.csv", csv3, Encoding.UTF8);
 
             String csv4 = String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\assigned_regular_small_sellers.csv", csv4, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"" + _output_files +"\\assigned_regular_small_sellers.csv", csv4, Encoding.UTF8);
 
             String csv5 = String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\assigned_big_sellers.csv", csv5, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"" + _output_files +"\\assigned_big_sellers.csv", csv5, Encoding.UTF8);
 
 
             Console.WriteLine("Hello World!");

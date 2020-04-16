@@ -16,12 +16,15 @@ namespace FMLMDelivery.Classes
         private String _header;
 
         private String _filename;
-        public Csv_Writer(List<String> records_of_outcomes, String filename, String Header)
+
+        private String _output_directory;
+        public Csv_Writer(List<String> records_of_outcomes, String filename, String Header,String output_directory)
         {
             _records = records_of_outcomes;
             _header = Header;
             _filename = filename;
-            var filepath = @"C:\Workspace\FMLMDelivery\FMLMDelivery\bin\Debug\netcoreapp2.1\Output\" + filename + ".csv";
+            _output_directory = output_directory;
+            var filepath = @""+ _output_directory+"\\" + filename + ".csv";
             _w = new StreamWriter(filepath,false,Encoding.UTF8);
             _w.WriteLine(Header);
         }

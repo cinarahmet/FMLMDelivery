@@ -47,8 +47,11 @@
             this.yes_button = new System.Windows.Forms.RadioButton();
             this.send_button = new System.Windows.Forms.Button();
             this.output_box = new System.Windows.Forms.GroupBox();
-            this.uotput_box = new System.Windows.Forms.TextBox();
+            this.username = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.Directory_Name_Submit = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
             this.input_files_parameters.SuspendLayout();
             this.run_option_group_box.SuspendLayout();
             this.output_box.SuspendLayout();
@@ -68,11 +71,11 @@
             this.input_files_parameters.Controls.Add(this.seller_label);
             this.input_files_parameters.Controls.Add(this.pot_xDock_label);
             this.input_files_parameters.Controls.Add(this.demand_label);
-            this.input_files_parameters.Location = new System.Drawing.Point(50, 98);
+            this.input_files_parameters.Location = new System.Drawing.Point(13, 210);
             this.input_files_parameters.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.input_files_parameters.Name = "input_files_parameters";
             this.input_files_parameters.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.input_files_parameters.Size = new System.Drawing.Size(428, 422);
+            this.input_files_parameters.Size = new System.Drawing.Size(428, 443);
             this.input_files_parameters.TabIndex = 0;
             this.input_files_parameters.TabStop = false;
             this.input_files_parameters.Text = "Dökümanlar ve Parametreler";
@@ -189,7 +192,7 @@
             // 
             this.run_option_group_box.Controls.Add(this.no_button);
             this.run_option_group_box.Controls.Add(this.yes_button);
-            this.run_option_group_box.Location = new System.Drawing.Point(486, 98);
+            this.run_option_group_box.Location = new System.Drawing.Point(534, 210);
             this.run_option_group_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.run_option_group_box.Name = "run_option_group_box";
             this.run_option_group_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -225,36 +228,37 @@
             // 
             // send_button
             // 
-            this.send_button.Location = new System.Drawing.Point(801, 511);
+            this.send_button.Location = new System.Drawing.Point(942, 608);
             this.send_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.send_button.Name = "send_button";
-            this.send_button.Size = new System.Drawing.Size(112, 35);
+            this.send_button.Size = new System.Drawing.Size(124, 45);
             this.send_button.TabIndex = 2;
-            this.send_button.Text = "OK";
+            this.send_button.Text = "Çalıştır";
             this.send_button.UseVisualStyleBackColor = true;
             this.send_button.Click += new System.EventHandler(this.send_button_Click);
             // 
             // output_box
             // 
-            this.output_box.Controls.Add(this.uotput_box);
+            this.output_box.Controls.Add(this.Directory_Name_Submit);
+            this.output_box.Controls.Add(this.username);
             this.output_box.Controls.Add(this.label1);
-            this.output_box.Location = new System.Drawing.Point(664, 305);
+            this.output_box.Location = new System.Drawing.Point(47, 14);
             this.output_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.output_box.Name = "output_box";
             this.output_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.output_box.Size = new System.Drawing.Size(465, 154);
+            this.output_box.Size = new System.Drawing.Size(962, 154);
             this.output_box.TabIndex = 3;
             this.output_box.TabStop = false;
             this.output_box.Text = "Hedef Dizin";
             this.output_box.Enter += new System.EventHandler(this.output_box_Enter);
             // 
-            // uotput_box
+            // username
             // 
-            this.uotput_box.Location = new System.Drawing.Point(14, 83);
-            this.uotput_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.uotput_box.Name = "uotput_box";
-            this.uotput_box.Size = new System.Drawing.Size(318, 26);
-            this.uotput_box.TabIndex = 1;
+            this.username.Location = new System.Drawing.Point(14, 83);
+            this.username.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.username.Name = "username";
+            this.username.Size = new System.Drawing.Size(318, 26);
+            this.username.TabIndex = 1;
             // 
             // label1
             // 
@@ -262,15 +266,44 @@
             this.label1.Location = new System.Drawing.Point(9, 38);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(322, 20);
+            this.label1.Size = new System.Drawing.Size(278, 20);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Çıktıların yazdırılacağı hedef klasörü belirtiniz:";
+            this.label1.Text = "Lütfen Trendyol Kullanıcı Adınızı Giriniz";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(534, 448);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(532, 28);
+            this.comboBox1.TabIndex = 4;
+            // 
+            // Directory_Name_Submit
+            // 
+            this.Directory_Name_Submit.Location = new System.Drawing.Point(655, 61);
+            this.Directory_Name_Submit.Name = "Directory_Name_Submit";
+            this.Directory_Name_Submit.Size = new System.Drawing.Size(142, 38);
+            this.Directory_Name_Submit.TabIndex = 2;
+            this.Directory_Name_Submit.Text = "Giriş";
+            this.Directory_Name_Submit.UseVisualStyleBackColor = true;
+            this.Directory_Name_Submit.Click += new System.EventHandler(this.Directory_Name_Submit_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(530, 408);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(178, 20);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Kaydedilecek Lokasyon:";
             // 
             // Network_Design_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1200, 692);
+            this.ClientSize = new System.Drawing.Size(1200, 755);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.output_box);
             this.Controls.Add(this.send_button);
             this.Controls.Add(this.run_option_group_box);
@@ -278,6 +311,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Network_Design_Form";
             this.Text = "Network Design Decision Making Tool";
+            this.Load += new System.EventHandler(this.Network_Design_Form_Load);
             this.input_files_parameters.ResumeLayout(false);
             this.input_files_parameters.PerformLayout();
             this.run_option_group_box.ResumeLayout(false);
@@ -285,6 +319,7 @@
             this.output_box.ResumeLayout(false);
             this.output_box.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -309,8 +344,11 @@
         private System.Windows.Forms.RadioButton yes_button;
         private System.Windows.Forms.Button send_button;
         private System.Windows.Forms.GroupBox output_box;
-        private System.Windows.Forms.TextBox uotput_box;
+        private System.Windows.Forms.TextBox username;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button Directory_Name_Submit;
+        private System.Windows.Forms.Label label2;
     }
 }
 

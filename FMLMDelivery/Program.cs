@@ -41,7 +41,7 @@ namespace FMLMDelivery
             var partial_solution = false;
             if (!partial_solution)
             {
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution);
+                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"");
                 (xDocks, hubs) = runner.Run();
                 Console.ReadKey();
             }
@@ -51,7 +51,7 @@ namespace FMLMDelivery
                 partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution);
+                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"");
                 (xDocks, hubs) = runner_partial.Run();
                 Console.ReadKey();
             }

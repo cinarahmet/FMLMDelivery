@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Core_Form
 {
@@ -20,11 +21,21 @@ namespace Core_Form
         private string parameter_file = "";
         private String directory = "";
         private Boolean partial_solution = new Boolean();
-
+        
         public Network_Design_Form_Core()
         {
             InitializeComponent();
-            yes_button.Checked = true;
+            yes_button.Checked = false;
+            demand_box.Enabled = false;
+            pot_xDock_box.Enabled = false;
+            yes_button.Enabled = false;
+            no_button.Enabled = false;
+            seller_box.Enabled = false;
+            parameter_box.Enabled = false;
+            presolved_box.Enabled = false;
+            comboBox1.Enabled = false;
+            Month_box.Enabled = false;
+            send_button.Enabled = false;
         }
         private void output_box_Enter(object sender, EventArgs e)
         {
@@ -43,6 +54,28 @@ namespace Core_Form
                 partial_solution = true;
             }
         }
+        private void Network_Design_Form_Load(object sender, EventArgs e)
+        {
+          
+        }
+        private void Directory_Name_Submit_Click(object sender, EventArgs e)
+        {
+            yes_button.Checked = false;
+            demand_box.Enabled = true;
+            pot_xDock_box.Enabled = true;
+            yes_button.Enabled = true;
+            no_button.Enabled = true;
+            seller_box.Enabled = true;
+            parameter_box.Enabled = true;
+            presolved_box.Enabled = true;
+            comboBox1.Enabled = true;
+            Month_box.Enabled = true;
+            send_button.Enabled = true;
+            username.Enabled = false;
+            DirectoryInfo obj = new DirectoryInfo("C:\\Users\\" + username.Text + "\\Desktop");
+            DirectoryInfo[] folders = obj.GetDirectories();
+            comboBox1.DataSource = folders;
+        }
         private void send_button_Click(object sender, EventArgs e)
         {
             demand_file = demand_box.Text + ".csv";
@@ -52,7 +85,7 @@ namespace Core_Form
             presolved_xDock_file = presolved_box.Text + ".csv";
             var month = Convert.ToInt32(Month_box.Text);
 
-            directory = uotput_box.Text + ".csv";
+            directory = comboBox1.Text;
             //Application.Run(new Form1());
             var demand_point = new List<DemandPoint>();
             var potential_xDocks = new List<xDocks>();
@@ -81,17 +114,17 @@ namespace Core_Form
             var parameter_list = reader.Get_Parameter_List();
             if (!partial_solution)
             {
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution);
+                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory);
                 (xDocks, hubs) = runner.Run();
                 Console.ReadKey();
             }
             else
             {
-                var partial_reader = new CSVReader("", "Output/Temporary_xDocks.csv", "", "", month);
+                var partial_reader = new CSVReader("", "Temporary_xDocks.csv", "", "", month);
                 partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution);
+                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory);
                 (xDocks, hubs) = runner_partial.Run();
                 Console.ReadKey();
 

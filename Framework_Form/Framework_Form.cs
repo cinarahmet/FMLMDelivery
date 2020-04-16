@@ -31,5 +31,15 @@ namespace Framework_Form
         {
 
         }
+
+        private void Network_Design_Form_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Directory_Name_Submit_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
