@@ -44,6 +44,36 @@ namespace Framework_Form
 
         }
 
-       
+      
+
+        private void Demand_box_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Pot_xdock_box_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Seller_box_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Parameter_box_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Presolved_box_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Outbut_loc_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

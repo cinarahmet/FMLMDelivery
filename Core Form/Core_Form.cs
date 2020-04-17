@@ -26,16 +26,16 @@ namespace Core_Form
         {
             InitializeComponent();
             yes_button.Checked = false;
-            demand_combo.Enabled = false;
-            pot_xdock_combo.Enabled = false;
+            Demand_box.Enabled = false;
+            Pot_xDock_Box.Enabled = false;
             yes_button.Enabled = false;
             no_button.Enabled = false;
-            seller_combo.Enabled = false;
-            parameter_combo.Enabled = false;
-            presolved_combo.Enabled = false;
-            comboBox1.Enabled = false;
-            Month_box.Enabled = false;
-            textBox2.Enabled = false;
+            Seller_Box.Enabled = false;
+            Parameter_Box.Enabled = false;
+            Presolved_box.Enabled = false;
+            Outbut_loc.Enabled = false;
+            textBox6.Enabled = false;
+            textBox7.Enabled = false;
             send_button.Enabled = false;
         }
         private void output_box_Enter(object sender, EventArgs e)
@@ -46,39 +46,93 @@ namespace Core_Form
         {
             if (yes_button.Checked)
             {
-                presolved_combo.Enabled = false;
+                Presolved_box.Enabled = false;
                 partial_solution = false;
             }
             else
             {
-                presolved_combo.Enabled = true;
+                Presolved_box.Enabled = true;
                 partial_solution = true;
             }
         }
         private void Network_Design_Form_Load(object sender, EventArgs e)
         {
-          
+           
+        }
+        private void Demand_box_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.RestoreDirectory = true;
+            var direct = openFileDialog1.FileName;
+            Demand_box.Text = direct;
+        }
+
+        private void Pot_xdock_box_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.RestoreDirectory = true;
+            var direct = openFileDialog1.FileName;
+            Pot_xDock_Box.Text = direct;
+
+        }
+
+        private void Seller_box_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.RestoreDirectory = true;
+            var direct = openFileDialog1.FileName;
+            Seller_Box.Text = direct;
+        }
+
+        private void Parameter_box_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.RestoreDirectory = true;
+            var direct = openFileDialog1.FileName;
+            Parameter_Box.Text = direct;
+        }
+
+        private void Presolved_box_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.RestoreDirectory = true;
+            var direct = openFileDialog1.FileName;
+            Presolved_box.Text = direct;
+
+        }
+
+        private void Outbut_loc_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog1.ShowDialog();         
+            
+            var direct = folderBrowserDialog1.SelectedPath;
+            Outbut_loc.Text = direct;
         }
         private void Directory_Name_Submit_Click(object sender, EventArgs e)
         {
             yes_button.Checked = false;
-            demand_combo.Enabled = true;
-            pot_xdock_combo.Enabled = true;
+            Demand_box.Enabled = true;
+            Pot_xDock_Box.Enabled = true;
             yes_button.Enabled = true;
             no_button.Enabled = true;
-            seller_combo.Enabled = true;
-            parameter_combo.Enabled = true;
-            presolved_combo.Enabled = true;
-            comboBox1.Enabled = true;
-            Month_box.Enabled = true;
-            textBox2.Enabled = true;
+            Seller_Box.Enabled = true;
+            Parameter_Box.Enabled = true;
+            Presolved_box.Enabled = true;
+            Outbut_loc.Enabled = true;
+            textBox6.Enabled = true;
+            textBox7.Enabled = true;
             send_button.Enabled = true;
             username.Enabled = false;
-            DirectoryInfo obj = new DirectoryInfo("C:\\Users\\" + username.Text + "\\Desktop");
+            /*DirectoryInfo obj = new DirectoryInfo("C:\\Users\\" + username.Text + "\\Desktop");
             DirectoryInfo[] folders = obj.GetDirectories();
-            comboBox1.DataSource = folders;
+            comboBox1.DataSource = folders;*/
 
-            string[] filePaths = Directory.GetFiles(@"C:\\Users\\" + username.Text + "\\Desktop\\Input Files\\", "*.csv");
+            /*string[] filePaths = Directory.GetFiles(@"C:\\Users\\" + username.Text + "\\Desktop\\Input Files\\", "*.csv");
             foreach (string file in filePaths)
             {
                 demand_combo.Items.Add(file);
@@ -87,18 +141,18 @@ namespace Core_Form
                 presolved_combo.Items.Add(file);
                 parameter_combo.Items.Add(file);
 
-            }
+            }*/
         }
         private void send_button_Click(object sender, EventArgs e)
         {
-            demand_file = demand_combo.Text ;
-            pot_xDock_file = pot_xdock_combo.Text;
-            seller_file = seller_combo.Text ;
-            parameter_file = parameter_combo.Text;
-            presolved_xDock_file = presolved_combo.Text ;
-            var month = Convert.ToInt32(Month_box.Text);
-            var hub_demand_coverage = Convert.ToDouble(textBox2.Text);
-            directory = comboBox1.Text;
+            demand_file = Demand_box.Text ;
+            pot_xDock_file = Pot_xDock_Box.Text;
+            seller_file = Seller_Box.Text ;
+            parameter_file = Parameter_Box.Text;
+            presolved_xDock_file = Presolved_box.Text ;
+            var month = Convert.ToInt32(textBox6.Text);
+            var hub_demand_coverage = Convert.ToDouble(textBox7.Text);
+            directory = Outbut_loc.Text;
             //Application.Run(new Form1());
             var demand_point = new List<DemandPoint>();
             var potential_xDocks = new List<xDocks>();
@@ -142,6 +196,8 @@ namespace Core_Form
                 Console.ReadKey();
 
             }
+
+           
 
 
         }
