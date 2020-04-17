@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using FMLMDelivery;
 using FMLMDelivery.Classes;
-
+using FMLMDelivery.MetaHeuristics;
 
 namespace FMLMDelivery
 {
@@ -12,7 +12,8 @@ namespace FMLMDelivery
     {
         static void Main(string[] args)
         {
-            
+            var heuristic = new Genetic_Algorithm();
+            heuristic.Run();
             //Application.Run(new Form1());
             var demand_point = new List<DemandPoint>();
             var potential_xDocks = new List<xDocks>();
