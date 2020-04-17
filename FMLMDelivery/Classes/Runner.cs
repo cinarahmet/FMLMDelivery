@@ -409,10 +409,10 @@ namespace FMLMDelivery.Classes
             
             //Seller-xDock Assignment
             
-            String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_Id()},{d.Get_City()},{d.Get_District()},{d.Get_Latitude()},{d.Get_Longitude()},{d.Get_LM_Capacity()},{d.Get_FM_Capacity()}"));
+            String csv7 = String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Latitude()},{d.Get_Longitude()},{d.Get_LM_Capacity()},{d.Get_FM_Capacity()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış Hublar Listesi.csv", csv7, Encoding.UTF8);
 
-            String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_Id()},{d.Get_City()},{d.Get_District()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()},{d.If_Agency()}"));
+            String csv2 = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()},{d.If_Agency()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
 
             String csv3 = String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
