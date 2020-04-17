@@ -460,7 +460,7 @@ namespace FMLMDelivery
                             var xdock_fm_demand = _xDocks[i].Get_FM_Demand();
                             var xdock_id = _xDocks[i].Get_Id();
                             var xdock_distance = d[i][j];
-                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{number_of_xdock},{xdock_city},{xdock_county},{xdock_id},{xdock_lm_demand},{xdock_fm_demand},{xdock_distance}";
+                            var result = $"{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{number_of_xdock},{xdock_city},{xdock_county},{xdock_id},{xdock_lm_demand},{xdock_fm_demand},{xdock_distance}";
                             records.Add(result);
                         }
                     }
@@ -477,7 +477,7 @@ namespace FMLMDelivery
                             var seller_lm_demand = "";
                             var seller_fm_demand = _sellers[k].Get_Demand();
                             var seller_distance = d_seller[k][j];
-                            var result = $"{hub_ranking},{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{seller_name},{seller_city},{seller_district},{seller_id},{seller_lm_demand},{seller_fm_demand},{seller_distance}";
+                            var result = $"{hub_city},{hub_district},{hub_id},{hub_long},{hub_lat},{type},{seller_name},{seller_city},{seller_district},{seller_id},{seller_lm_demand},{seller_fm_demand},{seller_distance}";
                             records.Add(result);
                         }
                     }

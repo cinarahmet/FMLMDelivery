@@ -48,9 +48,29 @@ namespace Core_Form
             {
                 Presolved_box.Enabled = false;
                 partial_solution = false;
+                Demand_box.Enabled = true;
+                Pot_xDock_Box.Enabled = true;
+                no_button.Enabled = true;
+                Seller_Box.Enabled = true;
+                Parameter_Box.Enabled = true;
+                Presolved_box.Enabled = false;
+                Outbut_loc.Enabled = true;
+                textBox6.Enabled = true;
+                textBox7.Enabled = true;
+                send_button.Enabled = true;
             }
-            else
+            else 
             {
+                Demand_box.Enabled = true;
+                Pot_xDock_Box.Enabled = true;
+                no_button.Enabled = true;
+                Seller_Box.Enabled = true;
+                Parameter_Box.Enabled = true;
+                Presolved_box.Enabled = true;
+                Outbut_loc.Enabled = true;
+                textBox6.Enabled = true;
+                textBox7.Enabled = true;
+                send_button.Enabled = true;
                 Presolved_box.Enabled = true;
                 partial_solution = true;
             }
@@ -115,33 +135,11 @@ namespace Core_Form
         }
         private void Directory_Name_Submit_Click(object sender, EventArgs e)
         {
-            yes_button.Checked = false;
-            Demand_box.Enabled = true;
-            Pot_xDock_Box.Enabled = true;
+            yes_button.Checked = false;            
             yes_button.Enabled = true;
-            no_button.Enabled = true;
-            Seller_Box.Enabled = true;
-            Parameter_Box.Enabled = true;
-            Presolved_box.Enabled = true;
-            Outbut_loc.Enabled = true;
-            textBox6.Enabled = true;
-            textBox7.Enabled = true;
-            send_button.Enabled = true;
+            no_button.Enabled = true;                      
             username.Enabled = false;
-            /*DirectoryInfo obj = new DirectoryInfo("C:\\Users\\" + username.Text + "\\Desktop");
-            DirectoryInfo[] folders = obj.GetDirectories();
-            comboBox1.DataSource = folders;*/
-
-            /*string[] filePaths = Directory.GetFiles(@"C:\\Users\\" + username.Text + "\\Desktop\\Input Files\\", "*.csv");
-            foreach (string file in filePaths)
-            {
-                demand_combo.Items.Add(file);
-                pot_xdock_combo.Items.Add(file);
-                seller_combo.Items.Add(file);
-                presolved_combo.Items.Add(file);
-                parameter_combo.Items.Add(file);
-
-            }*/
+            
         }
         private void send_button_Click(object sender, EventArgs e)
         {
@@ -187,7 +185,7 @@ namespace Core_Form
             }
             else
             {
-                var partial_reader = new CSVReader("", "Temporary_xDocks.csv", "", "", month);
+                var partial_reader = new CSVReader("", presolved_xDock_file, "", "", month);
                 partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 //partial_xDocks = partial_reader.Get_();

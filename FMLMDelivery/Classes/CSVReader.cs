@@ -217,12 +217,10 @@ public class CSVReader
             while ((s = sr.ReadLine()) != null)
             {
                 var line = s.Split(',');
-                var distinct_city = line[0];
-                var dist_thres = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);
-                var min_cap = Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture);
-                var sol_gap = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                var active= Convert.ToBoolean(Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture));
-                var parameter = new Parameters(distinct_city, dist_thres, min_cap, sol_gap, active);
+                var distinct_city = line[0];                
+                var min_cap = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);                
+                var active= Convert.ToBoolean(Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture));
+                var parameter = new Parameters(distinct_city, min_cap, active);
                 _parameters.Add(parameter);
             }
         }
@@ -292,7 +290,7 @@ public class CSVReader
                 var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                 var seller_dist = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);                
                 var seller_size = line[9];
-                if (seller_demand <= 1000)
+                if (seller_size=="Small")
                 {
                     var small_seller = new Seller(seller_name,seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist, seller_size);
                     if (seller_priority == 1)

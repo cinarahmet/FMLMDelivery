@@ -278,7 +278,7 @@ namespace FMLMDelivery.Classes
                         var seller_id = _small_seller[i].Get_Id();
                         var seller_demand = _small_seller[i].Get_Demand();
                         var seller_distance = distance_matrix[i][j];
-                        var result = $"{xdock_rank},{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{seller_name},{seller_city},{seller_district},{seller_distance},{seller_demand}";
+                        var result = $"{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{seller_name},{seller_city},{seller_district},{seller_distance},{seller_demand}";
                         record.Add(result);
                     }
                 }

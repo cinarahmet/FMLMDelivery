@@ -152,7 +152,7 @@
             this.seller_label.Name = "seller_label";
             this.seller_label.Size = new System.Drawing.Size(136, 20);
             this.seller_label.TabIndex = 2;
-            this.seller_label.Text = "Tedarikçi Dosyası:";
+            this.seller_label.Text = "First Mile Dosyası:";
             // 
             // parameter_label
             // 
@@ -312,7 +312,7 @@
             this.output_box.Size = new System.Drawing.Size(962, 154);
             this.output_box.TabIndex = 3;
             this.output_box.TabStop = false;
-            this.output_box.Text = "Hedef Dizin";
+            this.output_box.Text = "Giriş";
             this.output_box.Enter += new System.EventHandler(this.output_box_Enter);
             // 
             // Outbut_loc

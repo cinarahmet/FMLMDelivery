@@ -311,7 +311,7 @@
             this.output_box.Size = new System.Drawing.Size(962, 154);
             this.output_box.TabIndex = 3;
             this.output_box.TabStop = false;
-            this.output_box.Text = "Hedef Dizin";
+            this.output_box.Text = "Giriş";
             this.output_box.Enter += new System.EventHandler(this.output_box_Enter);
             // 
             // Outbut_loc
