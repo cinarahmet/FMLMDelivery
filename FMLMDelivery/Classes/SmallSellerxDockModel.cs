@@ -137,7 +137,7 @@ namespace FMLMDelivery.Classes
             //Create a[i,j] matrix
             for (int i = 0; i < _num_of_Seller; i++)
             {
-                var longtitude = _small_seller[i].Get_Longitude();
+                distance_threshold = _small_seller[i].Get_Distance_Threshold();
                 //var threshold = _prior_small_seller[i].Get_Distance_Threshold();
                 var a_i = new List<Double>();
                 for (int j = 0; j < _num_of_xDocks; j++)
