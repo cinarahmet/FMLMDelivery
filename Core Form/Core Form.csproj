@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Core_Form</RootNamespace>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>find_202032_15253324_mQc_1.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

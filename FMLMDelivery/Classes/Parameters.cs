@@ -12,10 +12,13 @@ namespace FMLMDelivery.Classes
 
         private Boolean _activation;
 
-        public Parameters(string key, double min_cap,Boolean activation)
+        private String _size;
+
+        public Parameters(string key, double min_cap,string size,Boolean activation)
         {
             _key = key;            
-            _min_xDock_cap = min_cap;            
+            _min_xDock_cap = min_cap;
+            _size = size;
             _activation = activation;
 
         }        
@@ -30,6 +33,10 @@ namespace FMLMDelivery.Classes
         public Boolean Get_Activation()
         {
             return _activation;
+        }
+        public String Get_Size()
+        {
+            return _size;
         }
     }
 }

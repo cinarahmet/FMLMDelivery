@@ -50,7 +50,7 @@ namespace FMLMDelivery.Classes
 
         private Double _objVal;
 
-        public PointEliminator(List<DemandPoint> demandPoints, List<xDocks> xDocks, double distance_threshold, double threshold_demand)
+        public PointEliminator(List<DemandPoint> demandPoints, List<xDocks> xDocks, double threshold_demand)
         {
 
             _whole_demand_points = demandPoints;
@@ -61,7 +61,7 @@ namespace FMLMDelivery.Classes
             x = new List<INumVar>();
             demand_list = new List<double>();
 
-            _distance_threshold = distance_threshold;
+            
             _threshold_demand = threshold_demand;
 
             _num_of_demand_points = _whole_demand_points.Count;

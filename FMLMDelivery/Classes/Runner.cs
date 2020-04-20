@@ -163,10 +163,10 @@ namespace FMLMDelivery.Classes
             return Tuple.Create(city_points, pot_xDock_loc);
         }
 
-        private void Partial_Run(string key, bool partial_city_run, double distance_threshold, double min_xDock_capacity, double demand_coverage, double gap)
+        private void Partial_Run(string key, bool partial_city_run, double min_xDock_capacity, double demand_coverage, double gap)
         {
             (city_points, pot_xDock_loc) = Get_City_Information(key, partial_city_run);
-            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, distance_threshold, min_xDock_capacity);
+            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, min_xDock_capacity);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
             (temp_xDocks, temp_hubs, temp_writer, temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage, min_xDock_capacity, key, gap);
@@ -258,7 +258,7 @@ namespace FMLMDelivery.Classes
                     {
                         if (_parameters[i].Get_Activation())
                         {
-                            Partial_Run(_parameters[i].Get_Key(), false, 40, _parameters[i].Get_Min_Cap(), 1.0, 0.01);
+                            Partial_Run(_parameters[i].Get_Key(), false, _parameters[i].Get_Min_Cap(), 1.0, Gap_Converter_1(_parameters[i].Get_Size()));
                         }
                     }
                 }
@@ -281,7 +281,7 @@ namespace FMLMDelivery.Classes
                     //Partial_Run("Marmara", true, 30, 1250, 1.0, gap_list[2]);
                 }
 
-                var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks_Lat,xDokcs_long,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,İlçe_Demand";
+                var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,Talep Noktası Talebi";
                 var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point,_output_files);
                 write_the_xdocks.Write_Records();
 
@@ -317,7 +317,7 @@ namespace FMLMDelivery.Classes
                 var cov_demand = second_phase.Return_Covered_Demand();
                 writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
                 stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
-                var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
+                var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
                 var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header,_output_files);
                 writer_small_seller.Write_Records();
 
@@ -340,7 +340,7 @@ namespace FMLMDelivery.Classes
                 var objVal = third_phase.GetObjVal();
                 new_hubs = third_phase.Return_New_Hubs();
                 assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-                var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub_Long,Hub_Lat,Type_of_Assignment,Distinct Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
+                var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub Boylam,Hub Enlem,Atanma Türü,Unique Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
                 var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
                 var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub,_output_files);
@@ -376,7 +376,7 @@ namespace FMLMDelivery.Classes
                 var cov_demand = second_phase.Return_Covered_Demand();
                 writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
                 stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
-                var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks_Lat,xDokcs_long, Seller İsmi,Seller İl,Seller İlçe,Uzaklık,Seller Gönderi Adeti";
+                var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
                 var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header,_output_files);
                 writer_small_seller.Write_Records();
                 
@@ -398,7 +398,7 @@ namespace FMLMDelivery.Classes
                 var objVal = third_phase.GetObjVal();
                 new_hubs = third_phase.Return_New_Hubs();
                 assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-                var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub_Long,Hub_Lat,Type_of_Assignment,Distinct Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
+                var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub Boylam,Hub Enlem,Atanma Türü,Unique Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
                 var stats_header = "Part,Model,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
                 var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub,_output_files);
@@ -431,7 +431,38 @@ namespace FMLMDelivery.Classes
                 return Tuple.Create(new_xDocks, new_hubs);
 
         }
-        
+        private Double Gap_Converter_1(String Size)
+        {   var gap = 0.0;
+            if (Size == "Small")
+            {
+                gap = 0.0001;
+            }else if (Size == "Medium")
+            {
+                gap = 0.01;
+            }
+            else
+            {
+                gap = 0.025;
+            }
+
+            return gap;
+        }
+        private Double Gap_Converter_2(int count)
+        {
+            var gap = 0.0;
+            if (count >= 1000)
+            {
+                gap = 0.025;
+            }else if(count>=500)
+            {
+                gap = 0.01;
+            }
+            else
+            {
+                gap = 0.0001;
+            }
+            return gap;
+        }
         private List<Hub> Convert_to_Potential_Hubs(List<xDocks> new_XDocks)
         {
             var potential_Hubs = new List<Hub>();
