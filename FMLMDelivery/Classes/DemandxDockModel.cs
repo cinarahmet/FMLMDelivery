@@ -735,7 +735,6 @@ public class DemandxDockModel
     private void CreateConstraints()
     {
         CoverageConstraints();
-        MainHubConstraint();
         Already_Opened();
         if (_cost_incurred)
         {
@@ -798,16 +797,7 @@ public class DemandxDockModel
             _solver.AddGe(constraint, 0);
         }
 
-        //for (int j = 0; j < _numOfXdocks; j++)
-        //{
-        //    var constraint = _solver.LinearNumExpr();
-        //    for (int i = 0; i < _numOfCounty; i++)
-        //    {
-        //        constraint.AddTerm(x[i][j], a[i][j]);
-        //    }
-        //    constraint.AddTerm(y[j], -min_num_county_assigned);
-        //    _solver.AddGe(constraint, 0);
-        //}
+
     }
 
     private void Demand_Coverage_Constraint()
@@ -833,13 +823,7 @@ public class DemandxDockModel
         _solver.AddEq(constraint, p);
     }
 
-    private void MainHubConstraint()
-    {
-        //  var constraint = _solver.LinearNumExpr();
-        //  constraint.AddTerm(y[39], 1);
-        //  constraint.AddTerm(y[40], 1);
-        //  _solver.AddEq(constraint, 2);
-    }
+
 
     private void Capacity_Constraint()
     {
