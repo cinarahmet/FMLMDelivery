@@ -11,8 +11,6 @@ namespace FMLMDelivery.Classes
 {
     class PointEliminator
     {
-        private List<INumVar> x;
-
         private List<DemandPoint> _whole_demand_points;
 
         private List<xDocks> _whole_xDocks;
@@ -21,34 +19,15 @@ namespace FMLMDelivery.Classes
 
         private List<List<double>> a;
 
-        private double _distance_threshold;
-
         private double _threshold_demand;
 
         private double _num_of_demand_points;
 
         private double _num_of_xDocks;
 
-        /// <summary>
-        /// Objective instance which stores the objective function
-        /// </summary>
-        private ILinearNumExpr _objective;
-
-        /// <summary>
-        /// How many seconds the solver worked..
-        /// </summary>
-        private double _solutionTime;
-
-        /// <summary>
-        /// Solution status: 0 - Optimal; 1 - Feasible...
-        /// </summary>
-        private Cplex.Status _status;
-
         private List<Double> demand_list;
 
         private List<Double> already_open_demand_list = new List<double>();
-
-        private Double _objVal;
 
         public PointEliminator(List<DemandPoint> demandPoints, List<xDocks> xDocks, double threshold_demand)
         {
@@ -58,7 +37,6 @@ namespace FMLMDelivery.Classes
 
             d = new List<List<double>>();
             a = new List<List<double>>();
-            x = new List<INumVar>();
             demand_list = new List<double>();
 
             

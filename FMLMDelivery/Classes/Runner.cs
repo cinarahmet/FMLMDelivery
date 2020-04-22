@@ -19,7 +19,6 @@ namespace FMLMDelivery.Classes
         private List<Seller> _regular_small_seller;
         private List<Seller> _regular_big_seller;
         private double total_demand;
-        private List<String> partial_run_cities = new List<string>(new string[] { "ANKARA", "İSTANBUL AVRUPA", "İSTANBUL ASYA", "İZMİR", "BURSA","ANTALYA","HATAY","YALOVA" });
         private List<String> writer_seller = new List<String>();
         private List<xDocks>  new_xDocks = new List<xDocks>();
         private List<Hub> potential_hub_locations = new List<Hub>();
@@ -105,67 +104,30 @@ namespace FMLMDelivery.Classes
             return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info(),stats);
         }
 
-        private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key,bool other_cities )
+        private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key)
         {
             var city_points = new List<DemandPoint>();
             var pot_xDock_loc = new List<xDocks>();
-            if (!other_cities)
+            for (int i = 0; i < demand_Points.Count; i++)
             {
-                for (int i = 0; i < demand_Points.Count; i++)
+                if (demand_Points[i].Get_City() == key)
                 {
-                    if (demand_Points[i].Get_City() == key)
-                    {
-                        city_points.Add(demand_Points[i]);
-                    }
-                }
-                for (int j = 0; j < xDocks.Count; j++)
-                {
-                    if (xDocks[j].Get_City() == key)
-                    {
-                        pot_xDock_loc.Add(xDocks[j]);
-                    }
+                    city_points.Add(demand_Points[i]);
                 }
             }
-            else
+            for (int j = 0; j < xDocks.Count; j++)
             {
-                for (int i = 0; i < demand_Points.Count; i++)
+                if (xDocks[j].Get_City() == key)
                 {
-                    var already_assigned = false;
-                    for (int j = 0; j < partial_run_cities.Count; j++)
-                    {
-                        if (demand_Points[i].Get_City() == partial_run_cities[j])
-                        {
-                            already_assigned = true;
-                        }
-                    }
-                    if (demand_Points[i].Get_Region() == key && !already_assigned)
-                    {
-                        city_points.Add(demand_Points[i]);
-                    }
-                }
-                for (int j = 0; j < xDocks.Count; j++)
-                {
-                    var already_assigned = false;
-                    for (int k = 0; k < partial_run_cities.Count; k++)
-                    {
-                        if (xDocks[j].Get_City() == partial_run_cities[k])
-                        {
-                            already_assigned = true;
-                        }
-                    }
-                    if (xDocks[j].Get_Region() == key && !already_assigned)
-                    {
-                        pot_xDock_loc.Add(xDocks[j]);
-                    }
+                    pot_xDock_loc.Add(xDocks[j]);
                 }
             }
-            
             return Tuple.Create(city_points, pot_xDock_loc);
         }
 
-        private void Partial_Run(string key, bool partial_city_run, double min_xDock_capacity, double demand_coverage, double gap)
+        private void Partial_Run(string key, double min_xDock_capacity, double demand_coverage, double gap)
         {
-            (city_points, pot_xDock_loc) = Get_City_Information(key, partial_city_run);
+            (city_points, pot_xDock_loc) = Get_City_Information(key);
             var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, min_xDock_capacity);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
@@ -252,35 +214,13 @@ namespace FMLMDelivery.Classes
             
             if (!partial_run)
             {
-                if (_discrete_solution)
+                for (int i = 0; i < _parameters.Count; i++)
                 {
-                    for (int i = 0; i < _parameters.Count; i++)
+                    if (_parameters[i].Get_Activation())
                     {
-                        if (_parameters[i].Get_Activation())
-                        {
-                            Partial_Run(_parameters[i].Get_Key(), false, _parameters[i].Get_Min_Cap(), 1.0, Gap_Converter_1(_parameters[i].Get_Size()));
-                        }
+                        Partial_Run(_parameters[i].Get_Key(), _parameters[i].Get_Min_Cap(), 1.0, Gap_Converter_1(_parameters[i].Get_Size()));
                     }
                 }
-                else
-                {
-                    gap_list = new List<double>(new double[] { 0.0001, 0.001, 0.01, 0.02, 0.025 });
-                    //Partial_Run("ANTALYA", false, 20, 1250, 0.7, gap_list[2]);
-                    //Partial_Run("HATAY", false, 20, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("Akdeniz", true, 30, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("ANKARA", false, 20, 2500, 1.0, gap_list[3]);
-                    //Partial_Run("İSTANBUL AVRUPA", false, 20, 2500, 1.0, gap_list[4]);
-                    //Partial_Run("İSTANBUL ASYA", false, 20, 2500, 1.0, gap_list[2]);
-                    //Partial_Run("İZMİR", false, 20, 2500, 1.0, gap_list[2]);
-                    //Partial_Run("BURSA", false, 20, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("İç Anadolu", true, 30, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("Ege", true, 30, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("Güneydoğu Anadolu", true, 30, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("Karadeniz", true, 30, 1250, 0.90);
-                    //Partial_Run("YALOVA", false, 30, 1250, 1.0, gap_list[2]);
-                    //Partial_Run("Marmara", true, 30, 1250, 1.0, gap_list[2]);
-                }
-
                 var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,Talep Noktası Talebi";
                 var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point,_output_files);
                 write_the_xdocks.Write_Records();
@@ -435,9 +375,6 @@ namespace FMLMDelivery.Classes
         {   var gap = 0.0;
             if (Size == "Small")
             {
-                gap = 0.0001;
-            }else if (Size == "Medium")
-            {
                 gap = 0.01;
             }
             else
@@ -447,22 +384,7 @@ namespace FMLMDelivery.Classes
 
             return gap;
         }
-        private Double Gap_Converter_2(int count)
-        {
-            var gap = 0.0;
-            if (count >= 1000)
-            {
-                gap = 0.025;
-            }else if(count>=500)
-            {
-                gap = 0.01;
-            }
-            else
-            {
-                gap = 0.0001;
-            }
-            return gap;
-        }
+        
         private List<Hub> Convert_to_Potential_Hubs(List<xDocks> new_XDocks)
         {
             var potential_Hubs = new List<Hub>();

@@ -42,6 +42,8 @@ public class CSVReader
 
     private List<Parameters> _parameters = new List<Parameters>();
 
+    private Double scope_out_threshold = 10;
+
 
     public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file, Int32 month)
     {
@@ -157,7 +159,7 @@ public class CSVReader
                             var demand_point_lat_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                             var demand_point_dis_thres_ = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                             var demand_point_Demand_ = Convert.ToDouble(line[_month]) / Math.Ceiling(Convert.ToDouble(line[_month]) / 4000);
-                            if (demand_point_Demand_ > 10.0)
+                            if (demand_point_Demand_ > scope_out_threshold)
                             {
                                 var demand_point_ = new DemandPoint(demand_point_City_, demand_point_district_, demand_point_ID_, demand_point_Region_, demand_point_long_, demand_point_lat_, demand_point_dis_thres_, demand_point_Demand_);
                                 _demand_point.Add(demand_point_);
@@ -257,7 +259,7 @@ public class CSVReader
 
                 var xDock_Capacity = Convert.ToDouble(line[_month + 1]);
                 
-                if (xDock_Capacity > 10.0)
+                if (xDock_Capacity > scope_out_threshold)
                 {
                     var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened,type_value);
                     if (type_value)

@@ -16,17 +16,8 @@ using FMLMDelivery;
 /// </summary>
 public class DemandxDockModel
 {
- 
-    /// <summary>
-    /// Maximum number of County that can be assigned to a single xDock.
-    /// </summary>
-    private Double max_num_demand_point_assigned = 400;
-
-    
-
     private Double max_hub_capacity = 4000000;
     
-
     /// <summary>
     /// Cplex object
     /// </summary>  
@@ -63,7 +54,7 @@ public class DemandxDockModel
     private List<INumVar> y;
 
     /// <summary>
-    /// z[i] € {0,1} denotes whether county i is covered 
+    /// z[i] € {0,1} denotes whether demand point i is covered 
     /// </summary>
     private List<INumVar> z;
 
@@ -863,18 +854,6 @@ public class DemandxDockModel
             constraint.AddTerm(y[j], -_xDocks[j].Get_LM_Demand());
             _solver.AddLe(constraint, 0);
         }
-
-        for (int j = 0; j < _numOfXdocks; j++)
-        {
-            var constraint = _solver.LinearNumExpr();
-            for (int i = 0; i < _num_of_demand_point; i++)
-            {
-                constraint.AddTerm(x[i][j], a[i][j]);
-            }
-            constraint.AddTerm(y[j], -max_num_demand_point_assigned);
-            _solver.AddLe(constraint, 0);
-        }
-
     }
 
     private void UnAssigned_XDock_Constraints()
@@ -986,19 +965,7 @@ public class DemandxDockModel
             }
 
         }
-        if (_cost_incurred)
-        {
-            for (int j = 0; j < _numOfXdocks; j++)
-            {
-                var constraint = _solver.LinearNumExpr();
-                for (int i = 0; i < _num_of_demand_point; i++)
-                {
-                    constraint.AddTerm(x[i][j], a[i][j]);
-                }
-                constraint.AddTerm(y[j], -max_num_demand_point_assigned);
-                _solver.AddLe(constraint, 0);
-            }
-        }
+        
     }
 
     /// <summary>
