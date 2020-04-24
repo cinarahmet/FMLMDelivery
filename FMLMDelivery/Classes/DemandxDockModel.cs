@@ -216,6 +216,8 @@ public class DemandxDockModel
 
     private String _location;
 
+    private List<List<Double>> heuristic_assignments = new List<List<double>>();
+
 
     public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
@@ -360,7 +362,24 @@ public class DemandxDockModel
                 _initial_assignments.Add(value);
             }
         }
+
+        for (int j = 0; j < _numOfXdocks; j++)
+        {
+            var value_list = new List<Double>();
+            for (int i = 0; i < _num_of_demand_point; i++)
+            {
+                var value = Math.Round(_solver.GetValue(x[i][j]));
+                value_list.Add(value);
+            }
+            heuristic_assignments.Add(value_list);
+        }
     }
+
+    public List<List<Double>> Return_Heuristic_Assignment()
+    {
+        return heuristic_assignments;
+    }
+
 
     public void Provide_Initial_Solution(List<Double> opened_xDocks, List<Double> assignments)
     {
@@ -422,6 +441,8 @@ public class DemandxDockModel
             }
         }
     }
+
+   
 
     public Double GetObjVal()
     {

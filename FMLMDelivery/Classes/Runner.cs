@@ -5,7 +5,7 @@ using System.Text;
 using FMLMDelivery;
 using FMLMDelivery.Classes;
 using System.IO;
-
+using FMLMDelivery.MetaHeuristics;
 
 namespace FMLMDelivery.Classes
 {
@@ -86,7 +86,10 @@ namespace FMLMDelivery.Classes
             var min_num = first_phase.Return_Num_Xdock();
             var opened_xDocks = first_phase.Return_Opened_xDocks();
             var assignments = first_phase.Return_Assignments();
+            var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
 
+            var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments,_pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
+            heuristic.Run();
 
 
             //Part 2 for county-xDock pair

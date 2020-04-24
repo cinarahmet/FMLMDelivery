@@ -203,7 +203,7 @@ namespace FMLMDelivery.Classes
                         fm_demand += _small_seller[i].Get_Demand();
                     }
                 }
-                _xDocks[j].Set_FM_Demand(fm_demand);
+                _xDocks[j].Add_FM_Demand(fm_demand);
             }
         }
 

@@ -19,7 +19,7 @@ public class xDocks
 
     private readonly Double _distance_threshold;
 
-    private readonly Double _lm_demand;
+    private Double _lm_demand;
 
     private Double _fm_demand;
 
@@ -99,9 +99,14 @@ public class xDocks
         return _fm_demand;
     }
 
-    public void Set_FM_Demand(double demand)
+    public void Add_FM_Demand(double demand)
     {
-        _fm_demand = demand;
+        _fm_demand += demand;
+    }
+
+    public void Add_LM_Demand(double demand)
+    {
+        _lm_demand += demand;
     }
    
 }
