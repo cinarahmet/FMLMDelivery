@@ -68,7 +68,35 @@ namespace FMLMDelivery.MetaHeuristics
             return is_feasible;
         }
 
+        private void Initial_Assignment_Procedure()
+        {
+            var distance_matrix = new List<List<Double>>();
+            
+            var sorted_list = new List<DemandPoint>();
+            sorted_list = _demand_Points.OrderByDescending(x => x.Get_Demand()).ToList();
 
+            for (int j = 0; j < sorted_list.Count; j++)
+            {
+                var best_distance = 100000000.0;
+                var best_index = 0;
+                var dist_matrix = new List<Double>();
+                for (int i = 0; (i < _solution.Count) ; i++)
+                {
+                    if(_solution[i] == 1)
+                    {
+                        var dist = Calculate_Distances(_xDocks[i].Get_Longitude(), _xDocks[i].Get_Latitude(), sorted_list[j].Get_Longitude(), sorted_list[j].Get_Latitude());
+
+                        if (dist < best_distance)
+                        {
+                            best_distance = dist;
+                            best_index = i;
+                        }
+                    }                  
+
+                }
+                _pairs[best_index].Add_Demand_Point(sorted_list[j], best_distance);
+            }
+        }
 
         private void Construct_Initial_Solution()
         {
@@ -180,6 +208,7 @@ namespace FMLMDelivery.MetaHeuristics
         public List<Double> Run()
         {
             Construct_Initial_Solution();
+            Initial_Assignment_Procedure();
             Optimize();
             return _solution;
         }
