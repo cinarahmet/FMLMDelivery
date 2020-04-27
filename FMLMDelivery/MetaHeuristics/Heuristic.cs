@@ -21,6 +21,7 @@ namespace FMLMDelivery.MetaHeuristics
         private List<List<Double>> _assignments;
         protected List<Double> _best_solution = new List<double>();
         protected List<xDock_Demand_Point_Pairs> _best_pairs = new List<xDock_Demand_Point_Pairs>();
+        protected Double objective_value = 0.0;
 
 
 
@@ -69,12 +70,13 @@ namespace FMLMDelivery.MetaHeuristics
             return is_feasible;
         }
 
-        private void Assignment_Procedure(List<Double> solution)
+        private void Assignment_Procedure()
         {
+            Initialize_Pairs();
             var index_list = new List<Int32>();
-            for (int k = 0; k < solution.Count; k++)
+            for (int k = 0; k < _solution.Count; k++)
             {
-                if (solution[k] == 1)
+                if (_solution[k] == 1)
                 {
                     index_list.Add(k);
                 }
@@ -203,7 +205,7 @@ namespace FMLMDelivery.MetaHeuristics
 
         private Double Objective_Value()
         {
-            return 0;
+            return objective_value;
         }
 
         protected abstract void Swap();
@@ -211,7 +213,7 @@ namespace FMLMDelivery.MetaHeuristics
         public List<Double> Run()
         {
             Construct_Initial_Solution();
-            Assignment_Procedure(_solution);
+            Assignment_Procedure();
             Optimize();
             return _solution;
         }
@@ -222,6 +224,20 @@ namespace FMLMDelivery.MetaHeuristics
             var eCoord = new GeoCoordinate(lat_2, long_2);
 
             return sCoord.GetDistanceTo(eCoord) / 1000;
+        }
+
+        public void Create_Objective()
+        {
+            for (int i = 0; i < _pairs.Count; i++)
+            {
+                if (_solution[i] == 1)
+                {
+                    for (int j = 0; j < _pairs[i].Get_Demand_Point_List().Count; j++)
+                    {
+                        objective_value += _pairs[i].Get_Demand_Point_List()[j].Get_Demand() * _pairs[i].Get_Distance_List()[j];
+                    }
+                }
+            }
         }
 
 

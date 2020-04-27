@@ -21,7 +21,7 @@ namespace FMLMDelivery.MetaHeuristics
         protected override void Optimize()
         {
             Console.WriteLine("I'm genetic algorithm :)");
-            Check_Feasibility(_solution,_pairs);
+            Check_Feasibility();
         }
     }
 }

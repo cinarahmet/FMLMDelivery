@@ -30,6 +30,11 @@ namespace FMLMDelivery.MetaHeuristics
             return _demand_Points;
         }
 
+        public List<Double> Get_Distance_List()
+        {
+            return _pair_distance;
+        }
+
         public void Extracted_Demand_Point(DemandPoint demand_p)
         {
             var index = _demand_Points.FindIndex(x => x.Get_Id() == demand_p.Get_Id() && x.Get_District() == demand_p.Get_District() && x.Get_City() == demand_p.Get_City());
