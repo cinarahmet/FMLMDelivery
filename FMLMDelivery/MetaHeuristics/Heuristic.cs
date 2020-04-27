@@ -21,7 +21,10 @@ namespace FMLMDelivery.MetaHeuristics
         private List<List<Double>> _assignments;
         protected List<Double> _best_solution = new List<double>();
         protected List<xDock_Demand_Point_Pairs> _best_pairs = new List<xDock_Demand_Point_Pairs>();
+        protected List<xDock_Demand_Point_Pairs> _old_pairs = new List<xDock_Demand_Point_Pairs>();
         protected Double objective_value = 0.0;
+        protected List<Double> _old_solution=new List<double>();
+        
 
 
 
@@ -70,8 +73,9 @@ namespace FMLMDelivery.MetaHeuristics
             return is_feasible;
         }
 
-        private void Assignment_Procedure()
+        protected void Assignment_Procedure()
         {
+            _pairs.Clear();
             Initialize_Pairs();
             var index_list = new List<Int32>();
             for (int k = 0; k < _solution.Count; k++)
@@ -93,7 +97,7 @@ namespace FMLMDelivery.MetaHeuristics
                 {
                     var index = index_list[i];
                     var dist = Calculate_Distances(_xDocks[index].Get_Longitude(), _xDocks[index].Get_Latitude(), sorted_list[j].Get_Longitude(), sorted_list[j].Get_Latitude());
-                    if (dist < best_distance)
+                    if (dist < best_distance && dist < sorted_list[j].Get_Distance_Threshold())
                     {
                         best_distance = dist;
                         best_index = index;
@@ -203,7 +207,7 @@ namespace FMLMDelivery.MetaHeuristics
         protected abstract void Optimize();
         
 
-        private Double Objective_Value()
+        public Double Objective_Value()
         {
             return objective_value;
         }
@@ -213,7 +217,7 @@ namespace FMLMDelivery.MetaHeuristics
         public List<Double> Run()
         {
             Construct_Initial_Solution();
-            Assignment_Procedure();
+            //Assignment_Procedure();
             Optimize();
             return _solution;
         }
