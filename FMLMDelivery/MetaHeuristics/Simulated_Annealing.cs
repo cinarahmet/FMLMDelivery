@@ -11,7 +11,7 @@ namespace FMLMDelivery.MetaHeuristics
     public class Simulated_Annealing : Heuristic
     {
         private Double iteration = 10000;
-        private Double Temperature=500;
+        private Double Temperature=1500;
         private double alpha_temp=0.001;
         private double alpha_km = 0.01;
         private Double generation_km=30;
@@ -76,7 +76,9 @@ namespace FMLMDelivery.MetaHeuristics
             var random = new Random();
             var old_objective = new double();
             var new_objective = new double();
-            
+            var best_objective = Double.MaxValue;
+            _best_pairs.AddRange(_pairs);
+            _best_solution.AddRange(_solution);
             old_objective = Get_Objective(_pairs, _solution);
             for (int i = 0; i < iteration; i++)
             {
@@ -85,33 +87,31 @@ namespace FMLMDelivery.MetaHeuristics
                 Assignment_Procedure();
                 if (Check_Feasibility())
                 {   
-                    _old_pairs = new List<xDock_Demand_Point_Pairs>();
-                    _old_solution = new List<double>();
-                    Console.WriteLine("Feasible Solution Found");
+                    //Console.WriteLine("Feasible Solution Found");
                     new_objective = Get_Objective(_pairs,_solution);
-                    var difference = new_objective - old_objective;
-                    if (old_objective < new_objective)
+                    var difference = new_objective - best_objective;
+                    if (best_objective < new_objective)
                     {
-                        _old_pairs.AddRange( _pairs);
-                        _old_solution.AddRange(_solution);
                         var propa = random.NextDouble();
                         var exp_temp = Math.Exp(-difference / Temperature);
-                        if (propa < exp_temp)
+                        if (propa > exp_temp)
                         {
                             _pairs.Clear();
-                            _pairs.AddRange(_old_pairs);
                             _solution.Clear();
-                            _solution.AddRange(_old_solution);
-                            old_objective = new_objective;
+                            _pairs.AddRange(_best_pairs);
+                            _solution.AddRange(_best_solution);                           
                         }
                     }
                     else
                     {
+                        _best_pairs = new List<xDock_Demand_Point_Pairs>();
+                        _best_solution = new List<double>();
+                        //old_objective = new_objective;
+                        best_objective = new_objective;
                         Console.WriteLine("İmrpovement found with new objective{0}", new_objective);
-                        old_objective = new_objective;
-                        _old_pairs = _pairs;
+                        _best_pairs.AddRange(_pairs);
+                        _best_solution.AddRange(_solution);
                         generation_km = generation_km - generation_km * alpha_km;
-                        
                     }
                 }
                 Temperature = Temperature - Temperature * alpha_temp;
