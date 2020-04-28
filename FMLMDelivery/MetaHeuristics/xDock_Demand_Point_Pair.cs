@@ -13,11 +13,23 @@ namespace FMLMDelivery.MetaHeuristics
 
         private List<Double> _pair_distance;
 
-        public xDock_Demand_Point_Pairs(xDocks xDocks, List<DemandPoint> demandPoints,List<Double> pair_dist)
+        private Double _occupied_capacity = 0.0;
+
+        public xDock_Demand_Point_Pairs(xDocks xDocks, List<DemandPoint> demandPoints, List<Double> pair_dist)
         {
             _xDock = xDocks;
             _demand_Points = demandPoints;
             _pair_distance = pair_dist;
+        }
+
+        public Double Get_Occupied_Capacity()
+        {
+            return _occupied_capacity;
+        }
+
+        public void Add_to_Occupied_Capacity(Double demand)
+        {
+            _occupied_capacity += demand;
         }
 
         public xDocks Get_xDock()

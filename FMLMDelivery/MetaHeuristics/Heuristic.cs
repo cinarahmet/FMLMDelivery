@@ -91,7 +91,7 @@ namespace FMLMDelivery.MetaHeuristics
             for (int j = 0; j < sorted_list.Count; j++)
             {
                 var best_distance = 100000000.0;
-                var best_index = 0;
+                var best_index = -1;
                 var dist_matrix = new List<Double>();
                 for (int i = 0; (i < index_list.Count) ; i++)
                 {
@@ -99,11 +99,19 @@ namespace FMLMDelivery.MetaHeuristics
                     var dist = Calculate_Distances(_xDocks[index].Get_Longitude(), _xDocks[index].Get_Latitude(), sorted_list[j].Get_Longitude(), sorted_list[j].Get_Latitude());
                     if (dist < best_distance && dist < sorted_list[j].Get_Distance_Threshold())
                     {
-                        best_distance = dist;
-                        best_index = index;
+                        var remaining_demand = _pairs[index].Get_xDock().Get_LM_Demand() - _pairs[index].Get_Occupied_Capacity();
+                        if (remaining_demand >= sorted_list[j].Get_Demand())
+                        {
+                            best_distance = dist;
+                            best_index = index;
+                        }
                     }
                 }
-                _pairs[best_index].Add_Demand_Point(sorted_list[j], best_distance);
+                if (best_index != -1)
+                {
+                    _pairs[best_index].Add_Demand_Point(sorted_list[j], best_distance);
+                    _pairs[best_index].Add_to_Occupied_Capacity(sorted_list[j].Get_Demand());
+                }
             }
         }
 
@@ -131,7 +139,7 @@ namespace FMLMDelivery.MetaHeuristics
             {
                 if (_solution[i] == 1) count += 1;
             }
-            if (_num_xDock != count)
+            if (_num_xDock > count)
             {
                 is_feasible = false;
             }
@@ -176,21 +184,11 @@ namespace FMLMDelivery.MetaHeuristics
         private Boolean Capacity_Constraint()
         {
             var is_feasible = true;
-
             for (int i = 0; i < _solution.Count; i++)
             {
                 if (_solution[i] == 1)
                 {
-                    var demand = 0.0;
-                    for (int j = 0; j < _pairs[i].Get_Demand_Point_List().Count; j++)
-                    {
-                        demand += _pairs[i].Get_Demand_Point_List()[j].Get_Demand();
-                    }
-                    if (demand > _pairs[i].Get_xDock().Get_LM_Demand())
-                    {
-                        is_feasible = false;
-                        return is_feasible;
-                    }
+                    var demand = _pairs[i].Get_Occupied_Capacity();
                     for (int k = 0; k < _parameters.Count; k++)
                     {
                         if (_parameters[k].Get_Key() == _pairs[i].Get_xDock().Get_City())
@@ -232,6 +230,7 @@ namespace FMLMDelivery.MetaHeuristics
 
         public void Create_Objective()
         {
+            objective_value = 0.0;
             for (int i = 0; i < _pairs.Count; i++)
             {
                 if (_solution[i] == 1)
