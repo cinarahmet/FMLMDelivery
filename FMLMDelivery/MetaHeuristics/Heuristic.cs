@@ -11,19 +11,20 @@ namespace FMLMDelivery.MetaHeuristics
     {
         protected Double time_limit = 360.0;
         protected List<Double> _solution;
-        private List<xDocks> _xDocks;
-        private List<DemandPoint> _demand_Points;
+        protected List<xDocks> _xDocks;
+        protected List<DemandPoint> _demand_Points;
         protected List<xDock_Demand_Point_Pairs> _pairs;
-        private Double total_lm_demand;
-        private Double _lm_coverage;
-        private List<Parameters> _parameters;
-        private Double _num_xDock;
-        private List<List<Double>> _assignments;
+        protected Double total_lm_demand;
+        protected Double _lm_coverage;
+        protected List<Parameters> _parameters;
+        protected Double _num_xDock;
+        protected List<List<Double>> _assignments;
         protected List<Double> _best_solution = new List<double>();
         protected List<xDock_Demand_Point_Pairs> _best_pairs = new List<xDock_Demand_Point_Pairs>();
         protected List<xDock_Demand_Point_Pairs> _old_pairs = new List<xDock_Demand_Point_Pairs>();
         protected Double objective_value = 0.0;
         protected List<Double> _old_solution=new List<double>();
+
         
 
 
@@ -170,7 +171,7 @@ namespace FMLMDelivery.MetaHeuristics
             var lm_demand = 0.0;
             for (int i = 0; i < _solution.Count; i++)
             {
-                lm_demand += _pairs[i].Get_xDock().Get_LM_Demand();
+                lm_demand += _pairs[i].Get_Occupied_Capacity();
             }
             if (lm_demand < _lm_coverage*total_lm_demand)
             {
