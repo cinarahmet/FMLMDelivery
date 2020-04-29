@@ -69,7 +69,7 @@ namespace FMLMDelivery.Classes
             var new_xDocks = new List<xDocks>();
             var potential_Hubs = new List<Hub>(); 
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false, gap);
+            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p,false, gap);
             first_phase.Run();
             var _status_check = first_phase.Return_Status();
             while (!_status_check)
@@ -88,11 +88,11 @@ namespace FMLMDelivery.Classes
             var assignments = first_phase.Return_Assignments();
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
 
-            //var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments,_pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
-            //heuristic.Run();
+            var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments,_pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
+            heuristic.Run();
 
-            var heuristic1=new Simulated_Annealing(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
-            heuristic1.Run();
+            //var heuristic1=new Simulated_Annealing(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
+            //heuristic1.Run();
 
             //Part 2 for county-xDock pair
             min_model_model = false;

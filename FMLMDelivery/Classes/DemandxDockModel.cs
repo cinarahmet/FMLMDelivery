@@ -9,6 +9,7 @@ using ILOG.Concert;
 using System.Device.Location;
 using System.Linq;
 using FMLMDelivery;
+using FMLMDelivery.MetaHeuristics;
 
 /// <summary>
 /// IMPORTANT !!!!!!!!!
@@ -218,8 +219,12 @@ public class DemandxDockModel
 
     private List<List<Double>> heuristic_assignments = new List<List<double>>();
 
+    private Boolean _xDocks_located;
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    private List<xDock_Demand_Point_Pairs> _pairs = new List<xDock_Demand_Point_Pairs>();
+
+
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _gap = Gap;
         _solver = new Cplex();
@@ -240,6 +245,7 @@ public class DemandxDockModel
         _initial_assignments = new List<double>();
         _second_part = second_part;
         _min_xDock_cap = min_xdock_cap;
+        _xDocks_located = xDocks_located;
         
 
         x = new List<List<INumVar>>();
@@ -517,11 +523,12 @@ public class DemandxDockModel
             Get_Num_XDocks();
             Get_Csv_Information();
             Get_Model_Status();
-
         }
         Print();
         ClearModel();
     }
+
+    
 
     public Boolean Return_Status()
     {
@@ -778,7 +785,10 @@ public class DemandxDockModel
             if (phase_2)
             {
                 Demand_Coverage_Constraint();
-                
+            }
+            if (_xDocks_located)
+            {
+                Open_Located_xDocks();
             }
 
         }
@@ -790,6 +800,17 @@ public class DemandxDockModel
         }
 
     }
+
+    private void Open_Located_xDocks()
+    {
+        for (int j = 0; j < _numOfXdocks; j++)
+        {
+            var constraint = _solver.LinearNumExpr();
+            constraint.AddTerm(y[j], 1);
+            _solver.AddEq(constraint, 1);
+        }
+    }
+
     private void Already_Opened()
     {
         for (int j = 0; j < _numOfXdocks; j++)
