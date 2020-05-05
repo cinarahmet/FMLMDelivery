@@ -24,7 +24,7 @@ namespace FMLMDelivery.MetaHeuristics
         private List<Double> score_table = new List<Double>();
         private List<Double> old_soln = new List<Double>();
 
-        public Simulated_Annealing(List<Double> solution, List<List<Double>> assignments, List<xDocks> xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock) : base(solution, assignments, xDocks, demandPoints, parameters, lm_coverage, num_xdock)
+        public Simulated_Annealing(List<Double> solution, List<List<Double>> assignments, List<xDocks> xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock,String key) : base(solution, assignments, xDocks, demandPoints, parameters, lm_coverage, num_xdock,key)
         {
 
         }

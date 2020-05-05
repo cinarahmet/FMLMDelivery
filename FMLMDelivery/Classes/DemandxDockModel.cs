@@ -223,6 +223,8 @@ public class DemandxDockModel
 
     private List<xDock_Demand_Point_Pairs> _pairs = new List<xDock_Demand_Point_Pairs>();
 
+    private List<Boolean> demand_point_assignment_matrix = new List<bool>();
+
 
     public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
@@ -346,7 +348,6 @@ public class DemandxDockModel
 
             }
         }
-
     }
 
     private void Get_Opened_xDocks()
@@ -668,7 +669,7 @@ public class DemandxDockModel
             {
                 if (_solver.GetValue(x[i][j]) > 0.9)
                 {
-                  //  Console.WriteLine("x[{0},{1}] = {2}", i, j, _solver.GetValue(x[i][j]));
+                    //Console.WriteLine("x[{0},{1}] = {2}", i, j, _solver.GetValue(x[i][j]));
                 }
 
             }
@@ -786,11 +787,16 @@ public class DemandxDockModel
             {
                 Demand_Coverage_Constraint();
             }
-            if (_xDocks_located)
-            {
-                Open_Located_xDocks();
-            }
-
+            //if (_xDocks_located)
+            //{
+            //    Open_Located_xDocks();
+            //}
+        }
+        if (_xDocks_located)
+        {
+            Open_Located_xDocks();
+            Capacity_Constraint();
+            Min_County_Constraint();
         }
         if (_min_xDock_model)
         {
@@ -968,6 +974,7 @@ public class DemandxDockModel
             for (int j = 0; j < _numOfXdocks; j++)
             {
                 constraint.AddTerm(x[i][j], a[i][j]);
+                //constraint.AddTerm(x[i][j], 1);
             }
             if (_cost_incurred)
             {
@@ -986,6 +993,10 @@ public class DemandxDockModel
 
             }
             else if (_min_xDock_model)
+            {
+                _solver.AddLe(constraint, 1);
+            }
+            else if (_xDocks_located)
             {
                 _solver.AddLe(constraint, 1);
             }
@@ -1032,7 +1043,7 @@ public class DemandxDockModel
             {
                 for (int j = 0; j < _numOfXdocks; j++)
                 {
-                    _objective.AddTerm(x[i][j], d[i][j] * demand_of_demand_point[i]);
+                    _objective.AddTerm(x[i][j], d[i][j] * demand_of_demand_point[i]*a[i][j]);
 
                 }
             }
@@ -1044,6 +1055,28 @@ public class DemandxDockModel
             {
                 _objective.AddTerm(y[j], 1);
             }
+        }
+        if (_xDocks_located)    
+        {
+            var sum = 0.0;
+            for (int i = 0; i < _num_of_demand_point; i++)
+            {
+                var coef = 100 * demand_of_demand_point[i];
+                sum += coef;
+                for (int j = 0; j < _numOfXdocks; j++)
+                {
+                    _objective.AddTerm(x[i][j], (-coef * a[i][j] + d[i][j] * demand_of_demand_point[i] * a[i][j]));
+                }
+            }
+            _objective.Constant = sum;
+            //for (int i = 0; i < _num_of_demand_point; i++)
+            //{
+            //    for (int j = 0; j < _numOfXdocks; j++)
+            //    {
+            //        _objective.AddTerm(x[i][j], d[i][j] * demand_of_demand_point[i]);
+
+            //    }
+            //}
         }
 
 

@@ -24,12 +24,13 @@ namespace FMLMDelivery.MetaHeuristics
         protected List<xDock_Demand_Point_Pairs> _old_pairs = new List<xDock_Demand_Point_Pairs>();
         protected Double objective_value = 0.0;
         protected List<Double> _old_solution=new List<double>();
+        protected String _key;
 
         
 
 
 
-        protected Heuristic(List<Double> solution, List<List<Double>> assignments, List<xDocks> xDocks, List<DemandPoint> demandPoints,List<Parameters> parameters, Double lm_coverage,Double num_xdock)
+        protected Heuristic(List<Double> solution, List<List<Double>> assignments, List<xDocks> xDocks, List<DemandPoint> demandPoints,List<Parameters> parameters, Double lm_coverage,Double num_xdock,String key)
         {
             _xDocks = xDocks;
             _demand_Points = demandPoints;
@@ -40,6 +41,7 @@ namespace FMLMDelivery.MetaHeuristics
             _lm_coverage = lm_coverage;
             _num_xDock = num_xdock;
             _assignments = assignments;
+            _key = key;
             Initialize_Pairs();
             Console.WriteLine("Working");
         }
