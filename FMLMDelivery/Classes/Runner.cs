@@ -88,7 +88,7 @@ namespace FMLMDelivery.Classes
             var assignments = first_phase.Return_Assignments();
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
 
-            var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments,_pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
+            var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments,_pot_xDocks, _demand_points, _parameters, demand_covarage, min_num,key);
             heuristic.Run();
 
             //var heuristic1=new Simulated_Annealing(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
