@@ -10,11 +10,12 @@ namespace FMLMDelivery.MetaHeuristics
 
     public class Simulated_Annealing : Heuristic
     {
-        private Double iteration = 10000;
-        private Double Temperature=1500;
+        private Double iteration = 100000;
+        private Double Temperature=1000000;
         private double alpha_temp=0.001;
         private double alpha_km = 0.01;
-        private Double generation_km=30;
+        private double diversification_km = 20;
+        private Double intensification_km=10;
         private List<xDock_Demand_Point_Pairs> candidate_pairs = new List<xDock_Demand_Point_Pairs>();
         private double best_objective = new double();
         
@@ -32,23 +33,37 @@ namespace FMLMDelivery.MetaHeuristics
 
         }
 
-        private List<List<int>> Neighborhood_Generation()
+        private List<List<int>> Neighborhood_Generation(Boolean diversification)
         {   var list_of_possible_points = new List<List<int>>();
             for (int i = 0; (i < _solution.Count) ; i++)
             {
                 var list_index = new List<int>();
-                if (_solution[i] == 1)
+                if (_solution[i] == 1 && !diversification)
                 {
                     for (int j = 0; (j < _solution.Count); j++)
                     {
                         var distance = Calculate_Distances(_pairs[i].Get_xDock().Get_Longitude(), _pairs[i].Get_xDock().Get_Latitude(), _pairs[j].Get_xDock().Get_Longitude(),_pairs[j].Get_xDock().Get_Latitude());
-                        if (distance < generation_km && !_pairs[i].Get_xDock().If_Already_Opened())
+                        if (distance < intensification_km && !_pairs[i].Get_xDock().If_Already_Opened())
                         {
                             list_index.Add(j);
                             _solution[i] = 0;
                         }
                     }
                     list_of_possible_points.Add(list_index);
+                }
+                else if(_solution[i] == 1 && diversification)
+                {
+                    for (int j = 0; (j < _solution.Count); j++)
+                    {
+                        var distance = Calculate_Distances(_pairs[i].Get_xDock().Get_Longitude(), _pairs[i].Get_xDock().Get_Latitude(), _pairs[j].Get_xDock().Get_Longitude(), _pairs[j].Get_xDock().Get_Latitude());
+                        if (distance < diversification_km && !_pairs[i].Get_xDock().If_Already_Opened())
+                        {
+                            list_index.Add(j);
+                            _solution[i] = 0;
+                        }
+                    }
+                    list_of_possible_points.Add(list_index);
+
                 }
             }
            
@@ -76,13 +91,14 @@ namespace FMLMDelivery.MetaHeuristics
             var random = new Random();
             var old_objective = new double();
             var new_objective = new double();
+            var diversification = true;
             var best_objective = Double.MaxValue;
             _best_pairs.AddRange(_pairs);
             _best_solution.AddRange(_solution);
             old_objective = Get_Objective(_pairs, _solution);
             for (int i = 0; i < iteration; i++)
             {
-                var list = Neighborhood_Generation();
+                var list = Neighborhood_Generation(diversification);
                 Neighborhood_Selection(list);
                 Assignment_Procedure();
                 if (Check_Feasibility())
@@ -90,16 +106,19 @@ namespace FMLMDelivery.MetaHeuristics
                     //Console.WriteLine("Feasible Solution Found");
                     new_objective = Get_Objective(_pairs,_solution);
                     var difference = new_objective - best_objective;
-                    if (best_objective < new_objective)
+                    
+                    if (best_objective <= new_objective)
                     {
                         var propa = random.NextDouble();
                         var exp_temp = Math.Exp(-difference / Temperature);
+                        diversification = true;
                         if (propa > exp_temp)
                         {
                             _pairs.Clear();
                             _solution.Clear();
                             _pairs.AddRange(_best_pairs);
-                            _solution.AddRange(_best_solution);                           
+                            _solution.AddRange(_best_solution);
+                            diversification = false;
                         }
                     }
                     else
@@ -111,7 +130,8 @@ namespace FMLMDelivery.MetaHeuristics
                         Console.WriteLine("İmrpovement found with new objective{0}", new_objective);
                         _best_pairs.AddRange(_pairs);
                         _best_solution.AddRange(_solution);
-                        generation_km = generation_km - generation_km * alpha_km;
+                        intensification_km = intensification_km - intensification_km * alpha_km;
+                        diversification = false;
                     }
                 }
                 Temperature = Temperature - Temperature * alpha_temp;
