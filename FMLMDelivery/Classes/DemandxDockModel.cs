@@ -124,7 +124,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit =3600;
+    private readonly long _timeLimit =60;
     /// <summary>
     /// The starting time of the model
     /// </summary>
@@ -506,6 +506,7 @@ public class DemandxDockModel
 
     public void Run()
     {
+        Console_Disable();
         Get_Model_Info();
         Get_Parameters();
         Build_Model();
@@ -527,9 +528,19 @@ public class DemandxDockModel
         }
         Print();
         ClearModel();
+        
     }
 
-    
+    public void Console_Disable()
+    {
+
+        if (_xDocks_located)
+        {
+            _solver.SetOut(null);
+            Console.SetOut(TextWriter.Null);
+        }
+            
+    }
 
     public Boolean Return_Status()
     {
@@ -787,12 +798,12 @@ public class DemandxDockModel
             {
                 Demand_Coverage_Constraint();
             }
-            //if (_xDocks_located)
-            //{
-            //    Open_Located_xDocks();
-            //}
+            if (_xDocks_located)
+            {
+                Open_Located_xDocks();
+            }
         }
-        if (_xDocks_located)
+        if (_xDocks_located && !_demand_weighted)
         {
             Open_Located_xDocks();
             Capacity_Constraint();
@@ -1056,7 +1067,7 @@ public class DemandxDockModel
                 _objective.AddTerm(y[j], 1);
             }
         }
-        if (_xDocks_located)    
+        if (_xDocks_located && !_demand_weighted)    
         {
             var sum = 0.0;
             for (int i = 0; i < _num_of_demand_point; i++)

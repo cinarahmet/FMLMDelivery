@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using FMLMDelivery.Classes;
@@ -7,11 +8,12 @@ using FMLMDelivery.Classes;
 namespace FMLMDelivery.MetaHeuristics
 {
     
-
     public class Simulated_Annealing : Heuristic
     {
-        private Double iteration = 5000;
+        private Double iteration = 10000;
         private Double Temperature=1000000;
+        private Double count_temp = 10;
+        private Double nofeas_iteration = 500;
         private double alpha_temp=0.99;
         private double alpha_km = 0.05;
         private double diversification_km = 30;
@@ -20,6 +22,7 @@ namespace FMLMDelivery.MetaHeuristics
         private List<xDock_Demand_Point_Pairs> candidate_pairs = new List<xDock_Demand_Point_Pairs>();
         private double best_objective = new double();
         private double objective = new Double();
+        private bool status = new bool();
         private List<xDocks> opened_xdocks = new List<xDocks>();
         private List<Double> score_table = new List<Double>();
         private List<Double> old_soln = new List<Double>();
@@ -30,28 +33,13 @@ namespace FMLMDelivery.MetaHeuristics
         }
         protected override void Optimize()
         {
-            Iteration_Solution_Selection();
+            Algorithm();
         }
-        private void Initialize_Score_Table()
+        private void Temperature_Revision(int Count)
         {
-            for (int i = 0; i < _solution.Count; i++)
-            {
-                score_table.Add(1);
-            }
+            if (Count% count_temp == 0) Temperature = Temperature * alpha_temp;
         }
 
-        private void Weighing_of_Points(List<Double> solution, List<Double> score_table)
-        {
-            for (int i = 0; i < _solution.Count; i++)
-            {
-                if (_solution[i] == 1)
-                {
-                    var increase = score_table[i];
-                    increase = increase + 1;
-                    score_table[i] = increase;
-;               }
-            }
-        }
         private List<xDocks> Get_Information_Xdocks(List<Double> best_solution)
         {
             for (int i = 0; i < best_solution.Count; i++)
@@ -64,43 +52,36 @@ namespace FMLMDelivery.MetaHeuristics
         {
             throw new NotImplementedException();    
         }
-        private Double Run_xDock_Demand_Point(Boolean Model_run)
+        private Tuple<Double,Boolean> Run_xDock_Demand_Point()
         {   var located_xdocks = new List<xDocks>();
-            var city_name ="";
             var min_cap = new Double();
-            
-            if (Model_run)
+            var _objective = new Double();
+            var _status = new bool();
+            for (int i = 0; i < _solution.Count; i++)
             {
-                for (int i = 0; i < _solution.Count; i++)
+                if (_solution[i] == 1)
                 {
-                    if (_solution[i] == 1)
-                    {
-                        located_xdocks.Add(_pairs[i].Get_xDock());
-                    }
-                    
-                }
-                for (int i = 0; i < _parameters.Count; i++)
-                {
-                    city_name = located_xdocks[0].Get_City();
-                    if (_parameters[i].Get_Key() == located_xdocks[0].Get_City())
-                    {
-                        min_cap = _parameters[i].Get_Min_Cap();
-                    }
+                    located_xdocks.Add(_pairs[i].Get_xDock());
                 }
 
-                var assignment = new DemandxDockModel(_demand_Points, located_xdocks, city_name, true, false, _lm_coverage, min_cap, true, _num_xDock, false, 0.05, true);
-                assignment.Run();
-                objective = assignment.GetObjVal();
             }
-            else
+            for (int i = 0; i < _parameters.Count; i++)
             {
-                Assignment_Procedure();
+                if (_parameters[i].Get_Key() == located_xdocks[0].Get_City())
+                {
+                    min_cap = _parameters[i].Get_Min_Cap();
+                }
             }
 
-            return objective;
+            var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, true, false, _lm_coverage, min_cap, true, _num_xDock, false, 0.05, true);
+            assignment.Run();
+            _objective = assignment.GetObjVal();
+            _status = assignment.Return_Status();
+            return Tuple.Create(_objective, _status);
         }
         private List<List<int>> Neighborhood_Generation(Boolean diversification)
         {   var list_of_possible_points = new List<List<int>>();
+            
             for (int i = 0; (i < _solution.Count) ; i++)
             {
                 var list_index = new List<int>();
@@ -152,59 +133,64 @@ namespace FMLMDelivery.MetaHeuristics
                 }
             }
         }
-        private void Iteration_Solution_Selection()
+        private void Algorithm()
         {
             var random = new Random();
             var new_objective = Double.MaxValue;
+            var best_objective = Double.MaxValue;
+            var old_objective = Double.MaxValue;
             var diversification = true;
             var model_run = true;
-            var best_objective = Double.MaxValue;
-            var old_objective= Double.MaxValue;
             var best_model_objective = new List<Double>();
             var time = DateTime.Now;
-            var count = 0;
+            var feasible_count = 0;
+            var temp_count = 0;
+            var call_back = 0;
             for (int i = 0; i < iteration; i++)
             {
+                temp_count += 1;
+                call_back += 1;
                 if (i != 0)
                 {
                     var list = Neighborhood_Generation(diversification);
                     Neighborhood_Selection(list);
                 }
-                Run_xDock_Demand_Point(model_run);
-                if (objective != 0)
+                (objective,status)=Run_xDock_Demand_Point();
+                if (status==true)
                 {
-                    count += 1;
+                    feasible_count += 1;
+                    call_back = 1;
                     Console.WriteLine("Feasible Solution Found");
-                    new_objective = objective;
+                    new_objective=objective;
                     var difference = new_objective - best_objective;
                     if (best_objective <= new_objective)
                     {
-                        //if (old_objective <= new_objective)
-                        //{
-                        //    var propa = random.NextDouble();
-                        //    difference = new_objective - old_objective;
-                        //    var exp_temp = Math.Exp(-difference / Temperature);
-                        //    diversification = true;
-                        //    if (propa > exp_temp)
-                        //    {   
-                        //        _solution.Clear();
-                        //        _solution.AddRange(_old_solution);
-                        //        diversification = false;
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    diversification = false;
-                        //}
-                        var propa = random.NextDouble();
-                        var exp_temp = Math.Exp(-difference / Temperature);
-                        diversification = true;
-                        if (propa > exp_temp)
-                        {   //new if condition will be added
-                            _solution.Clear();
-                            _solution.AddRange(_best_solution);
+                        if (old_objective <= new_objective)
+                        {
+                            var propa = random.NextDouble();
+                            difference = new_objective - old_objective;
+                            var exp_temp = Math.Exp(-difference / Temperature);
+                            diversification = true;
+                            if (propa > exp_temp)
+                            {
+                                _solution.Clear();
+                                _solution.AddRange(old_soln);
+                                diversification = false;
+                            }
+                        }
+                        else
+                        {
                             diversification = false;
                         }
+                        //var propa = random.NextDouble();
+                        //var exp_temp = Math.Exp(-difference / Temperature);
+                        //diversification = true;
+                        //if (propa > exp_temp)
+                        //{
+                        //    _solution.Clear();
+                        //    _solution.AddRange(_best_solution);
+                        //    diversification = false;
+                        //}
                     }
                     else
                     {
@@ -220,15 +206,25 @@ namespace FMLMDelivery.MetaHeuristics
                     old_soln.AddRange(_solution);
                     old_objective = new_objective;
                 }
-                Temperature = Temperature * alpha_temp;
-                Console.WriteLine("Tempereature:{0} \t objective value:{1}", Temperature, best_model_objective[best_model_objective.Count - 1]);
-                
+                else
+                {
+                    diversification = true;
+                    if (call_back % nofeas_iteration == 0)
+                    {
+                        _solution.Clear();
+                        _solution.AddRange(_best_solution);
+                        old_objective = best_model_objective[best_model_objective.Count - 1];
+                        diversification = false;
+                    }
+                }
+                Temperature_Revision(temp_count);
+                Console.WriteLine("Tempereature:{0} \t objective value:{1}", Temperature, best_model_objective[best_model_objective.Count - 1]);  
             }
             var xdocks = new List<xDocks>();
             xdocks = Get_Information_Xdocks(_best_solution);
             var endtime = DateTime.Now;
             Console.WriteLine("Time Passed{0}", (endtime - time));
-            Console.WriteLine("Number of Feasible Solution Found{0}", count);
+           
         }
         public Double Get_Objective(List<xDock_Demand_Point_Pairs> pairs, List<Double> solution)
         {
