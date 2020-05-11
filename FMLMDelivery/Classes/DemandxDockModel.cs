@@ -226,10 +226,11 @@ public class DemandxDockModel
     private List<Boolean> demand_point_assignment_matrix = new List<bool>();
 
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, long Timelimit,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _gap = Gap;
         _solver = new Cplex();
+        _timeLimit = Timelimit;
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
         _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
         _xDocks = xDocks;

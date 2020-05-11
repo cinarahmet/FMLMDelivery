@@ -10,7 +10,7 @@ namespace FMLMDelivery.MetaHeuristics
     
     public class Simulated_Annealing : Heuristic
     {
-        private Double iteration = 10000;
+        private Double iteration = 5000;
         private Double Temperature=1000000;
         private Double count_temp = 10;
         private Double nofeas_iteration = 500;
@@ -26,6 +26,9 @@ namespace FMLMDelivery.MetaHeuristics
         private List<xDocks> opened_xdocks = new List<xDocks>();
         private List<Double> score_table = new List<Double>();
         private List<Double> old_soln = new List<Double>();
+        private List<Double> heuristic_assignments = new List<double>();
+        private List<Double> Solution_to_send = new List<Double>();
+        private List<Double> assignment_to_send = new List<Double>();
 
         public Simulated_Annealing(List<Double> solution, List<List<Double>> assignments, List<xDocks> xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock,String key) : base(solution, assignments, xDocks, demandPoints, parameters, lm_coverage, num_xdock,key)
         {
@@ -34,6 +37,11 @@ namespace FMLMDelivery.MetaHeuristics
         protected override void Optimize()
         {
             Algorithm();
+        }
+        public Tuple<List<Double>,List<Double>> Return_Heuristic_Results()
+        {
+            return Tuple.Create(Solution_to_send, assignment_to_send);
+            
         }
         private void Temperature_Revision(int Count)
         {
@@ -52,10 +60,11 @@ namespace FMLMDelivery.MetaHeuristics
         {
             throw new NotImplementedException();    
         }
-        private Tuple<Double,Boolean> Run_xDock_Demand_Point()
+        private Tuple<Double,Boolean,List<Double>> Run_xDock_Demand_Point()
         {   var located_xdocks = new List<xDocks>();
             var min_cap = new Double();
             var _objective = new Double();
+            var _assignments = new List<Double>();
             var _status = new bool();
             for (int i = 0; i < _solution.Count; i++)
             {
@@ -73,11 +82,12 @@ namespace FMLMDelivery.MetaHeuristics
                 }
             }
 
-            var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, true, false, _lm_coverage, min_cap, true, _num_xDock, false, 0.05, true);
+            var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, true, false, _lm_coverage, min_cap, true, _num_xDock, false, 0.05, 60, true);
             assignment.Run();
             _objective = assignment.GetObjVal();
             _status = assignment.Return_Status();
-            return Tuple.Create(_objective, _status);
+            _assignments = assignment.Return_Assignments();
+            return Tuple.Create(_objective, _status,_assignments);
         }
         private List<List<int>> Neighborhood_Generation(Boolean diversification)
         {   var list_of_possible_points = new List<List<int>>();
@@ -136,6 +146,7 @@ namespace FMLMDelivery.MetaHeuristics
         private void Algorithm()
         {
             var random = new Random();
+            var results = new Results();
             var new_objective = Double.MaxValue;
             var best_objective = Double.MaxValue;
             var old_objective = Double.MaxValue;
@@ -155,7 +166,7 @@ namespace FMLMDelivery.MetaHeuristics
                     var list = Neighborhood_Generation(diversification);
                     Neighborhood_Selection(list);
                 }
-                (objective,status)=Run_xDock_Demand_Point();
+                (objective,status,heuristic_assignments)=Run_xDock_Demand_Point();
                 if (status==true)
                 {
                     feasible_count += 1;
@@ -196,9 +207,10 @@ namespace FMLMDelivery.MetaHeuristics
                     {
                         Console.WriteLine("Improvement found with new objective{0}", new_objective);
                         _best_solution = new List<double>();
+                        var best_heu_assignments = new List<List<double>>();
                         best_objective = new_objective;
                         _best_solution.AddRange(_solution);
-                        best_model_objective.Add(best_objective);
+                        results.Add_Stats(best_objective, heuristic_assignments, _best_solution, Temperature);
                         if (intensification_km > lb_intens) intensification_km = intensification_km - intensification_km * alpha_km;
                         diversification = false;
                     }
@@ -213,17 +225,18 @@ namespace FMLMDelivery.MetaHeuristics
                     {
                         _solution.Clear();
                         _solution.AddRange(_best_solution);
-                        old_objective = best_model_objective[best_model_objective.Count - 1];
+                        old_objective = best_objective;
                         diversification = false;
                     }
                 }
                 Temperature_Revision(temp_count);
-                Console.WriteLine("Tempereature:{0} \t objective value:{1}", Temperature, best_model_objective[best_model_objective.Count - 1]);  
             }
             var xdocks = new List<xDocks>();
             xdocks = Get_Information_Xdocks(_best_solution);
             var endtime = DateTime.Now;
             Console.WriteLine("Time Passed{0}", (endtime - time));
+            Solution_to_send = results.Return_Best_Solution_Array();
+            assignment_to_send = results.Return_Best_Assignments();
            
         }
         public Double Get_Objective(List<xDock_Demand_Point_Pairs> pairs, List<Double> solution)
@@ -242,6 +255,41 @@ namespace FMLMDelivery.MetaHeuristics
                 }
             }
             return objective;
+        }
+
+        internal class Results
+        {
+            private List<Double> _Best_Score=new List<double>();
+            private List<List<Double>> _Best_Assignments=new List<List<double>>();
+            private List<List<Double>> _Best_Solution=new List<List<double>>();
+            private List<Double> _temp=new List<double>();
+            public Results()
+            {
+            }
+
+            public void Add_Stats(Double best_score, List<Double> best_assignments, List<Double> best_solution, Double temperature)
+            {
+                _Best_Score.Add(best_score);
+                _Best_Assignments.Add(best_assignments);
+                _Best_Solution.Add(best_solution);
+                _temp.Add(temperature);
+            }
+            public Double Return_Best_Score()
+            {
+                return _Best_Score[_Best_Score.Count - 1];
+            }
+            public List<Double> Return_Best_Assignments()
+            {
+                return _Best_Assignments[_Best_Assignments.Count - 1];
+            }
+            public List<Double> Return_Best_Solution_Array()
+            {
+                return _Best_Solution[_Best_Solution.Count - 1];
+            }
+            public Double Current_Temp()
+            {
+                return _temp[_temp.Count - 1];
+            }
         }
     }
 }

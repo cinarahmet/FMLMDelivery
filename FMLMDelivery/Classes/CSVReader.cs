@@ -178,33 +178,33 @@ public class CSVReader
         using(var sr = File.OpenText(_xDocks_file))
         {
             String s = sr.ReadLine();
-            var line = s.Split(',');
-            var xDock_City = line[0];
-            var xDock_District = line[1];
-            var xDock_Id = line[2];
-            var xDock_region = line[3];
-            var type_value = Convert.ToBoolean(line[4], System.Globalization.CultureInfo.InvariantCulture);
-            var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-            var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-            var Already_Opened = Convert.ToBoolean(line[7], System.Globalization.CultureInfo.InvariantCulture);
-            var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-            var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-            var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);
-            _partial_xdocks.Add(xDock);
+            //var line = s.Split(',');
+            //var xDock_City = line[0];
+            //var xDock_District = line[1];
+            //var xDock_Id = line[2];
+            //var xDock_region = line[3];
+            //var type_value = Convert.ToBoolean(line[4], System.Globalization.CultureInfo.InvariantCulture);
+            //var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+            //var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+            //var Already_Opened = Convert.ToBoolean(line[7], System.Globalization.CultureInfo.InvariantCulture);
+            //var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+            //var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+            //var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);
+            //_partial_xdocks.Add(xDock);
             while ((s = sr.ReadLine()) != null)
             {
-                line = s.Split(',');
-                xDock_City = line[0];
-                xDock_District = line[1];
-                xDock_Id = line[2];
-                xDock_region = line[3];
-                type_value = Convert.ToBoolean(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                Already_Opened = Convert.ToBoolean(line[7], System.Globalization.CultureInfo.InvariantCulture);
-                xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                xdock_demand= Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);
+                var line = s.Split(',');
+                var xDock_City = line[0];
+                var xDock_District = line[1];
+                var xDock_Id = line[2];
+                var xDock_region = line[3];
+                var type_value = Convert.ToBoolean(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                var Already_Opened = Convert.ToBoolean(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);
                 _partial_xdocks.Add(xDock);
             }
         }
