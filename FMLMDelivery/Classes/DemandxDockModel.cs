@@ -18,7 +18,7 @@ using FMLMDelivery.MetaHeuristics;
 public class DemandxDockModel
 {
     private Double max_hub_capacity = 4000000;
-
+    
     /// <summary>
     /// Cplex object
     /// </summary>  
@@ -124,7 +124,7 @@ public class DemandxDockModel
     /// <summary>
     /// Time limit is given in seconds.
     /// </summary>
-    private readonly long _timeLimit = 3600;
+    private readonly long _timeLimit =60;
     /// <summary>
     /// The starting time of the model
     /// </summary>
@@ -133,7 +133,7 @@ public class DemandxDockModel
     /// <summary>
     /// Gap limit is given in percentage
     /// </summary>
-    private readonly double _gap;
+    private readonly double _gap ;
 
     /// <summary>
     /// if cost is incurred
@@ -209,7 +209,7 @@ public class DemandxDockModel
 
     private List<Double> opened_xdocks = new List<Double>();
 
-    private List<String> record_list = new List<String>();
+    private  List<String> record_list = new List<String>();
 
     private Double _min_xDock_cap;
 
@@ -226,11 +226,11 @@ public class DemandxDockModel
     private List<Boolean> demand_point_assignment_matrix = new List<bool>();
 
 
-
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Double min_xdock_cap, Boolean Phase2, Double P, Boolean second_part, double Gap, Boolean xDocks_located = false, Boolean cost_incurred = false, Boolean capacity_incurred = false)
-    {
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, long Timelimit,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
+	{
         _gap = Gap;
         _solver = new Cplex();
+        _timeLimit = Timelimit;
         _solver.SetParam(Cplex.DoubleParam.TiLim, val: _timeLimit);
         _solver.SetParam(Cplex.DoubleParam.EpGap, _gap);
         _xDocks = xDocks;
@@ -249,7 +249,7 @@ public class DemandxDockModel
         _second_part = second_part;
         _min_xDock_cap = min_xdock_cap;
         _xDocks_located = xDocks_located;
-
+        
 
         x = new List<List<INumVar>>();
         y = new List<INumVar>();
@@ -299,7 +299,7 @@ public class DemandxDockModel
         for (int j = 0; j < _numOfXdocks; j++)
         {
 
-            if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
+            if (_status == Cplex.   Status.Feasible || _status == Cplex.Status.Optimal)
             {
                 if (_solver.GetValue(y[j]) > 0.9)
                 {
@@ -315,12 +315,12 @@ public class DemandxDockModel
                     var is_agency = _xDocks[j].If_Agency();
                     for (int i = 0; i < _num_of_demand_point; i++)
                     {
-                        if (_solver.GetValue(x[i][j]) > 0.9)
+                        if (_solver.GetValue(x[i][j])>0.9)
                         {
                             demand += _demandpoint[i].Get_Demand();
                         }
                     }
-                    var x_Dock = new xDocks(city, district, county, region, valueslong, valueslat, distance_threshold, demand, already_opened, is_agency);
+                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold,demand,already_opened,is_agency);
                     new_XDocks.Add(x_Dock);
 
                 }
@@ -344,7 +344,7 @@ public class DemandxDockModel
                 var dist_thres = new_XDocks[i].Get_Distance_Threshold();
                 var capacity = max_hub_capacity;
                 var already_opened = false;
-                var potential_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
                 potential_Hubs.Add(potential_hub);
 
             }
@@ -418,7 +418,7 @@ public class DemandxDockModel
 
     private void Get_Distance_Matrix()
     {
-
+        
         //Calculating the distance matrix
         for (int i = 0; i < _num_of_demand_point; i++)
         {
@@ -440,17 +440,17 @@ public class DemandxDockModel
 
     private void Get_Num_XDocks()
     {
-
+        
         for (int j = 0; j < _numOfXdocks; j++)
         {
-            if (_solver.GetValue(y[j]) > 0.9)
+            if (_solver.GetValue(y[j])>0.9)
             {
                 xDock_count += 1;
             }
         }
     }
 
-
+   
 
     public Double GetObjVal()
     {
@@ -476,7 +476,7 @@ public class DemandxDockModel
             var a_i = new List<Double>();
             for (int j = 0; j < _numOfXdocks; j++)
             {
-                if (d[i][j] <= threshold)
+                if (d[i][j]<= threshold)
                 {
                     var a_ij = 1;
                     a_i.Add(a_ij);
@@ -507,6 +507,7 @@ public class DemandxDockModel
 
     public void Run()
     {
+        Console_Disable();
         Get_Model_Info();
         Get_Parameters();
         Build_Model();
@@ -528,9 +529,19 @@ public class DemandxDockModel
         }
         Print();
         ClearModel();
+        
     }
 
+    public void Console_Disable()
+    {
 
+        if (_xDocks_located)
+        {
+            _solver.SetOut(null);
+            Console.SetOut(TextWriter.Null);
+        }
+            
+    }
 
     public Boolean Return_Status()
     {
@@ -590,9 +601,9 @@ public class DemandxDockModel
         return xDock_names;
     }
     private void Get_Csv_Information()
-    {
+    {                      
         var count = 0;
-
+        
         for (int j = 0; j < _xDocks.Count; j++)
         {
             if (_solver.GetValue(y[j]) > 0.9)
@@ -604,21 +615,21 @@ public class DemandxDockModel
                 var xdock_long = _xDocks[j].Get_Longitude();
                 var xdock_id = _xDocks[j].Get_Id();
                 for (int i = 0; i < _demandpoint.Count; i++)
-                {
+                { 
                     if (_solver.GetValue(x[i][j]) > 0.9)
-                    { var x_dock_ranking = "Xdock" + count;
+                    {   var x_dock_ranking = "Xdock" + count ;
                         var demand_point_city = _demandpoint[i].Get_City();
                         var demand_point_district = _demandpoint[i].Get_District();
                         var demand_point_id = _demandpoint[i].Get_Id();
                         var demand = _demandpoint[i].Get_Demand();
                         var distance_xdock_county = d[i][j];
-                        var result = $"{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{demand_point_city},{demand_point_district},{demand_point_id},{distance_xdock_county},{demand}";
+                        var result = $"{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{demand_point_city},{demand_point_district},{demand_point_id},{distance_xdock_county},{demand}";                                            
                         record_list.Add(result);
-                    }
+                    }                    
                 }
             }
         }
-
+                        
     }
     public List<String> Get_Xdock_County_Info()
     {
@@ -630,7 +641,7 @@ public class DemandxDockModel
         var location = _location;
         var status = _status;
         var time = _solutionTime;
-        var gap_to_optimal = (_solver.GetMIPRelativeGap()) * 100;
+        var gap_to_optimal = (_solver.GetMIPRelativeGap())*100;
         var type = "";
         if (phase_2 == false)
         {
@@ -643,14 +654,14 @@ public class DemandxDockModel
         var result = $"{location},{type},{_demand_covarage},{status},{time},{gap_to_optimal}";
         record_stats.Add(result);
     }
-
+    
     public List<String> Get_Model_Stats_Info()
     {
         return record_stats;
     }
     private void Print()
     {
-
+        
         if (!(_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
         {
             Console.WriteLine("Solution is neither optimal nor feasible!");
@@ -681,7 +692,7 @@ public class DemandxDockModel
         {
             if (_solver.GetValue(y[j]) > 0.9)
             {
-                // Console.WriteLine("y[{0}] = {1}", j, _solver.GetValue(y[j]));
+               // Console.WriteLine("y[{0}] = {1}", j, _solver.GetValue(y[j]));
             }
 
         }
@@ -748,7 +759,7 @@ public class DemandxDockModel
         Console.WriteLine("Algorithm starts running at {0}", DateTime.Now);
         var startTime = DateTime.Now;
         _solver.Solve();
-        _solutionTime = ((DateTime.Now - startTime).Hours * 60 * 60 + (DateTime.Now - startTime).Minutes * 60 + (DateTime.Now - startTime).Seconds);
+        _solutionTime =( (DateTime.Now - startTime).Hours*60*60 + (DateTime.Now - startTime).Minutes*60 + (DateTime.Now - startTime).Seconds);
         _status = _solver.GetStatus();
         Console.WriteLine("Algorithm stops running at {0}", DateTime.Now);
     }
@@ -788,12 +799,12 @@ public class DemandxDockModel
             {
                 Demand_Coverage_Constraint();
             }
-            //if (_xDocks_located)
-            //{
-            //    Open_Located_xDocks();
-            //}
+            if (_xDocks_located)
+            {
+                Open_Located_xDocks();
+            }
         }
-        if (_xDocks_located)
+        if (_xDocks_located && !_demand_weighted)
         {
             Open_Located_xDocks();
             Capacity_Constraint();
@@ -807,10 +818,6 @@ public class DemandxDockModel
         }
 
     }
-
-    
-
-   
 
     private void Open_Located_xDocks()
     {
@@ -1061,7 +1068,7 @@ public class DemandxDockModel
                 _objective.AddTerm(y[j], 1);
             }
         }
-        if (_xDocks_located)    
+        if (_xDocks_located && !_demand_weighted)    
         {
             var sum = 0.0;
             for (int i = 0; i < _num_of_demand_point; i++)
