@@ -223,6 +223,28 @@ namespace FMLMDelivery.MetaHeuristics
             return _solution;
         }
 
+        protected List<Double> Create_Initial_Solution_Procedure(List<Double> best_solution, List<List<Double>> model_assignments)
+        {
+            var heuristic_pairs = new List<Double>();
+            for (int i = 0; i < _demand_Points.Count; i++)
+            {
+                var index_count = 0;
+                for (int j = 0; j < _xDocks.Count; j++)
+                {
+                    if (best_solution[j] == 1)
+                    {
+                        heuristic_pairs.Add(model_assignments[index_count][i]);
+                        index_count += 1;
+                    }
+                    else
+                    {
+                        heuristic_pairs.Add(0);
+                    }
+                }
+            }
+            return heuristic_pairs;
+        }
+
         public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
         {
             var sCoord = new GeoCoordinate(lat_1, long_1);

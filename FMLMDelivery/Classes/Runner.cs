@@ -94,6 +94,8 @@ namespace FMLMDelivery.Classes
             //var heuristic1=new Simulated_Annealing(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num);
             //heuristic1.Run();
 
+            (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
+
             //Part 2 for county-xDock pair
             min_model_model = false;
             demand_weighted_model = true;
@@ -227,7 +229,7 @@ namespace FMLMDelivery.Classes
                     }
                 }
                 var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,Talep Noktası Talebi";
-                var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point,_output_files);
+                var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point, _output_files);
                 write_the_xdocks.Write_Records();
 
                 Modify_xDocks(new_xDocks);
@@ -235,7 +237,7 @@ namespace FMLMDelivery.Classes
                 Add_Already_Open_Main_Hubs();
 
                 String csv_new = String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Region()},{d.If_Agency()},{d.Get_Longitude()},{d.Get_Latitude()},{d.If_Already_Opened()},{d.Get_Distance_Threshold()},{d.Get_LM_Demand()},{d.Get_FM_Demand()}"));
-                System.IO.File.WriteAllText(@""+_output_files+"\\Açılmış xDock Dosyası.csv", csv_new, Encoding.UTF8);
+                System.IO.File.WriteAllText(@"" + _output_files + "\\Açılmış xDock Dosyası.csv", csv_new, Encoding.UTF8);
 
                 //Seller-xDock Assignment
 
@@ -263,10 +265,10 @@ namespace FMLMDelivery.Classes
                 writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
                 stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
                 var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
-                var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header,_output_files);
+                var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header, _output_files);
                 writer_small_seller.Write_Records();
 
-                
+
                 var min_model_model = true;
                 var demand_weighted_model = false;
                 var phase_2 = false;
@@ -288,8 +290,8 @@ namespace FMLMDelivery.Classes
                 var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub Boylam,Hub Enlem,Atanma Türü,Unique Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
                 var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
-                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub,_output_files);
-                var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header,_output_files);
+                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub, _output_files);
+                var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
                 writer_hub_seller.Write_Records();
                 stat_writer.Write_Records();
 
@@ -322,9 +324,9 @@ namespace FMLMDelivery.Classes
                 writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
                 stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
                 var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
-                var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header,_output_files);
+                var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header, _output_files);
                 writer_small_seller.Write_Records();
-                
+
                 var min_model_model = true;
                 var demand_weighted_model = false;
                 var phase_2 = false;
@@ -346,8 +348,8 @@ namespace FMLMDelivery.Classes
                 var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub Boylam,Hub Enlem,Atanma Türü,Unique Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
                 var stats_header = "Part,Model,Status,Time,Gap";
                 stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
-                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub,_output_files);
-                var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header,_output_files);
+                var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub, _output_files);
+                var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
                 writer_hub_seller.Write_Records();
                 stat_writer.Write_Records();
             }

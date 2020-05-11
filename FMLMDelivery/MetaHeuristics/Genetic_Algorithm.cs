@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace FMLMDelivery.MetaHeuristics
     public class Genetic_Algorithm : Heuristic
     {
         private List<List<Double>> population = new List<List<double>>();
-        private Double population_size = 20;
+        private Double population_size = 10;
         private List<Score> Score_List = new List<Score>();
         private List<Score> new_score_list = new List<Score>();
         private List<Int32> already_open_list = new List<Int32>();
@@ -19,14 +20,14 @@ namespace FMLMDelivery.MetaHeuristics
         private Int32 elitist_size = 4;
         private Random rand = new Random();
         private Int32 chromosome_length;
-        private Int32 iteration_count = 100;
+        private Int32 iteration_count = 30;
         private Double infeasible_acceptance_percentage = 0.30;
         private Double alpha = 0.005;
         private Dictionary<Int32,Double> best_score_matrix = new Dictionary<Int32, Double>();
-        private Dictionary<Int32, List<Double>> best_solution_matrix = new Dictionary<int, List<double>>();
+        private List<Double> best_solution = new List<double>();
         private List<Double> final_assignments = new List<double>();
         private List<Double> final_chromosome = new List<double>();
-
+        private List<Double> heuristic_pairs = new List<double>();
 
 
 
@@ -226,8 +227,10 @@ namespace FMLMDelivery.MetaHeuristics
                     current_infeasible_count += 1;
                 }
             }
-            population = new_population;
-            Score_List = new_scores;
+            population.Clear();
+            Score_List.Clear();
+            population.AddRange(new_population);
+            Score_List.AddRange(new_scores);
         }
 
         private List<Double> Repair_Chromosome(List<Double> chromosome,Int32 xDock_count)
@@ -385,7 +388,7 @@ namespace FMLMDelivery.MetaHeuristics
                 if (Score_List[i].Get_Cum_Prob() > probability)
                 {
                     found = true;
-                    selected_chromosome = population[i];
+                    selected_chromosome.AddRange(population[i]);
                 }
             }
             return selected_chromosome;
@@ -409,23 +412,57 @@ namespace FMLMDelivery.MetaHeuristics
         protected override void Optimize()
         {
             Console.WriteLine("I'm genetic algorithm :)");
+            List<Double> new_choromosome = Enumerable.Repeat(0.0, chromosome_length).ToList();
+            new_choromosome[11] = 1;
+            new_choromosome[100] = 1;
+            var value=Test_Chromosome_Evaluation(new_choromosome);
             Create_Initial_Population();
             Evaluation();
             Run_Algorithm();
         }
 
+        private Double Test_Chromosome_Evaluation(List<Double> chromosome)
+        {
+            var xDocks = Update_Open_xDock(chromosome);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, true);
+            model.Run();
+            var a = model.GetObjVal();
+            return a;
+        }
+        private Double Find_Covered_Demand(List<xDocks> xDocks) 
+        {
+            var whole_demand = _demand_Points.Sum(x => x.Get_Demand());
+            var assigned_demand = 0.0;
+            for (int i = 0; i < xDocks.Count; i++)
+            {
+                assigned_demand += xDocks[i].Get_LM_Demand();
+            }
+            var covered_demand = assigned_demand / whole_demand;
+            return covered_demand;
+
+        }
+
+        public Tuple<List<Double>,List<Double>> Return_Best_Solution()
+        {
+            return Tuple.Create(best_solution, heuristic_pairs);
+        }
+
         private void Run_Algorithm()
         {
-            
+            var best_obj = Double.MaxValue;
             for (int i = 0; i < iteration_count; i++)
             {
                 Console.WriteLine("Iteration Count: {0}\n", i);
                 Select_Population();
                 Evaluation();
-                var best_obj = Score_List.Min(x => x.Get_Obj_Value());
-                var sorted_list = Score_List.OrderByDescending(x => x.Get_Fitness_Score()).ToList();
-                var index = sorted_list[0].Get_ID();
-                best_solution_matrix.Add(i, population[index]);
+                var new_best_obj = Score_List.Min(x => x.Get_Obj_Value());
+                if (new_best_obj<best_obj)
+                {
+                    best_obj = new_best_obj;
+                    var score = Score_List.Where(x => x.Get_Obj_Value().Equals(new_best_obj)).First();
+                    best_solution = population[score.Get_ID()];
+                }
+
                 best_score_matrix.Add(i, best_obj);
                 Console.WriteLine("Best objective: {0}\n",best_obj);
                 if (infeasible_acceptance_percentage > 0.01)
@@ -433,7 +470,16 @@ namespace FMLMDelivery.MetaHeuristics
                     infeasible_acceptance_percentage -= alpha;
                 }
             }
-
+            Console.WriteLine("Finish");
+            var xDocks = Update_Open_xDock(best_solution);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, true);
+            model.Run();
+            var a = model.GetObjVal();
+            var final_xDocks = model.Return_XDock();
+            var cov = Find_Covered_Demand(final_xDocks);
+            var model_assignments = model.Return_Heuristic_Assignment();
+            heuristic_pairs = Create_Initial_Solution_Procedure(best_solution, model_assignments);
+            Console.WriteLine("Finish");
         }
     }
 
