@@ -18,7 +18,6 @@ namespace FMLMDelivery.MetaHeuristics
         protected Double _lm_coverage;
         protected List<Parameters> _parameters;
         protected Double _num_xDock;
-        protected List<List<Double>> _assignments;
         protected List<Double> _best_solution = new List<double>();
         protected List<xDock_Demand_Point_Pairs> _best_pairs = new List<xDock_Demand_Point_Pairs>();
         protected List<xDock_Demand_Point_Pairs> _old_pairs = new List<xDock_Demand_Point_Pairs>();
@@ -30,7 +29,7 @@ namespace FMLMDelivery.MetaHeuristics
 
 
 
-        protected Heuristic(List<Double> solution, List<List<Double>> assignments, List<xDocks> xDocks, List<DemandPoint> demandPoints,List<Parameters> parameters, Double lm_coverage,Double num_xdock,String key)
+        protected Heuristic(List<Double> solution, List<xDocks> xDocks, List<DemandPoint> demandPoints,List<Parameters> parameters, Double lm_coverage,Double num_xdock,String key)
         {
             _xDocks = xDocks;
             _demand_Points = demandPoints;
@@ -40,7 +39,6 @@ namespace FMLMDelivery.MetaHeuristics
             total_lm_demand = _demand_Points.Sum(x => x.Get_Demand());
             _lm_coverage = lm_coverage;
             _num_xDock = num_xdock;
-            _assignments = assignments;
             _key = key;
             Initialize_Pairs();
             Console.WriteLine("Working");
@@ -118,7 +116,7 @@ namespace FMLMDelivery.MetaHeuristics
             }
         }
 
-        private void Construct_Initial_Solution()
+        /*private void Construct_Initial_Solution()
         {
             for (int i = 0; i < _solution.Count; i++)
             {
@@ -132,7 +130,7 @@ namespace FMLMDelivery.MetaHeuristics
                     
                 }
             }
-        }
+        }*/
 
         private Boolean Total_xDock_Constraint()
         {
@@ -217,7 +215,7 @@ namespace FMLMDelivery.MetaHeuristics
 
         public List<Double> Run()
         {
-            Construct_Initial_Solution();
+            //Construct_Initial_Solution();
             //Assignment_Procedure();
             Optimize();
             return _solution;

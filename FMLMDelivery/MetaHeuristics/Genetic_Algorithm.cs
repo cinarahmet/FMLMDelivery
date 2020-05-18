@@ -31,7 +31,7 @@ namespace FMLMDelivery.MetaHeuristics
 
 
 
-        public Genetic_Algorithm(List<Double> solution, List<List<Double>> assignments, List<xDocks> _xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock, String key) : base(solution,assignments,_xDocks, demandPoints, parameters, lm_coverage, num_xdock, key)
+        public Genetic_Algorithm(List<Double> solution, List<xDocks> _xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock, String key) : base(solution,_xDocks, demandPoints, parameters, lm_coverage, num_xdock, key)
         {
             chromosome_length = _xDocks.Count;
         }
@@ -424,7 +424,7 @@ namespace FMLMDelivery.MetaHeuristics
         private Double Test_Chromosome_Evaluation(List<Double> chromosome)
         {
             var xDocks = Update_Open_xDock(chromosome);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01,60, true);
             model.Run();
             var a = model.GetObjVal();
             return a;
@@ -472,7 +472,7 @@ namespace FMLMDelivery.MetaHeuristics
             }
             Console.WriteLine("Finish");
             var xDocks = Update_Open_xDock(best_solution);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, 60,true);
             model.Run();
             var a = model.GetObjVal();
             var final_xDocks = model.Return_XDock();
