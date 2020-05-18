@@ -225,6 +225,9 @@ public class DemandxDockModel
 
     private List<Boolean> demand_point_assignment_matrix = new List<bool>();
 
+    private List<Double> solution_to_send = new List<Double>();
+
+    private Double gap_to_send = new double();
 
     public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, long Timelimit,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
@@ -507,7 +510,7 @@ public class DemandxDockModel
 
     public void Run()
     {
-       // Console_Disable();
+        //Console_Disable();
         Get_Model_Info();
         Get_Parameters();
         Build_Model();
@@ -520,7 +523,7 @@ public class DemandxDockModel
         {
             Get_Opened_xDocks();
             Get_Assignments();
-            Create_XDock_Names();   
+            Create_XDock_Names();
             Get_xDock();
             Get_Potential_Hubs();
             Get_Num_XDocks();
@@ -540,7 +543,7 @@ public class DemandxDockModel
             _solver.SetOut(null);
             Console.SetOut(TextWriter.Null);
         }
-        
+            
     }
 
     public Boolean Return_Status()
@@ -753,12 +756,32 @@ public class DemandxDockModel
     {
         return xDock_count;
     }
-
-    private void Solve()
+    public Double Get_Gap()
     {
+        return gap_to_send;
+    }
+    public List<Double> Get_Solution()
+    {
+        return solution_to_send;
+    }
+    private void Solve()
+    {   
         Console.WriteLine("Algorithm starts running at {0}", DateTime.Now);
         var startTime = DateTime.Now;
-        _solver.Solve();
+        var incumb = new double[y.Count];
+        var incumb2 = new List<List<double>>();
+        var callback = new Call_Back(y, incumb);
+        if (!_min_xDock_model && !_xDocks_located)
+        {
+            _solver.Use(callback);
+            _solver.Solve();
+            solution_to_send = callback.Get_Partial_Solution().ToList();
+            gap_to_send = callback.Get_Gap();
+        }
+        else
+        {
+            _solver.Solve();
+        }
         _solutionTime =( (DateTime.Now - startTime).Hours*60*60 + (DateTime.Now - startTime).Minutes*60 + (DateTime.Now - startTime).Seconds);
         _status = _solver.GetStatus();
         Console.WriteLine("Algorithm stops running at {0}", DateTime.Now);

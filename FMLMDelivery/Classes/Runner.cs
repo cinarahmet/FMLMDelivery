@@ -93,9 +93,14 @@ namespace FMLMDelivery.Classes
             var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
             heuristic.Run();
 
-            //var heuristic1 = new Simulated_Annealing(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num,key);
-            //heuristic1.Run();
-            //(heuristic_pot_xdocks, heuristic_assign) = heuristic1.Return_Heuristic_Results();
+            var heuristic1 = new Simulated_Annealing(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+            heuristic1.Run();
+            (heuristic_pot_xdocks, heuristic_assign, demand_covarage) = heuristic1.Return_Heuristic_Results();
+
+            //var heuristic_particle = new Particle_Swarm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+            //heuristic_particle.Run();
+
+            //Loop_For_Simulated_Annealing(opened_xDocks, _demand_points, _pot_xDocks, demand_covarage, min_xDock_cap, key, gap,min_num);
 
             (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
             demand_covarage = heuristic.Return_Covered_Demand();
@@ -105,16 +110,65 @@ namespace FMLMDelivery.Classes
             demand_weighted_model = true;
             phase_2 = true;
             first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true,gap,3600);
-            first_phase.Provide_Initial_Solution(opened_xDocks,assignments);
+            first_phase.Provide_Initial_Solution(heuristic_pot_xdocks, heuristic_assign);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             //xDocks are assigned
-            new_xDocks = first_phase.Return_XDock();
+            new_xDocks = first_phase.Return_XDock();  
             potential_Hubs = first_phase.Return_Potential_Hubs();
             stats.AddRange(first_phase.Get_Model_Stats_Info());
+
+
             return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info(),stats);
         }
+        private void Loop_For_Simulated_Annealing(List<Double> opened_xDocks,List<DemandPoint> demandPoints, List<xDocks> xDocks, Double demand_cov, Double min_xDock_cap, String key, double gap,double num_xdock)
+        {
+            var stats = new List<String>();
+            var heuristic_pot_xdocks = new List<Double>();
+            var heuristic_assign = new List<Double>();
+            var partial_gap = 100.0;
+            var partial_solution = new List<Double>();
+            var _demand_points = demandPoints;
+            var _pot_xDocks = xDocks;
+            var _key = key;
+            var min_model_model = true;
+            var demand_weighted_model = false;
+            //Phase 2 takes the solution of min_model as an input and solve same question with demand weighted objective
+            var phase_2 = false;
+            var demand_covarage = demand_cov;
+            var objVal = 0.0;
+            var new_xDocks = new List<xDocks>();
+            var potential_Hubs = new List<Hub>();
+            var p = 0;
+            var opened_xdocks = opened_xDocks;
+            var min_num = num_xdock;
+            while (partial_gap>=(gap*100))
+            {
+                
+                
+                var heuristic1 = new Simulated_Annealing(opened_xdocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+                heuristic1.Run();
+                (heuristic_pot_xdocks, heuristic_assign, demand_covarage) = heuristic1.Return_Heuristic_Results();
 
+                //Part 2 for county-xDock pair
+                min_model_model = false;
+                demand_weighted_model = true;
+                phase_2 = true;
+                var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true, gap, 3600);
+                first_phase.Provide_Initial_Solution(heuristic_pot_xdocks, heuristic_assign);
+                first_phase.Run();
+                objVal = first_phase.GetObjVal();
+                //xDocks are assigned
+                new_xDocks = first_phase.Return_XDock();
+                potential_Hubs = first_phase.Return_Potential_Hubs();
+                partial_gap = first_phase.Get_Gap();
+                partial_solution = first_phase.Get_Solution();
+
+                opened_xDocks.Clear();
+                opened_xDocks.AddRange(partial_solution);
+            }
+
+        }
         private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key)
         {
             var city_points = new List<DemandPoint>();
