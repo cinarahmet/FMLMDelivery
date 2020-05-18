@@ -11,29 +11,34 @@ namespace FMLMDelivery.MetaHeuristics
     public class Genetic_Algorithm : Heuristic
     {
         private List<List<Double>> population = new List<List<double>>();
-        private Double population_size = 10;
+        private Double population_size = 30;
         private List<Score> Score_List = new List<Score>();
         private List<Score> new_score_list = new List<Score>();
         private List<Int32> already_open_list = new List<Int32>();
-        private Double crossover_probability = 0.40;
-        private Double mutation_probability = 0.40;
-        private Int32 elitist_size = 4;
+        private Double crossover_probability = 0.70;
+        private Double mutation_probability = 0.70;
+        private Int32 elitist_size = 2;
         private Random rand = new Random();
         private Int32 chromosome_length;
-        private Int32 iteration_count = 30;
-        private Double infeasible_acceptance_percentage = 0.30;
+        private Int32 iteration_count = 500;
+        private Double infeasible_acceptance_percentage = 0.00;
         private Double alpha = 0.005;
         private Dictionary<Int32,Double> best_score_matrix = new Dictionary<Int32, Double>();
         private List<Double> best_solution = new List<double>();
         private List<Double> final_assignments = new List<double>();
         private List<Double> final_chromosome = new List<double>();
         private List<Double> heuristic_pairs = new List<double>();
+        private Double min_cap = new double();
+        private Double covered_demand = new double();
+        private Dictionary<String, Double> solution_list = new Dictionary<string, double>();
 
 
 
         public Genetic_Algorithm(List<Double> solution, List<List<Double>> assignments, List<xDocks> _xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock, String key) : base(solution,assignments,_xDocks, demandPoints, parameters, lm_coverage, num_xdock, key)
         {
             chromosome_length = _xDocks.Count;
+            var index = parameters.FindIndex(x => x.Get_Key().Equals(key));
+            min_cap = parameters[index].Get_Min_Cap();
         }
 
 
@@ -69,7 +74,7 @@ namespace FMLMDelivery.MetaHeuristics
         {
             var xDocks = new List<xDocks>();
             var obj_value_for_chromosome = 0.0;
-            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, 1250,false, _num_xDock,false, 0.01,3600, true);
+            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, min_cap,false, _num_xDock,false, 0.04,60, true);
             model.Run();
             var is_feasible = model.Return_Status();
             if (!is_feasible)
@@ -81,7 +86,7 @@ namespace FMLMDelivery.MetaHeuristics
                     while (!is_feasible)
                     {
                         (new_choromosome,xDocks) = Create_New_Choromosome();
-                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01,3600, true);
+                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04,60, true);
                         model1.Run();
                         is_feasible = model1.Return_Status();
                         obj_value_for_chromosome = model1.GetObjVal();
@@ -118,6 +123,8 @@ namespace FMLMDelivery.MetaHeuristics
             (_solution, objective_value, chromosome_status) = Suitability_Check(_solution, Score_List.Count, current_infeasible_count,xDocks);
             population.Add(_solution);
             var score = new Score(0, objective_value);
+            var string_sol = String.Join(',', _solution);
+            solution_list.Add(string_sol, objective_value);
             Score_List.Add(score);
             for (int k = 0; k < _xDocks.Count; k++) if (_xDocks[k].If_Already_Opened()) already_open_list.Add(k); ;
             for (int i = 1; i < population_size; i++)
@@ -125,8 +132,19 @@ namespace FMLMDelivery.MetaHeuristics
                 var selected_chromosome = new List<Double>();
                 var new_choromosome = new List<Double>();
                 (new_choromosome,xDocks)= Create_New_Choromosome();
-                (selected_chromosome, objective_value, chromosome_status) = Suitability_Check(new_choromosome, Score_List.Count, current_infeasible_count,xDocks);
-                population.Add(selected_chromosome);
+                string_sol = String.Join(',', new_choromosome);
+                if (solution_list.ContainsKey(string_sol))
+                {
+                    solution_list.TryGetValue(string_sol,out objective_value);
+                    population.Add(new_choromosome);
+                }
+                else
+                {
+                    (selected_chromosome, objective_value, chromosome_status) = Suitability_Check(new_choromosome, Score_List.Count, current_infeasible_count, xDocks);
+                    population.Add(selected_chromosome);
+                    string_sol = String.Join(',', selected_chromosome);
+                    solution_list.Add(string_sol, objective_value);
+                }
                 score = new Score(i, objective_value);
                 Score_List.Add(score);
                 if (!chromosome_status)
@@ -136,12 +154,29 @@ namespace FMLMDelivery.MetaHeuristics
             }  
         }
 
+        private void Eliminate_Initial_Population()
+        {
+            var sorted_score_list = Score_List.OrderBy(x => x.Get_Fitness_Score()).ToList();
+            var initial_population = new List<List<Double>>(); 
+            for (int i = 0; i < population_size; i++)
+            {
+                var index = sorted_score_list[i].Get_ID();
+                initial_population.Add(population[index]);
+            }
+            population = initial_population;
+            Score_List = sorted_score_list.GetRange(0, Convert.ToInt32( population_size));
+            for (int i = 0; i < population_size; i++)
+            {
+                Score_List[i].Set_ID(i);
+            }
+        }
+
         private void Evaluation()
         {
             var max_obj = Score_List.Max(x => x.Get_Obj_Value());
             var min_obj = Score_List.Min(x => x.Get_Obj_Value());
             var difference = max_obj - min_obj;
-            for (int i = 0; i < population_size; i++)
+            for (int i = 0; i < population.Count; i++)
             {
                 var fitness_score = 0.0;
                 if (difference == 0)
@@ -157,7 +192,7 @@ namespace FMLMDelivery.MetaHeuristics
 
             var cumulative_fitness_score = Score_List.Sum(x => x.Get_Fitness_Score());
             var cumulative_probability = 0.0;
-            for (int j = 0; j < population_size; j++)
+            for (int j = 0; j < population.Count; j++)
             {
                 var probability = Score_List[j].Get_Fitness_Score() / cumulative_fitness_score;
                 Score_List[j].Set_Prob(probability);
@@ -217,10 +252,22 @@ namespace FMLMDelivery.MetaHeuristics
                 var new_xDocks = Update_Open_xDock(selected_chromosome);
                 var final_chromosome = new List<Double>();
                 //Buranın konuşulması gerek
-                (final_chromosome, objective_value, chromosome_status) = Suitability_Check(selected_chromosome, new_population.Count, current_infeasible_count,new_xDocks);
+                var string_sol = String.Join(',', selected_chromosome);
+                if (solution_list.ContainsKey(string_sol))
+                {
+                    solution_list.TryGetValue(string_sol, out objective_value);
+                    new_population.Add(selected_chromosome);
+                }
+                else
+                {
+                    (final_chromosome, objective_value, chromosome_status) = Suitability_Check(selected_chromosome, new_population.Count, current_infeasible_count, new_xDocks);
+                    new_population.Add(final_chromosome);
+                    string_sol = String.Join(',', final_chromosome);
+                    solution_list.Add(string_sol, objective_value);
+                }
                 var score = new Score(i, objective_value);
                 new_scores.Add(score);
-                new_population.Add(final_chromosome);
+                
 
                 if (!chromosome_status)
                 {
@@ -418,13 +465,14 @@ namespace FMLMDelivery.MetaHeuristics
             var value=Test_Chromosome_Evaluation(new_choromosome);
             Create_Initial_Population();
             Evaluation();
+           // Eliminate_Initial_Population();
             Run_Algorithm();
         }
 
         private Double Test_Chromosome_Evaluation(List<Double> chromosome)
         {
             var xDocks = Update_Open_xDock(chromosome);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.01, 30 ,true);
             model.Run();
             var a = model.GetObjVal();
             return a;
@@ -445,6 +493,11 @@ namespace FMLMDelivery.MetaHeuristics
         public Tuple<List<Double>,List<Double>> Return_Best_Solution()
         {
             return Tuple.Create(best_solution, heuristic_pairs);
+        }
+
+        public Double Return_Covered_Demand()
+        {
+            return covered_demand;
         }
 
         private void Run_Algorithm()
@@ -469,14 +522,21 @@ namespace FMLMDelivery.MetaHeuristics
                 {
                     infeasible_acceptance_percentage -= alpha;
                 }
+                if (population_size > 100   )
+                {
+                    if (iteration_count % 10 == 0)
+                    {
+                        population_size -= 1;
+                    }
+                }
             }
             Console.WriteLine("Finish");
             var xDocks = Update_Open_xDock(best_solution);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04, 30 ,true);
             model.Run();
             var a = model.GetObjVal();
             var final_xDocks = model.Return_XDock();
-            var cov = Find_Covered_Demand(final_xDocks);
+            covered_demand = Find_Covered_Demand(final_xDocks);
             var model_assignments = model.Return_Heuristic_Assignment();
             heuristic_pairs = Create_Initial_Solution_Procedure(best_solution, model_assignments);
             Console.WriteLine("Finish");
@@ -510,6 +570,11 @@ namespace FMLMDelivery.MetaHeuristics
         public Int32 Get_ID()
         {
             return ID;
+        }
+
+        public void Set_ID(Int32 id)
+        {
+            ID = id;
         }
 
         public Double Get_Fitness_Score()

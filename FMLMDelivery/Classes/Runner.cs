@@ -82,7 +82,7 @@ namespace FMLMDelivery.Classes
                 _status_check = first_phase.Return_Status();
             }
             
-            objVal = first_phase.GetObjVal();
+            objVal = first_phase.GetObjVal(); 
             new_xDocks = first_phase.Return_XDock();
             stats.AddRange(first_phase.Get_Model_Stats_Info());
             var min_num = first_phase.Return_Num_Xdock();
@@ -90,14 +90,15 @@ namespace FMLMDelivery.Classes
             var assignments = first_phase.Return_Assignments();
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
 
-            //var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments,_pot_xDocks, _demand_points, _parameters, demand_covarage, min_num,key);
-            //heuristic.Run();
+            var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+            heuristic.Run();
 
             //var heuristic1 = new Simulated_Annealing(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num,key);
             //heuristic1.Run();
             //(heuristic_pot_xdocks, heuristic_assign) = heuristic1.Return_Heuristic_Results();
 
             (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
+            demand_covarage = heuristic.Return_Covered_Demand();
 
             //Part 2 for county-xDock pair
             min_model_model = false;

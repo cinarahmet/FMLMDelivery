@@ -507,7 +507,7 @@ public class DemandxDockModel
 
     public void Run()
     {
-        Console_Disable();
+       // Console_Disable();
         Get_Model_Info();
         Get_Parameters();
         Build_Model();
@@ -520,7 +520,7 @@ public class DemandxDockModel
         {
             Get_Opened_xDocks();
             Get_Assignments();
-            Create_XDock_Names();
+            Create_XDock_Names();   
             Get_xDock();
             Get_Potential_Hubs();
             Get_Num_XDocks();
@@ -540,7 +540,7 @@ public class DemandxDockModel
             _solver.SetOut(null);
             Console.SetOut(TextWriter.Null);
         }
-            
+        
     }
 
     public Boolean Return_Status()
