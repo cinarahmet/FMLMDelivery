@@ -101,7 +101,6 @@ namespace FMLMDelivery.MetaHeuristics
                     min_cap = _parameters[i].Get_Min_Cap();
                 }
             }
-
             var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.05, 20, true);
             assignment.Run();
             _objective = assignment.GetObjVal();

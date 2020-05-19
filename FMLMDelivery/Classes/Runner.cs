@@ -11,6 +11,7 @@ namespace FMLMDelivery.Classes
 {
     public class Runner
     {
+        private Boolean is_genetic = true;
         private List<xDocks> xDocks;
         private List<DemandPoint> demand_Points;
         private List<xDocks> agency;
@@ -57,8 +58,6 @@ namespace FMLMDelivery.Classes
 
         private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
         {   var stats = new List<String>();
-            var heuristic_pot_xdocks = new List<Double>();
-            var heuristic_assign = new List<Double>();
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
             var _key = key;
@@ -90,27 +89,33 @@ namespace FMLMDelivery.Classes
             var assignments = first_phase.Return_Assignments();
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
 
-            var heuristic = new Genetic_Algorithm(opened_xDocks, heuristic_assignments, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
-            heuristic.Run();
 
-            var heuristic1 = new Simulated_Annealing(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
-            heuristic1.Run();
-            (heuristic_pot_xdocks, heuristic_assign, demand_covarage) = heuristic1.Return_Heuristic_Results();
+            if (is_genetic)
+            {
+                var heuristic = new Genetic_Algorithm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+                heuristic.Run();
+                (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
+                demand_covarage = heuristic.Return_Covered_Demand();
+            }
+
+            if (!is_genetic)
+            {
+                var heuristic1 = new Simulated_Annealing(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+                heuristic1.Run();
+                (opened_xDocks, assignments, demand_covarage) = heuristic1.Return_Heuristic_Results();
+            }
 
             //var heuristic_particle = new Particle_Swarm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
             //heuristic_particle.Run();
 
             //Loop_For_Simulated_Annealing(opened_xDocks, _demand_points, _pot_xDocks, demand_covarage, min_xDock_cap, key, gap,min_num);
 
-            (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
-            demand_covarage = heuristic.Return_Covered_Demand();
-
             //Part 2 for county-xDock pair
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
             first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true,gap,3600);
-            first_phase.Provide_Initial_Solution(heuristic_pot_xdocks, heuristic_assign);
+            first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
             //xDocks are assigned

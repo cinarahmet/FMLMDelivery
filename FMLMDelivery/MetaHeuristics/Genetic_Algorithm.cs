@@ -11,19 +11,20 @@ namespace FMLMDelivery.MetaHeuristics
     public class Genetic_Algorithm : Heuristic
     {
         private List<List<Double>> population = new List<List<double>>();
-        private Double population_size = 30;
+        private Double population_size = 10;
         private List<Score> Score_List = new List<Score>();
         private List<Score> new_score_list = new List<Score>();
         private List<Int32> already_open_list = new List<Int32>();
         private Double crossover_probability = 0.70;
         private Double mutation_probability = 0.70;
-        private Int32 elitist_size = 2;
+        private Int32 elitist_size = 5;
         private Random rand = new Random();
         private Int32 chromosome_length;
-        private Int32 iteration_count = 500;
+        private Int32 iteration_count = 1000;
         private Double infeasible_acceptance_percentage = 0.00;
         private Double alpha = 0.005;
         private Dictionary<Int32,Double> best_score_matrix = new Dictionary<Int32, Double>();
+        private Dictionary<Int32, Double> time_matrix = new Dictionary<Int32, Double>();
         private List<Double> best_solution = new List<double>();
         private List<Double> final_assignments = new List<double>();
         private List<Double> final_chromosome = new List<double>();
@@ -31,10 +32,11 @@ namespace FMLMDelivery.MetaHeuristics
         private Double min_cap = new double();
         private Double covered_demand = new double();
         private Dictionary<String, Double> solution_list = new Dictionary<string, double>();
+        private String heuristic_name = "Genetic Algorithm";
 
 
 
-        public Genetic_Algorithm(List<Double> solution, List<List<Double>> assignments, List<xDocks> _xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock, String key) : base(solution,assignments,_xDocks, demandPoints, parameters, lm_coverage, num_xdock, key)
+        public Genetic_Algorithm(List<Double> solution, List<xDocks> _xDocks, List<DemandPoint> demandPoints, List<Parameters> parameters, Double lm_coverage, Double num_xdock, String key) : base(solution,_xDocks, demandPoints, parameters, lm_coverage, num_xdock, key)
         {
             chromosome_length = _xDocks.Count;
             var index = parameters.FindIndex(x => x.Get_Key().Equals(key));
@@ -74,7 +76,7 @@ namespace FMLMDelivery.MetaHeuristics
         {
             var xDocks = new List<xDocks>();
             var obj_value_for_chromosome = 0.0;
-            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, min_cap,false, _num_xDock,false, 0.04,60, true);
+            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, min_cap,false, _num_xDock,false, 0.04,60, true,heuristic_name);
             model.Run();
             var is_feasible = model.Return_Status();
             if (!is_feasible)
@@ -86,7 +88,7 @@ namespace FMLMDelivery.MetaHeuristics
                     while (!is_feasible)
                     {
                         (new_choromosome,xDocks) = Create_New_Choromosome();
-                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04,60, true);
+                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04,60, true,heuristic_name);
                         model1.Run();
                         is_feasible = model1.Return_Status();
                         obj_value_for_chromosome = model1.GetObjVal();
@@ -502,6 +504,7 @@ namespace FMLMDelivery.MetaHeuristics
 
         private void Run_Algorithm()
         {
+            var start_time = DateTime.Now;
             var best_obj = Double.MaxValue;
             for (int i = 0; i < iteration_count; i++)
             {
@@ -515,24 +518,30 @@ namespace FMLMDelivery.MetaHeuristics
                     var score = Score_List.Where(x => x.Get_Obj_Value().Equals(new_best_obj)).First();
                     best_solution = population[score.Get_ID()];
                 }
-
+                var current_time = DateTime.Now;
+                var time_difference = (current_time - start_time).TotalSeconds;
+                if(time_difference > 600)
+                {
+                    start_time = DateTime.Now;
+                    time_matrix.Add(i, best_obj);
+                }
                 best_score_matrix.Add(i, best_obj);
                 Console.WriteLine("Best objective: {0}\n",best_obj);
-                if (infeasible_acceptance_percentage > 0.01)
-                {
-                    infeasible_acceptance_percentage -= alpha;
-                }
-                if (population_size > 100   )
-                {
-                    if (iteration_count % 10 == 0)
-                    {
-                        population_size -= 1;
-                    }
-                }
+                //if (infeasible_acceptance_percentage > 0.01)
+                //{
+                //    infeasible_acceptance_percentage -= alpha;
+                //}
+                //if (population_size > 100)
+                //{
+                //    if (iteration_count % 10 == 0)
+                //    {
+                //        population_size -= 1;
+                //    }
+                //}
             }
             Console.WriteLine("Finish");
             var xDocks = Update_Open_xDock(best_solution);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04, 30 ,true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04, 30 ,true,heuristic_name);
             model.Run();
             var a = model.GetObjVal();
             var final_xDocks = model.Return_XDock();

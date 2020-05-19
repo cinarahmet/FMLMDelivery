@@ -229,7 +229,9 @@ public class DemandxDockModel
 
     private Double gap_to_send = new double();
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, long Timelimit,Boolean xDocks_located = false ,Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    private String _heuristic_name = "";
+
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, long Timelimit,Boolean xDocks_located = false, String heuristic_name = "", Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _gap = Gap;
         _solver = new Cplex();
@@ -272,6 +274,7 @@ public class DemandxDockModel
         normalized_demand = new List<double>();
         record_stats = new List<String>();
         _location = key;
+        _heuristic_name = heuristic_name;
     }
 
     public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -770,7 +773,7 @@ public class DemandxDockModel
         var startTime = DateTime.Now;
         var incumb = new double[y.Count];
         var incumb2 = new List<List<double>>();
-        var callback = new Call_Back(y, incumb);
+        var callback = new Call_Back(y, incumb,_heuristic_name);
         if (!_min_xDock_model && !_xDocks_located)
         {
             _solver.Use(callback);

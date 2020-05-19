@@ -14,35 +14,44 @@ namespace FMLMDelivery.MetaHeuristics
         private List<Double> _gap;
         private int revision;
         private Double Time_thresh = 300;
-        public Call_Back(List<INumVar> x, double[] incumb)
+        private String _heuristic ="";
+        public Call_Back(List<INumVar> x, double[] incumb,string heuristic)
         {
             this.x = x;
             _x = incumb;
             start = DateTime.Now;
             _gap = new List<double>();
-            
+            _heuristic = heuristic;
         }
 
        public override void Main()
        {    
             if (HasIncumbent())
             {
-                revision += 1;
-                var time_passed = 0;
-                var a = GetBestObjValue();
-                _gap.Add(Math.Round(GetMIPRelativeGap() * 100));
-                if (revision > 10 && _gap[_gap.Count - 2] != _gap[_gap.Count - 1])
+                if (_heuristic == "Simulated Annealing")
                 {
-                    start = DateTime.Now;
+                    revision += 1;
+                    var time_passed = 0;
+                    var a = GetBestObjValue();
+                    _gap.Add(Math.Round(GetMIPRelativeGap() * 100));
+                    if (revision > 10 && _gap[_gap.Count - 2] != _gap[_gap.Count - 1])
+                    {
+                        start = DateTime.Now;
+                    }
+                    time_passed = (DateTime.Now - start).Seconds + 60 * (DateTime.Now - start).Minutes;
+
+                    if (time_passed > Time_thresh)
+                    {
+                        _x = GetIncumbentValues(x.ToArray());
+                        Abort();
+                        return;
+                    }
                 }
-                time_passed = (DateTime.Now-start).Seconds+ 60* (DateTime.Now - start).Minutes;
+                if (_heuristic == "Genetic Algorithm")
+                {
+
+                }
                 
-                if (time_passed > Time_thresh)
-                {
-                    _x = GetIncumbentValues(x.ToArray());
-                    Abort();
-                    return;
-                }
             } 
        }
         public double[] Get_Partial_Solution()
