@@ -163,55 +163,38 @@ namespace FMLMDelivery.Classes
             writer_xdocks.AddRange(temp_writer);
         }
 
+        private void Add_Main_Hub(int i,string _district,string _id, double _capacity)
+        {
+            var city = xDocks[i].Get_City();
+            var district = xDocks[i].Get_District();
+            var id = xDocks[i].Get_Id();
+            var region = xDocks[i].Get_Region();
+            var longitude = xDocks[i].Get_Longitude();
+            var latitude = xDocks[i].Get_Latitude();
+            var dist_thres = xDocks[i].Get_Distance_Threshold();
+            var capacity = _capacity;
+            var already_opened = true;
+            var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+            potential_hub_locations.Add(open_hub);
+        }
+
         private void Add_Already_Open_Main_Hubs()
         {
             for (int i = 0; i < xDocks.Count; i++)
             {
                 if (xDocks[i].Get_District() == "TUZLA" && xDocks[i].Get_Id() == "KİRAZ")
                 {
-                    var city = xDocks[i].Get_City();
-                    var district = xDocks[i].Get_District();
-                    var id = xDocks[i].Get_Id();
-                    var region = xDocks[i].Get_Region();
-                    var longitude = xDocks[i].Get_Longitude();
-                    var latitude = xDocks[i].Get_Latitude();
-                    var dist_thres = xDocks[i].Get_Distance_Threshold();
-                    var capacity = 1000000;
-                    var already_opened = true;
-                    var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
-                    potential_hub_locations.Add(open_hub);
-
+                    Add_Main_Hub(i, "TUZLA", "KİRAZ", 1000000);
                 }
                 else if (xDocks[i].Get_District() == "YÜREĞİR" && xDocks[i].Get_Id() == "İNCİRLİK CUMHURİYET")
                 {
-                    var city = xDocks[i].Get_City();
-                    var district = xDocks[i].Get_District();
-                    var id = xDocks[i].Get_Id();
-                    var region = xDocks[i].Get_Region();
-                    var longitude = xDocks[i].Get_Longitude();
-                    var latitude = xDocks[i].Get_Latitude();
-                    var dist_thres = xDocks[i].Get_Distance_Threshold();
-                    var capacity = 400000;
-                    var already_opened = true;
-                    var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
-                    potential_hub_locations.Add(open_hub);
+                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 400000);
                 }
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
-                    var city = xDocks[i].Get_City();
-                    var district = xDocks[i].Get_District();
-                    var id = xDocks[i].Get_Id();
-                    var region = xDocks[i].Get_Region();
-                    var longitude = xDocks[i].Get_Longitude();
-                    var latitude = xDocks[i].Get_Latitude();
-                    var dist_thres = xDocks[i].Get_Distance_Threshold();
-                    var capacity = 200000;
-                    var already_opened = true;
-                    var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
-                    potential_hub_locations.Add(open_hub);
+                    Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 200000);
                 }
             }
-           
         }
 
         private Tuple<List<Seller>,List<Seller>> Second_Phase()
