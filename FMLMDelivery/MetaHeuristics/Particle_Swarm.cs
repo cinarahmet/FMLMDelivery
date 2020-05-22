@@ -85,7 +85,7 @@ namespace FMLMDelivery.MetaHeuristics
         {
             var xDocks = new List<xDocks>();
             Console.WriteLine("sc burdayım1");
-            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, 3600, true);
+            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01, 3600, true);
             model.Run();
             Console.WriteLine("sc burdayım2");
             var is_feasible = model.Return_Status();
@@ -99,7 +99,7 @@ namespace FMLMDelivery.MetaHeuristics
                     while (!is_feasible)
                     {
                         (new_particle, xDocks) = Create_New_Particle();
-                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, 3600, true);
+                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01, 3600, true);
                         model1.Run();
                         new_particle.IsFeasible = model1.Return_Status();
                         new_particle.Fitness = model1.GetObjVal();
@@ -303,7 +303,7 @@ namespace FMLMDelivery.MetaHeuristics
             {
 
                 var new_xDocks_2 = Update_Open_xDock(particle);
-                var model = new DemandxDockModel(_demand_Points, new_xDocks_2, _key, false, false, _lm_coverage, 1250, false, _num_xDock, false, 0.01, 3600, true);
+                var model = new DemandxDockModel(_demand_Points, new_xDocks_2, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01, 3600, true);
                 model.Run();
                 particle.Fitness = model.GetObjVal();
                 particle.IsFeasible = model.Return_Status();

@@ -19,8 +19,6 @@ namespace FMLMDelivery.Classes
 
         private List<List<double>> a;
 
-        private double _threshold_demand;
-
         private double _num_of_demand_points;
 
         private double _num_of_xDocks;
@@ -29,7 +27,7 @@ namespace FMLMDelivery.Classes
 
         private List<Double> already_open_demand_list = new List<double>();
 
-        public PointEliminator(List<DemandPoint> demandPoints, List<xDocks> xDocks, double threshold_demand)
+        public PointEliminator(List<DemandPoint> demandPoints, List<xDocks> xDocks)
         {
 
             _whole_demand_points = demandPoints;
@@ -39,9 +37,6 @@ namespace FMLMDelivery.Classes
             a = new List<List<double>>();
             demand_list = new List<double>();
 
-            
-            _threshold_demand = threshold_demand;
-
             _num_of_demand_points = _whole_demand_points.Count;
             _num_of_xDocks = _whole_xDocks.Count();
         }
@@ -49,31 +44,35 @@ namespace FMLMDelivery.Classes
         private void Uptade_Candidate_xDocks()
         {
             var count = 0;
-            for (int i = 0; i < _num_of_demand_points; i++)
+            for (int j = 0; j < _whole_xDocks.Count; j++)
             {
-                if (demand_list[i] <= _threshold_demand)
+                for (int i = 0; i < _num_of_demand_points; i++)
                 {
-                    count += 1;
-                    var item_to_remove = _whole_xDocks.SingleOrDefault(x => (x.Get_Id() == _whole_demand_points[i].Get_Id()) && (x.Get_District() == _whole_demand_points[i].Get_District()) && x.Get_City() == _whole_demand_points[i].Get_City());
-                    _whole_xDocks.Remove(item_to_remove);
+                    if (_whole_demand_points[i].Get_District()==_whole_xDocks[j].Get_District() && _whole_demand_points[i].Get_Id()==_whole_xDocks[j].Get_Id())
+                    {
+                        if (demand_list[i] <= _whole_xDocks[j].Get_Min_Cap())
+                        {
+                            count += 1;
+                            var item_to_remove = _whole_xDocks.SingleOrDefault(x => (x.Get_Id() == _whole_demand_points[i].Get_Id()) && (x.Get_District() == _whole_demand_points[i].Get_District()) && x.Get_City() == _whole_demand_points[i].Get_City());
+                            _whole_xDocks.Remove(item_to_remove);
+                        }
+                    }
                 }
             }
+            
             var count_2 = 0;
             for (int j = 0; j < _whole_xDocks.Count; j++)
             {
                 if (_whole_xDocks[j].If_Already_Opened())
                 {
-                    if (already_open_demand_list[count_2] <= _threshold_demand)
+                    if (already_open_demand_list[count_2] <= _whole_xDocks[j].Get_Min_Cap())
                     {
                         var remove_item = _whole_xDocks.SingleOrDefault(x => (x.Get_Id() == _whole_xDocks[j].Get_Id()) && (x.Get_District() == _whole_xDocks[j].Get_District()) && x.Get_City() == _whole_xDocks[j].Get_City());
                         _whole_xDocks.Remove(remove_item);
                     }
                     count_2 += 1;
                 }
-                
             }
-            
-            
         }
 
         public List<xDocks> Return_Filtered_xDocx_Locations()

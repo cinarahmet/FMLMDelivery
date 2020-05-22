@@ -21,6 +21,7 @@ namespace Core_Form
         private string parameter_file = "";
         private String directory = "";
         private Boolean partial_solution = new Boolean();
+        private string direct_initial = "";
         
         public Network_Design_Form_Core()
         {
@@ -81,17 +82,17 @@ namespace Core_Form
         }
         private void Demand_box_Click(object sender, EventArgs e)
         {
-            openFileDialog1.ShowDialog();
             openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.ShowDialog();
             openFileDialog1.RestoreDirectory = true;
-            var direct = openFileDialog1.FileName;
-            Demand_box.Text = direct;
+            direct_initial = openFileDialog1.FileName;
+            Demand_box.Text = direct_initial;
         }
 
         private void Pot_xdock_box_Click(object sender, EventArgs e)
         {
+            openFileDialog1.InitialDirectory = direct_initial;
             openFileDialog1.ShowDialog();
-            openFileDialog1.InitialDirectory = @"C:\";
             openFileDialog1.RestoreDirectory = true;
             var direct = openFileDialog1.FileName;
             Pot_xDock_Box.Text = direct;
@@ -100,8 +101,8 @@ namespace Core_Form
 
         private void Seller_box_Click(object sender, EventArgs e)
         {
+            openFileDialog1.InitialDirectory = direct_initial;
             openFileDialog1.ShowDialog();
-            openFileDialog1.InitialDirectory = @"C:\";
             openFileDialog1.RestoreDirectory = true;
             var direct = openFileDialog1.FileName;
             Seller_Box.Text = direct;
@@ -109,8 +110,8 @@ namespace Core_Form
 
         private void Parameter_box_Click(object sender, EventArgs e)
         {
+            openFileDialog1.InitialDirectory = direct_initial;
             openFileDialog1.ShowDialog();
-            openFileDialog1.InitialDirectory = @"C:\";
             openFileDialog1.RestoreDirectory = true;
             var direct = openFileDialog1.FileName;
             Parameter_Box.Text = direct;
@@ -118,8 +119,8 @@ namespace Core_Form
 
         private void Presolved_box_Click(object sender, EventArgs e)
         {
+            openFileDialog1.InitialDirectory = direct_initial;
             openFileDialog1.ShowDialog();
-            openFileDialog1.InitialDirectory = @"C:\";
             openFileDialog1.RestoreDirectory = true;
             var direct = openFileDialog1.FileName;
             Presolved_box.Text = direct;

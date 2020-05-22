@@ -203,8 +203,9 @@ public class CSVReader
                 var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                 var Already_Opened = Convert.ToBoolean(line[7], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xdock_demand, Already_Opened, type_value);
+                var xDock_min_cap = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                var xdock_demand = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold,xDock_min_cap, xdock_demand, Already_Opened, type_value);
                 _partial_xdocks.Add(xDock);
             }
         }
@@ -246,6 +247,7 @@ public class CSVReader
                 var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                 var xDock_dist_threshold = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                var xDock_min_cap = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
                 if (xDock_dist_threshold == 0.0)
                 {
                     xDock_dist_threshold = region_xDock_threshold[xDock_region];
@@ -257,11 +259,11 @@ public class CSVReader
                     xDock_Already_Opened = true;
                 }
 
-                var xDock_Capacity = Convert.ToDouble(line[_month + 1]);
+                var xDock_Capacity = Convert.ToDouble(line[_month + 2]);
                 
                 if (xDock_Capacity > scope_out_threshold)
                 {
-                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_Capacity, xDock_Already_Opened,type_value);
+                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold,xDock_min_cap, xDock_Capacity, xDock_Already_Opened,type_value);
                     if (type_value)
                     {
                         _agency.Add(xDock);
