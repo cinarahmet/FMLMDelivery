@@ -17,7 +17,7 @@ namespace FMLMDelivery.MetaHeuristics
         private List<Int32> already_open_list = new List<Int32>();
         private Double crossover_probability = 0.70;
         private Double mutation_probability = 0.70;
-        private Int32 elitist_size = 5;
+        private Int32 elitist_size = 2;
         private Random rand = new Random();
         private Int32 chromosome_length;
         private Int32 iteration_count = 1000;
@@ -76,7 +76,7 @@ namespace FMLMDelivery.MetaHeuristics
         {
             var xDocks = new List<xDocks>();
             var obj_value_for_chromosome = 0.0;
-            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, min_cap,false, _num_xDock,false, 0.04,60, true,heuristic_name);
+            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, min_cap,false, _num_xDock,false, 0.01,10, true);
             model.Run();
             var is_feasible = model.Return_Status();
             if (!is_feasible)
@@ -88,7 +88,7 @@ namespace FMLMDelivery.MetaHeuristics
                     while (!is_feasible)
                     {
                         (new_choromosome,xDocks) = Create_New_Choromosome();
-                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04,60, true,heuristic_name);
+                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.01,10, true);
                         model1.Run();
                         is_feasible = model1.Return_Status();
                         obj_value_for_chromosome = model1.GetObjVal();
@@ -541,7 +541,7 @@ namespace FMLMDelivery.MetaHeuristics
             }
             Console.WriteLine("Finish");
             var xDocks = Update_Open_xDock(best_solution);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.04, 30 ,true,heuristic_name);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.01, 30 ,true);
             model.Run();
             var a = model.GetObjVal();
             var final_xDocks = model.Return_XDock();

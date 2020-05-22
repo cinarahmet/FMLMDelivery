@@ -229,9 +229,11 @@ public class DemandxDockModel
 
     private Double gap_to_send = new double();
 
-    private String _heuristic_name = "";
+    private Boolean _issa_call_back;
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage,Double min_xdock_cap, Boolean Phase2, Double P,Boolean second_part, double Gap, long Timelimit,Boolean xDocks_located = false, String heuristic_name = "", Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    private List<List<Double>> new_population = new List<List<double>>();
+
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Double min_xdock_cap, Boolean Phase2, Double P, Boolean second_part, double Gap, long Timelimit, Boolean xDocks_located = false, Boolean call_back = false, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _gap = Gap;
         _solver = new Cplex();
@@ -254,6 +256,7 @@ public class DemandxDockModel
         _second_part = second_part;
         _min_xDock_cap = min_xdock_cap;
         _xDocks_located = xDocks_located;
+        _issa_call_back = call_back;
         
 
         x = new List<List<INumVar>>();
@@ -274,7 +277,6 @@ public class DemandxDockModel
         normalized_demand = new List<double>();
         record_stats = new List<String>();
         _location = key;
-        _heuristic_name = heuristic_name;
     }
 
     public Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
@@ -773,13 +775,21 @@ public class DemandxDockModel
         var startTime = DateTime.Now;
         var incumb = new double[y.Count];
         var incumb2 = new List<List<double>>();
-        var callback = new Call_Back(y, incumb,_heuristic_name);
-        if (!_min_xDock_model && !_xDocks_located)
+        var callback = new Call_Back(y, incumb);
+        if (_issa_call_back)
         {
             _solver.Use(callback);
             _solver.Solve();
-            solution_to_send = callback.Get_Partial_Solution().ToList();
-            gap_to_send = callback.Get_Gap();
+            double[][] population_array = callback.Get_Population();
+            for (int i = 0; i < population_array.Length; i++)
+            {
+                if (population_array[i] != null)
+                {
+                    new_population.Add(population_array[i].ToList());
+                }
+            }
+            //solution_to_send = callback.Get_Partial_Solution().ToList();
+            //gap_to_send = callback.Get_Gap();
         }
         else
         {

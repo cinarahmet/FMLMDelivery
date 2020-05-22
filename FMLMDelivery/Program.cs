@@ -12,7 +12,6 @@ namespace FMLMDelivery
     {
         static void Main(string[] args)
         {
-            
             var demand_point = new List<DemandPoint>();
             var potential_xDocks = new List<xDocks>();
             var xDocks = new List<xDocks>();
@@ -37,7 +36,7 @@ namespace FMLMDelivery
             var prior_big_sellers = reader.Get_Prior_Big_Sellers();
             var regular_big_sellers = reader.Get_Regular_Big_Sellers();
             var parameter_list = reader.Get_Parameter_List();
-            var partial_solution = false;
+            var partial_solution = true;
             
             if (!partial_solution)
             {
