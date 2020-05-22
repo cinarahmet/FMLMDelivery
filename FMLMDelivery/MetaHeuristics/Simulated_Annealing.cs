@@ -94,14 +94,6 @@ namespace FMLMDelivery.MetaHeuristics
                 }
 
             }
-            for (int i = 0; i < _parameters.Count; i++)
-            {
-                if (_parameters[i].Get_Key() == located_xdocks[0].Get_City())
-                {
-                    min_cap = _parameters[i].Get_Min_Cap();
-                }
-            }
-
             var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.05, 20, true);
             assignment.Run();
             _objective = assignment.GetObjVal();

@@ -194,7 +194,7 @@ namespace FMLMDelivery.MetaHeuristics
                     {
                         if (_parameters[k].Get_Key() == _pairs[i].Get_xDock().Get_City())
                         {
-                            if (_parameters[k].Get_Min_Cap() > demand) is_feasible = false;
+                            if (_pairs[i].Get_xDock().Get_Min_Cap() > demand) is_feasible = false;
                         }
                     }
                 }

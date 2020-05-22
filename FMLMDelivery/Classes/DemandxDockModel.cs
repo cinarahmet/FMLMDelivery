@@ -233,7 +233,7 @@ public class DemandxDockModel
 
     private List<List<Double>> new_population = new List<List<double>>();
 
-    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Double min_xdock_cap, Boolean Phase2, Double P, Boolean second_part, double Gap, long Timelimit, Boolean xDocks_located = false, Boolean call_back = false, Boolean cost_incurred = false, Boolean capacity_incurred=false)
+    public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Double P, Boolean second_part, double Gap, long Timelimit, Boolean xDocks_located = false, Boolean call_back = false, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
         _gap = Gap;
         _solver = new Cplex();
@@ -254,7 +254,6 @@ public class DemandxDockModel
         _initial_xDocks = new List<double>();
         _initial_assignments = new List<double>();
         _second_part = second_part;
-        _min_xDock_cap = min_xdock_cap;
         _xDocks_located = xDocks_located;
         _issa_call_back = call_back;
         
@@ -321,6 +320,7 @@ public class DemandxDockModel
                     var demand = 0.0;
                     var already_opened = _xDocks[j].If_Already_Opened();
                     var is_agency = _xDocks[j].If_Agency();
+                    var min_cap = _xDocks[j].Get_Min_Cap();
                     for (int i = 0; i < _num_of_demand_point; i++)
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
@@ -328,7 +328,7 @@ public class DemandxDockModel
                             demand += _demandpoint[i].Get_Demand();
                         }
                     }
-                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold,demand,already_opened,is_agency);
+                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold, min_cap,demand, already_opened,is_agency);
                     new_XDocks.Add(x_Dock);
 
                 }
@@ -888,7 +888,7 @@ public class DemandxDockModel
                 constraint.AddTerm(x[i][j], a[i][j] * demand_of_demand_point[i]);
             }
             
-            constraint.AddTerm(y[j], -_min_xDock_cap);
+            constraint.AddTerm(y[j], -_xDocks[j].Get_Min_Cap());
            
             _solver.AddGe(constraint, 0);
         }

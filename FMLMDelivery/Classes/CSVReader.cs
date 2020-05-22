@@ -220,11 +220,10 @@ public class CSVReader
             while ((s = sr.ReadLine()) != null)
             {
                 var line = s.Split(',');
-                var distinct_city = line[0];                
-                var min_cap = Convert.ToDouble(line[1], System.Globalization.CultureInfo.InvariantCulture);
-                var size = line[2];
-                var active= Convert.ToBoolean(Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture));
-                var parameter = new Parameters(distinct_city, min_cap,size, active);
+                var distinct_city = line[0];
+                var size = line[1];
+                var active= Convert.ToBoolean(Convert.ToDouble(line[2], System.Globalization.CultureInfo.InvariantCulture));
+                var parameter = new Parameters(distinct_city,size, active);
                 _parameters.Add(parameter);
             }
         }

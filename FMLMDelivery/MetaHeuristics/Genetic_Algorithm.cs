@@ -40,7 +40,7 @@ namespace FMLMDelivery.MetaHeuristics
         {
             chromosome_length = _xDocks.Count;
             var index = parameters.FindIndex(x => x.Get_Key().Equals(key));
-            min_cap = parameters[index].Get_Min_Cap();
+            //min_cap = parameters[index].Get_Min_Cap();
         }
 
 
@@ -76,7 +76,7 @@ namespace FMLMDelivery.MetaHeuristics
         {
             var xDocks = new List<xDocks>();
             var obj_value_for_chromosome = 0.0;
-            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage, min_cap,false, _num_xDock,false, 0.01,10, true);
+            var model = new DemandxDockModel(_demand_Points, opened_xDocks, _key,false, false, _lm_coverage,false, _num_xDock,false, 0.01,10, true);
             model.Run();
             var is_feasible = model.Return_Status();
             if (!is_feasible)
@@ -88,7 +88,7 @@ namespace FMLMDelivery.MetaHeuristics
                     while (!is_feasible)
                     {
                         (new_choromosome,xDocks) = Create_New_Choromosome();
-                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.01,10, true);
+                        var model1 = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01,10, true);
                         model1.Run();
                         is_feasible = model1.Return_Status();
                         obj_value_for_chromosome = model1.GetObjVal();
@@ -474,7 +474,7 @@ namespace FMLMDelivery.MetaHeuristics
         private Double Test_Chromosome_Evaluation(List<Double> chromosome)
         {
             var xDocks = Update_Open_xDock(chromosome);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.01, 30 ,true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01, 30 ,true);
             model.Run();
             var a = model.GetObjVal();
             return a;
@@ -541,7 +541,7 @@ namespace FMLMDelivery.MetaHeuristics
             }
             Console.WriteLine("Finish");
             var xDocks = Update_Open_xDock(best_solution);
-            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, min_cap, false, _num_xDock, false, 0.01, 30 ,true);
+            var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01, 30 ,true);
             model.Run();
             var a = model.GetObjVal();
             var final_xDocks = model.Return_XDock();

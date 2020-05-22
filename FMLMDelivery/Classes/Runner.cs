@@ -58,7 +58,7 @@ namespace FMLMDelivery.Classes
             _only_cities = only_cities;
         }
 
-        private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, Double min_xDock_cap, String key,double gap)
+        private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, String key,double gap)
         {   var stats = new List<String>();
             var _demand_points = demandPoints;
             var _pot_xDocks = xDocks;
@@ -72,13 +72,13 @@ namespace FMLMDelivery.Classes
             var new_xDocks = new List<xDocks>();
             var potential_Hubs = new List<Hub>(); 
             var p = 0;
-            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p,false, gap, 3600);
+            var first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, p,false, gap, 3600);
             first_phase.Run();
             var _status_check = first_phase.Return_Status();
             while (!_status_check)
             {
                 demand_covarage -= 0.01;
-                first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, p, false, gap,3600);
+                first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, p, false, gap,3600);
                 first_phase.Run();
                 _status_check = first_phase.Return_Status();
             }
@@ -116,7 +116,7 @@ namespace FMLMDelivery.Classes
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, min_xDock_cap, phase_2, min_num, true,gap,3600,false,true);
+            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true,gap,3600,false,true);
             first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
@@ -150,13 +150,13 @@ namespace FMLMDelivery.Classes
             return Tuple.Create(city_points, pot_xDock_loc);
         }
 
-        private void Partial_Run(string key, double min_xDock_capacity, double demand_coverage, double gap)
+        private void Partial_Run(string key, double demand_coverage, double gap)
         {
             (city_points, pot_xDock_loc) = Get_City_Information(key);
-            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc, min_xDock_capacity);
+            var elimination_phase = new PointEliminator(city_points, pot_xDock_loc);
             elimination_phase.Run();
             pot_xDock_loc = elimination_phase.Return_Filtered_xDocx_Locations();
-            (temp_xDocks, temp_hubs, temp_writer, temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage, min_xDock_capacity, key, gap);
+            (temp_xDocks, temp_hubs, temp_writer, temp_stats) = Run_Demand_Point_xDock_Model(city_points, pot_xDock_loc, demand_coverage, key, gap);
             stats_writer.AddRange(temp_stats);
             new_xDocks.AddRange(temp_xDocks);
             potential_hub_locations.AddRange(temp_hubs);
@@ -275,7 +275,7 @@ namespace FMLMDelivery.Classes
                 {
                     if (_parameters[i].Get_Activation())
                     {
-                        Partial_Run(_parameters[i].Get_Key(), _parameters[i].Get_Min_Cap(), 1.0, Gap_Converter_1(_parameters[i].Get_Size()));
+                        Partial_Run(_parameters[i].Get_Key(), 1.0, Gap_Converter_1(_parameters[i].Get_Size()));
                     }
                 }
                 var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Uzaklık,Talep Noktası Talebi";
