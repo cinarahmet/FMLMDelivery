@@ -10,6 +10,7 @@ using System.Device.Location;
 using System.Linq;
 using FMLMDelivery;
 using FMLMDelivery.MetaHeuristics;
+using MLMDelivery.Classes;
 
 /// <summary>
 /// IMPORTANT !!!!!!!!!
@@ -232,6 +233,7 @@ public class DemandxDockModel
     private Boolean _issa_call_back;
 
     private List<List<Double>> new_population = new List<List<double>>();
+    internal Cplex solver;
 
     public DemandxDockModel(List<DemandPoint> Demand_Points, List<xDocks> xDocks, string key, Boolean Demandweight, Boolean min_hub_model, Double Demand_Covarage, Boolean Phase2, Double P, Boolean second_part, double Gap, long Timelimit, Boolean xDocks_located = false, Boolean call_back = false, Boolean cost_incurred = false, Boolean capacity_incurred=false)
 	{
@@ -788,8 +790,6 @@ public class DemandxDockModel
                     new_population.Add(population_array[i].ToList());
                 }
             }
-            //solution_to_send = callback.Get_Partial_Solution().ToList();
-            //gap_to_send = callback.Get_Gap();
         }
         else
         {

@@ -43,9 +43,6 @@ namespace Framework_Form
         {
 
         }
-
-      
-
         private void Demand_box_Click(object sender, EventArgs e)
         {
 
@@ -72,6 +69,16 @@ namespace Framework_Form
         }
 
         private void Outbut_loc_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void no_button_CheckedChanged(object sender, EventArgs e)
         {
 
         }

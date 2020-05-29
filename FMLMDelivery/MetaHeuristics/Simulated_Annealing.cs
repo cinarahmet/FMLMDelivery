@@ -10,16 +10,16 @@ namespace FMLMDelivery.MetaHeuristics
     
     public class Simulated_Annealing : Heuristic
     {
-        private Double iteration = 1500;
-        private Double Temperature=500000;
-        private Double count_temp = 30;
+        private Double iteration = 10000;
+        private Double Temperature=5000000;
+        private Double count_temp = 5;
         private Double nofeas_iteration = 500;
-        private double alpha_temp=0.95;
+        private double alpha_temp=0.99;
         private double alpha_km = 0.0001;
         private double diversification_km = 30;
-        private Double intensification_km=10;
+        private Double intensification_km=5;
         private Double lb_intens = 2;
-        private Boolean version1 = true;
+        private Boolean version1 = false;
         private List<xDock_Demand_Point_Pairs> candidate_pairs = new List<xDock_Demand_Point_Pairs>();
         private double objective = new Double();
         private bool status = new bool();
@@ -94,7 +94,7 @@ namespace FMLMDelivery.MetaHeuristics
                 }
 
             }
-            var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.05, 20, true);
+            var assignment = new DemandxDockModel(_demand_Points, located_xdocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.05, 30, true);
             assignment.Run();
             _objective = assignment.GetObjVal();
             _status = assignment.Return_Status();

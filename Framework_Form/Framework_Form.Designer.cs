@@ -28,11 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Network_Design_Form));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.run_option_group_box = new System.Windows.Forms.GroupBox();
-            this.no_button = new System.Windows.Forms.RadioButton();
-            this.yes_button = new System.Windows.Forms.RadioButton();
+            this.Run_CitybyCity = new System.Windows.Forms.RadioButton();
+            this.Partial_Run = new System.Windows.Forms.RadioButton();
+            this.Full_Run = new System.Windows.Forms.RadioButton();
             this.send_button = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
@@ -44,8 +46,8 @@
             this.month_label = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.input_files_parameters = new System.Windows.Forms.GroupBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.Month_Selected = new System.Windows.Forms.ComboBox();
+            this.Hub_Cov_Box = new System.Windows.Forms.TextBox();
             this.Presolved_box = new System.Windows.Forms.TextBox();
             this.Parameter_Box = new System.Windows.Forms.TextBox();
             this.Seller_Box = new System.Windows.Forms.TextBox();
@@ -54,6 +56,10 @@
             this.Outbut_loc = new System.Windows.Forms.TextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip3 = new System.Windows.Forms.ToolTip(this.components);
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.run_option_group_box.SuspendLayout();
             this.input_files_parameters.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -62,45 +68,63 @@
             // run_option_group_box
             // 
             this.run_option_group_box.BackColor = System.Drawing.Color.White;
-            this.run_option_group_box.Controls.Add(this.no_button);
-            this.run_option_group_box.Controls.Add(this.yes_button);
+            this.run_option_group_box.Controls.Add(this.Run_CitybyCity);
+            this.run_option_group_box.Controls.Add(this.Partial_Run);
+            this.run_option_group_box.Controls.Add(this.Full_Run);
             this.run_option_group_box.Location = new System.Drawing.Point(692, 82);
             this.run_option_group_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.run_option_group_box.Name = "run_option_group_box";
             this.run_option_group_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.run_option_group_box.Size = new System.Drawing.Size(659, 141);
+            this.run_option_group_box.Size = new System.Drawing.Size(574, 224);
             this.run_option_group_box.TabIndex = 1;
             this.run_option_group_box.TabStop = false;
             this.run_option_group_box.Text = "Model Tipi ";
             // 
-            // no_button
+            // Run_CitybyCity
             // 
-            this.no_button.AutoSize = true;
-            this.no_button.Location = new System.Drawing.Point(391, 55);
-            this.no_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.no_button.Name = "no_button";
-            this.no_button.Size = new System.Drawing.Size(244, 24);
-            this.no_button.TabIndex = 1;
-            this.no_button.TabStop = true;
-            this.no_button.Text = "Xdock-Tedarikçi-Hub Ataması";
-            this.no_button.UseVisualStyleBackColor = true;
+            this.Run_CitybyCity.AutoSize = true;
+            this.Run_CitybyCity.Location = new System.Drawing.Point(24, 58);
+            this.Run_CitybyCity.Name = "Run_CitybyCity";
+            this.Run_CitybyCity.Size = new System.Drawing.Size(190, 24);
+            this.Run_CitybyCity.TabIndex = 2;
+            this.Run_CitybyCity.TabStop = true;
+            this.Run_CitybyCity.Text = "İl Bazlı xDock Ataması";
+            this.toolTip1.SetToolTip(this.Run_CitybyCity, resources.GetString("Run_CitybyCity.ToolTip"));
+            this.Run_CitybyCity.UseVisualStyleBackColor = true;
+            this.Run_CitybyCity.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
-            // yes_button
+            // Partial_Run
             // 
-            this.yes_button.AutoSize = true;
-            this.yes_button.Location = new System.Drawing.Point(8, 55);
-            this.yes_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.yes_button.Name = "yes_button";
-            this.yes_button.Size = new System.Drawing.Size(348, 24);
-            this.yes_button.TabIndex = 0;
-            this.yes_button.TabStop = true;
-            this.yes_button.Text = "Talep Noktası-xDock-Tedarikçi-Hub Ataması ";
-            this.yes_button.UseVisualStyleBackColor = true;
-            this.yes_button.CheckedChanged += new System.EventHandler(this.yes_button_CheckedChanged);
+            this.Partial_Run.AutoSize = true;
+            this.Partial_Run.Location = new System.Drawing.Point(24, 174);
+            this.Partial_Run.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Partial_Run.Name = "Partial_Run";
+            this.Partial_Run.Size = new System.Drawing.Size(244, 24);
+            this.Partial_Run.TabIndex = 1;
+            this.Partial_Run.TabStop = true;
+            this.Partial_Run.Text = "Xdock-Tedarikçi-Hub Ataması";
+            this.toolTip3.SetToolTip(this.Partial_Run, resources.GetString("Partial_Run.ToolTip"));
+            this.Partial_Run.UseVisualStyleBackColor = true;
+            this.Partial_Run.CheckedChanged += new System.EventHandler(this.no_button_CheckedChanged);
+            // 
+            // Full_Run
+            // 
+            this.Full_Run.AutoSize = true;
+            this.Full_Run.Location = new System.Drawing.Point(24, 114);
+            this.Full_Run.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Full_Run.Name = "Full_Run";
+            this.Full_Run.Size = new System.Drawing.Size(348, 24);
+            this.Full_Run.TabIndex = 0;
+            this.Full_Run.TabStop = true;
+            this.Full_Run.Text = "Talep Noktası-xDock-Tedarikçi-Hub Ataması ";
+            this.toolTip2.SetToolTip(this.Full_Run, "Bu modelde verilen iller kapsamında xDock alokasyonu, Hub \r\naloksayonu, Büyük ve " +
+        "küçük tedarikçi atamalarını gerçekleştirir.\r\n");
+            this.Full_Run.UseVisualStyleBackColor = true;
+            this.Full_Run.CheckedChanged += new System.EventHandler(this.yes_button_CheckedChanged);
             // 
             // send_button
             // 
-            this.send_button.Location = new System.Drawing.Point(599, 630);
+            this.send_button.Location = new System.Drawing.Point(600, 636);
             this.send_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.send_button.Name = "send_button";
             this.send_button.Size = new System.Drawing.Size(147, 61);
@@ -178,9 +202,9 @@
             this.month_label.Location = new System.Drawing.Point(9, 369);
             this.month_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.month_label.Name = "month_label";
-            this.month_label.Size = new System.Drawing.Size(226, 20);
+            this.month_label.Size = new System.Drawing.Size(113, 20);
             this.month_label.TabIndex = 9;
-            this.month_label.Text = "Çalışılan Ay (1: Ocak, 12:Aralık)";
+            this.month_label.Text = "Çalışılacak Ay :";
             // 
             // label3
             // 
@@ -193,8 +217,8 @@
             // 
             // input_files_parameters
             // 
-            this.input_files_parameters.Controls.Add(this.textBox7);
-            this.input_files_parameters.Controls.Add(this.textBox6);
+            this.input_files_parameters.Controls.Add(this.Month_Selected);
+            this.input_files_parameters.Controls.Add(this.Hub_Cov_Box);
             this.input_files_parameters.Controls.Add(this.Presolved_box);
             this.input_files_parameters.Controls.Add(this.Parameter_Box);
             this.input_files_parameters.Controls.Add(this.Seller_Box);
@@ -216,19 +240,35 @@
             this.input_files_parameters.TabStop = false;
             this.input_files_parameters.Text = "Dökümanlar ve Parametreler";
             // 
-            // textBox7
+            // Month_Selected
             // 
-            this.textBox7.Location = new System.Drawing.Point(340, 428);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(55, 26);
-            this.textBox7.TabIndex = 24;
+            this.Month_Selected.FormattingEnabled = true;
+            this.Month_Selected.Items.AddRange(new object[] {
+            "Ay",
+            "Ocak",
+            "Şubat",
+            "Mart",
+            "Nisan",
+            "Mayıs",
+            "Haziran",
+            "Temmuz",
+            "Ağustos",
+            "Eylül ",
+            "Ekim ",
+            "Kasım ",
+            "Aralık"});
+            this.Month_Selected.Location = new System.Drawing.Point(322, 361);
+            this.Month_Selected.Name = "Month_Selected";
+            this.Month_Selected.Size = new System.Drawing.Size(119, 28);
+            this.Month_Selected.TabIndex = 25;
+            this.Month_Selected.Text = "Ay Seçiniz";
             // 
-            // textBox6
+            // Hub_Cov_Box
             // 
-            this.textBox6.Location = new System.Drawing.Point(340, 363);
-            this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(55, 26);
-            this.textBox6.TabIndex = 23;
+            this.Hub_Cov_Box.Location = new System.Drawing.Point(355, 428);
+            this.Hub_Cov_Box.Name = "Hub_Cov_Box";
+            this.Hub_Cov_Box.Size = new System.Drawing.Size(55, 26);
+            this.Hub_Cov_Box.TabIndex = 24;
             // 
             // Presolved_box
             // 
@@ -284,22 +324,54 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(692, 371);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(608, 209);
+            this.groupBox1.Size = new System.Drawing.Size(574, 209);
             this.groupBox1.TabIndex = 26;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Çıktı Dosyaları";
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.AutoPopDelay = 20000;
+            this.toolTip1.BackColor = System.Drawing.SystemColors.InactiveBorder;
+            this.toolTip1.InitialDelay = 500;
+            this.toolTip1.ReshowDelay = 100;
+            this.toolTip1.ToolTipTitle = "Açıklama";
+            this.toolTip1.UseFading = false;
+            // 
+            // toolTip2
+            // 
+            this.toolTip2.AutoPopDelay = 20000;
+            this.toolTip2.InitialDelay = 500;
+            this.toolTip2.ReshowDelay = 100;
+            this.toolTip2.ToolTipTitle = "Açıklama";
+            this.toolTip2.UseFading = false;
+            // 
+            // toolTip3
+            // 
+            this.toolTip3.AutoPopDelay = 20000;
+            this.toolTip3.InitialDelay = 500;
+            this.toolTip3.ReshowDelay = 100;
+            this.toolTip3.ToolTipTitle = "Açıklama";
+            this.toolTip3.UseFading = false;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(72, 607);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(351, 43);
+            this.progressBar1.TabIndex = 27;
             // 
             // Network_Design_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1356, 743);
+            this.ClientSize = new System.Drawing.Size(1281, 743);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.send_button);
             this.Controls.Add(this.run_option_group_box);
             this.Controls.Add(this.input_files_parameters);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Network_Design_Form";
             this.Text = "Network Design Decision Making Tool";
@@ -317,8 +389,8 @@
         #endregion
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.GroupBox run_option_group_box;
-        private System.Windows.Forms.RadioButton no_button;
-        private System.Windows.Forms.RadioButton yes_button;
+        private System.Windows.Forms.RadioButton Partial_Run;
+        private System.Windows.Forms.RadioButton Full_Run;
         private System.Windows.Forms.Button send_button;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
@@ -330,8 +402,7 @@
         private System.Windows.Forms.Label month_label;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox input_files_parameters;
-        private System.Windows.Forms.TextBox textBox7;
-        private System.Windows.Forms.TextBox textBox6;
+        private System.Windows.Forms.TextBox Hub_Cov_Box;
         private System.Windows.Forms.TextBox Presolved_box;
         private System.Windows.Forms.TextBox Parameter_Box;
         private System.Windows.Forms.TextBox Seller_Box;
@@ -340,6 +411,12 @@
         private System.Windows.Forms.TextBox Outbut_loc;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton Run_CitybyCity;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ToolTip toolTip3;
+        private System.Windows.Forms.ToolTip toolTip2;
+        private System.Windows.Forms.ComboBox Month_Selected;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 

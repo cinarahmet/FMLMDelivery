@@ -6,12 +6,15 @@ using FMLMDelivery;
 using FMLMDelivery.Classes;
 using System.IO;
 using FMLMDelivery.MetaHeuristics;
+using ILOG.CPLEX;
+using System.Threading.Tasks;
+using MLMDelivery.Classes;
 
 namespace FMLMDelivery.Classes
 {
     public class Runner
     {
-        private Boolean is_genetic = true;
+        private Boolean is_genetic = false;
         private List<xDocks> xDocks;
         private List<DemandPoint> demand_Points;
         private List<xDocks> agency;
@@ -39,7 +42,6 @@ namespace FMLMDelivery.Classes
         private String _output_files;
         private double _hub_demand_coverage;
         private bool _only_cities;
-
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files,double hub_demand_coverage,Boolean only_cities)
         {
             partial_xdocks=_partial_xdocks;
@@ -193,6 +195,9 @@ namespace FMLMDelivery.Classes
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
                     Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 200000);
+                }else if (xDocks[i].Get_District()=="" && xDocks[i].Get_Id() == "")
+                {
+                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 200000);
                 }
             }
         }
