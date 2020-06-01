@@ -112,8 +112,7 @@ namespace FMLMDelivery.Classes
             //var heuristic_particle = new Particle_Swarm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
             //heuristic_particle.Run();
 
-            //Loop_For_Simulated_Annealing(opened_xDocks, _demand_points, _pot_xDocks, demand_covarage, min_xDock_cap, key, gap,min_num);
-
+            
             //Part 2 for county-xDock pair
             min_model_model = false;
             demand_weighted_model = true;
@@ -195,7 +194,7 @@ namespace FMLMDelivery.Classes
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
                     Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 200000);
-                }else if (xDocks[i].Get_District()=="" && xDocks[i].Get_Id() == "")
+                }else if (xDocks[i].Get_District() == "KEMALPAŞA" && xDocks[i].Get_Id() == "KIZILÜZÜM")
                 {
                     Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 200000);
                 }
@@ -225,11 +224,15 @@ namespace FMLMDelivery.Classes
             assigned_regular_sellers = second_phase.Return_Assigned_Seller();
             new_xDocks = second_phase.Return_Updated_xDocks();
             var cov_demand = second_phase.Return_Covered_Demand();
-            //writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
-            //stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
-            //var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
-            //var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header, _output_files);
-            //writer_small_seller.Write_Records();
+            writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
+            stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
+            var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
+            var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
+            var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header, _output_files);
+            var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
+            writer_small_seller.Write_Records();
+            if (_only_cities) stat_writer.Write_Records();
+
 
             return Tuple.Create(assigned_prior_sellers, assigned_regular_sellers);
         }
@@ -253,13 +256,13 @@ namespace FMLMDelivery.Classes
             var objVal = third_phase.GetObjVal();
             new_hubs = third_phase.Return_New_Hubs();
             assigned_big_sellers = third_phase.Return_Assigned_Big_Sellers();
-            //var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub Boylam,Hub Enlem,Atanma Türü,Unique Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
-            //var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
-            //stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
-            //var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub, _output_files);
-            //var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
-            //writer_hub_seller.Write_Records();
-            //stat_writer.Write_Records();
+            var header_hub = "Hub İl,Hub İlçe,Hub Mahalle,Hub Boylam,Hub Enlem,Atanma Türü,Unique Id,İl,İlçe,Mahalle,LM Talep/Gönderi,FM Gönderi,Distance";
+            var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
+            stats_writer.AddRange(third_phase.Get_Xdock_Hub_Stats());
+            var writer_hub_seller = new Csv_Writer(third_phase.Get_Hub_Xdock_Seller_Info(), "Büyük Tedarikçi xDock Hub Atamaları", header_hub, _output_files);
+            var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
+            writer_hub_seller.Write_Records();
+            stat_writer.Write_Records();
 
             return Tuple.Create(new_hubs, assigned_big_sellers);
         }

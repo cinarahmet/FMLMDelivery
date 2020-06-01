@@ -234,13 +234,12 @@ namespace Core_Form
                 var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,directory, hub_demand_coverage,only_cities);
                 (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
                 //Console.ReadKey();
-
             }
             var path = directory + "\\";
             var dirname = new DirectoryInfo(path).Name;
             MessageBoxButtons buttons= MessageBoxButtons.OK;
             MessageBoxIcon icon = MessageBoxIcon.Information;
-            MessageBox.Show("Çalıştırma Bitti! Sonuçları "+dirname+" dosyasında bulabilirsiniz.","Bilgi", buttons,icon);
+            MessageBox.Show("Çalıştırma Bitti! Sonuçları "+"'"+dirname+"'"+" dosyasında bulabilirsiniz.","Bilgi", buttons,icon);
             
         }
     }
