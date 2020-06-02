@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Reflection.PortableExecutable;
-using System.Text;
 using System.IO;
 using ILOG.CPLEX;
 using ILOG.Concert;
 using System.Device.Location;
 using System.Linq;
-using FMLMDelivery;
 using FMLMDelivery.MetaHeuristics;
-using MLMDelivery.Classes;
 
 /// <summary>
 /// IMPORTANT !!!!!!!!!
@@ -19,7 +14,7 @@ using MLMDelivery.Classes;
 public class DemandxDockModel
 {
     private Double max_hub_capacity = 4000000;
-    
+
     /// <summary>
     /// Cplex object
     /// </summary>  

@@ -2,13 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FMLMDelivery;
-using FMLMDelivery.Classes;
-using System.IO;
-using FMLMDelivery.MetaHeuristics;
-using ILOG.CPLEX;
-using System.Threading.Tasks;
-using MLMDelivery.Classes;
+
 
 namespace FMLMDelivery.Classes
 {
@@ -21,7 +15,6 @@ namespace FMLMDelivery.Classes
         private List<Seller> _prior_small_seller;
         private List<Seller> _prior_big_seller;
         private List<Seller> _regular_small_seller;
-        private List<Seller> _regular_big_seller;
         private double total_demand;
         private List<String> writer_seller = new List<String>();
         private List<xDocks>  new_xDocks = new List<xDocks>();
@@ -50,7 +43,6 @@ namespace FMLMDelivery.Classes
             agency = _agency;
             _prior_big_seller = prior_big;
             _prior_small_seller = prior_small;
-            _regular_big_seller = regular_big;
             _regular_small_seller = regular_small;
             _parameters = parameters;
             partial_run = _partial_run;
@@ -117,7 +109,7 @@ namespace FMLMDelivery.Classes
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true,gap,3600,false,true);
+            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true,gap,3600,false);
             first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
             first_phase.Run();
             objVal = first_phase.GetObjVal();
