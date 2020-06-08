@@ -120,7 +120,7 @@
             this.Full_Run.TabStop = true;
             this.Full_Run.Text = "Talep Noktası-xDock-Tedarikçi-Hub Ataması ";
             this.toolTip2.SetToolTip(this.Full_Run, "Bu modelde verilen iller kapsamında xDock alokasyonu, Hub \r\naloksayonu, Büyük ve " +
-        "küçük tedarikçi atamalarını gerçekleştirir.\r\n");
+        "küçük tedarikçi atamalarını gerçekleşir.\r\n");
             this.Full_Run.UseVisualStyleBackColor = true;
             this.Full_Run.CheckedChanged += new System.EventHandler(this.yes_button_CheckedChanged);
             // 
@@ -371,6 +371,7 @@
             this.Name = "Network_Design_Form";
             this.Text = "Network Design Decision Making Tool";
             this.Load += new System.EventHandler(this.Network_Design_Form_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Close_The_Form);
             this.run_option_group_box.ResumeLayout(false);
             this.run_option_group_box.PerformLayout();
             this.input_files_parameters.ResumeLayout(false);

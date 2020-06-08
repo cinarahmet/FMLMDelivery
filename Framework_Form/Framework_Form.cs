@@ -82,5 +82,10 @@ namespace Framework_Form
         {
 
         }
+
+        private void Close_The_Form(object sender, FormClosingEventArgs e)
+        {
+
+        }
     }
 }

@@ -170,6 +170,10 @@ namespace Core_Form
             Presolved_box.Text = direct;
 
         }
+        private void Close_The_Form(object sender, FormClosingEventArgs e)
+        {
+
+        }
 
         private void Outbut_loc_Click(object sender, EventArgs e)
         {
@@ -178,12 +182,7 @@ namespace Core_Form
             var direct = folderBrowserDialog1.SelectedPath;
             Outbut_loc.Text = direct;
         }
-        //private void Directory_Name_Submit_Click(object sender, EventArgs e)
-        //{
-        //    yes_button.Checked = false;            
-        //    yes_button.Enabled = true;
-        //    no_button.Enabled = true;     
-        //}
+        
         private async void send_button_Click(object sender, EventArgs e)
         {
             demand_file = Demand_box.Text ;

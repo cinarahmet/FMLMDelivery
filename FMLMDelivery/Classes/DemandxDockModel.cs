@@ -22,7 +22,7 @@ public class DemandxDockModel
 
     /// <summary>
     /// Number of Xdocks
-    /// </summary>
+    /// </summary>ti
     private readonly Int32 _numOfXdocks;
 
     /// <summary>

@@ -375,6 +375,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Network_Design_Form";
             this.Text = "Network Design Decision Making Tool";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Close_The_Form);
             this.Load += new System.EventHandler(this.Network_Design_Form_Load);
             this.run_option_group_box.ResumeLayout(false);
             this.run_option_group_box.PerformLayout();
