@@ -13,12 +13,13 @@ namespace FMLMDelivery.Classes
 
         private bool _big_mahalle;
 
-        private double Threshold = 120;
-        public Mahalle(String mahalle_id, Double mahalle_demand)
+        private double _threshold = 120;
+        public Mahalle(String mahalle_id, Double mahalle_demand,double threshold)
         {
             _mahalle_id = mahalle_id;
             _mahalle_demand = mahalle_demand;
-            if (_mahalle_demand >= 120)
+            _threshold = threshold;
+            if (_mahalle_demand >= _threshold)
             {
                 _big_mahalle = true;
             }
@@ -36,6 +37,12 @@ namespace FMLMDelivery.Classes
         public void Set_Remaning_Demand(Double extracted)
         {   
             _mahalle_demand = (_mahalle_demand - extracted);
-        }        
+        }
+
+        public Double Return_Mahalle_Demand()
+        {
+            return _mahalle_demand;
+        }
+
     }
 }
