@@ -57,9 +57,6 @@ namespace FMLMDelivery.MetaHeuristics
             }
         }
 
-
-        
-
         protected bool Check_Feasibility()
         {
             var is_feasible = true;
