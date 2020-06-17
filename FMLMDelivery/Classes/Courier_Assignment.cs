@@ -174,6 +174,7 @@ namespace FMLMDelivery.Classes
                     new_courier.Set_Total_Demand(_mahalle_list[i].Return_Mahalle_Demand());
                     new_courier.Demand_From_Mahalle(_mahalle_list[i].Return_Mahalle_Demand());
                     _mahalle_list[i].Set_Remaning_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                    _remaining_demand_list[i].Set_Min_Max_Demand(0);
                     courier_list.Add(new_courier);
                 }
             }
@@ -181,7 +182,24 @@ namespace FMLMDelivery.Classes
 
         private void Complete_Final_Assignments()
         {
-
+            var starting_xdock = new Mahalle(_xDock.Get_Id(), _xDock.Get_Longitude(), _xDock.Get_Latitude(), 0);
+            var keep_on = true;
+            while (keep_on)
+            {
+                var courier_id = $"{"Courier "}{courier_list.Count}";
+                var new_courier = new Courier(courier_id);
+                new_courier = Nearest_Neighbour_Assignment(starting_xdock,new_courier,_threshold);
+                if (new_courier.Return_Total_Demand() != 0)
+                {
+                    courier_list.Add(new_courier);
+                    
+                }
+                else
+                {
+                    keep_on = false;
+                }
+                
+            }
         }
 
         public void Run_Assignment_Procedure()
