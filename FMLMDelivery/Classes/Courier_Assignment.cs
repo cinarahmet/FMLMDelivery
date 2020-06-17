@@ -68,11 +68,6 @@ namespace FMLMDelivery.Classes
                     for (int j = 0; j < loop_until; j++)
                     {
                         demand_count += _threshold;
-                        var courier_mahalle = _mahalle_list[i];
-                        var number_courier = $"{"Courier "}{courier_list.Count}";
-                        var new_courier = new Courier(number_courier);
-                        new_courier.Add_Mahalle_To_Courier(courier_mahalle);
-                        courier_list.Add(new_courier);
                     }
                     var mahalle_id = _mahalle_list[i].Return_Mahalle_Id();
                     var min_demand = _mahalle_list[i].Return_Mahalle_Demand() - demand_count;
@@ -128,9 +123,7 @@ namespace FMLMDelivery.Classes
                             }
                         }
                     }
-
                 }
-
             }
             return courier;
         }
@@ -143,6 +136,27 @@ namespace FMLMDelivery.Classes
                     var courier = new Courier($"{"Courier "}{courier_list.Count}");
                     var upper_bound = _threshold - _remaining_demand_list[i].Get_Min_Demand();
                     courier = Nearest_Neighbour_Assignment(_mahalle_list[i], courier, upper_bound);
+                    var total_demand_of_neighborhood = _mahalle_list[i].Return_Mahalle_Demand();
+                    var assigned_demand_from_big_neighborhood = Math.Min(_remaining_demand_list[i].Get_Max_Demand(), _threshold - courier.Return_Total_Demand());
+                    var remaining_demand_big_neighborhood = total_demand_of_neighborhood - assigned_demand_from_big_neighborhood;
+                    var count = Convert.ToDouble(Math.Floor(total_demand_of_neighborhood / _threshold));
+                    var demand_of_courier = remaining_demand_big_neighborhood / count;
+                    for (int j = 0; j < count; j++)
+                    {
+                        var courier_mahalle = _mahalle_list[i];
+                        var number_courier = $"{"Courier "}{courier_list.Count}";
+                        var new_courier = new Courier(number_courier);
+                        new_courier.Add_Mahalle_To_Courier(courier_mahalle);
+                        new_courier.Demand_From_Mahalle(demand_of_courier);
+                        new_courier.Set_Total_Demand(demand_of_courier);
+                        courier_list.Add(new_courier);
+                    }
+                    courier.Add_Mahalle_To_Courier(_mahalle_list[i]);
+                    courier.Demand_From_Mahalle(assigned_demand_from_big_neighborhood);
+                    courier.Set_Total_Demand(assigned_demand_from_big_neighborhood);
+                    courier_list.Add(courier);
+                    _mahalle_list[i].Set_Remaning_Demand(total_demand_of_neighborhood);
+                    _remaining_demand_list[i].Set_Min_Max_Demand(0);
                     Console.WriteLine("dcsv");
                 }
             }
