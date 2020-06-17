@@ -29,13 +29,13 @@ namespace FMLMDelivery.Classes
             _mahalle_list.Add(mahalle);
         }
 
-        public void Add_To_Total(Double addition)
-        {
-            _total_demand = _total_demand + addition;
-        }
         public void Demand_From_Mahalle(Double demand)
         {
             _demand_from_mahalle.Add(demand);
+        }
+        public Double Return_Total_Demand()
+        {
+            return _total_demand;
         }
     }
 }

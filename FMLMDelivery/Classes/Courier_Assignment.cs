@@ -15,15 +15,17 @@ namespace FMLMDelivery.Classes
         private Double _courier_max_cap;
         private Double _courier_min_cap;
         private Double _threshold;
-        private List<Courier> courier_list=new List<Courier>();
+        private Double compensation_parameter = 2;
+        private List<Courier> courier_list = new List<Courier>();
         private List<List<Double>> _distance_matrix = new List<List<double>>();
+        private List<Distance_Class> _all_distances = new List<Distance_Class>();
         private List<Remaining_Demand_List> _remaining_demand_list = new List<Remaining_Demand_List>();
 
         public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_max_cap, Double courier_min_cap, Double threshold)
         {
             _xDock = xDock;
             //Sort Descending Order
-            _mahalle_list = mahalles.OrderByDescending(x => x.Return_Mahalle_Demand()).ToList(); 
+            _mahalle_list = mahalles.OrderByDescending(x => x.Return_Mahalle_Demand()).ToList();
             _courier_max_cap = courier_max_cap;
             _courier_min_cap = courier_min_cap;
             _threshold = threshold;
@@ -31,7 +33,7 @@ namespace FMLMDelivery.Classes
             {
                 if (_mahalle_list[i].Return_Mahalle_Demand() >= _threshold) _mahalle_list[i].Set_Type_of_Mahalle(true);
             }
-            
+
         }
         private Double Calculate_Distances(double long_1, double lat_1, double long_2, double lat_2)
         {
@@ -42,13 +44,15 @@ namespace FMLMDelivery.Classes
         }
         private void Create_Distance_Matrix()
         {
-            
+
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
                 var d_i = new List<Double>();
                 for (int j = 0; j < _mahalle_list.Count; j++)
                 {
                     var distance = Calculate_Distances(_mahalle_list[i].Return_Longitude(), _mahalle_list[i].Return_Lattitude(), _mahalle_list[j].Return_Longitude(), _mahalle_list[j].Return_Lattitude());
+                    var Distance = new Distance_Class(_mahalle_list[i].Return_Mahalle_Id(), _mahalle_list[j].Return_Mahalle_Id(), distance);
+                    _all_distances.Add(Distance);
                     d_i.Add(distance);
                 }
                 _distance_matrix.Add(d_i);
@@ -59,7 +63,7 @@ namespace FMLMDelivery.Classes
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
                 if (_mahalle_list[i].Return_Type())
-                {   var loop_until = Math.Floor(_mahalle_list[i].Return_Mahalle_Demand() / _threshold);
+                { var loop_until = Math.Floor(_mahalle_list[i].Return_Mahalle_Demand() / _threshold);
                     var demand_count = 0.0;
                     for (int j = 0; j < loop_until; j++)
                     {
@@ -73,7 +77,7 @@ namespace FMLMDelivery.Classes
                     var mahalle_id = _mahalle_list[i].Return_Mahalle_Id();
                     var min_demand = _mahalle_list[i].Return_Mahalle_Demand() - demand_count;
                     var max_demand = 0.0;
-                    if((_mahalle_list[i].Return_Mahalle_Demand() - loop_until * _courier_min_cap) > _threshold)
+                    if ((_mahalle_list[i].Return_Mahalle_Demand() - loop_until * _courier_min_cap) > _threshold)
                     {
                         max_demand = _threshold;
                     }
@@ -92,25 +96,78 @@ namespace FMLMDelivery.Classes
                     var remaining = new Remaining_Demand_List(mahalle_id, min_demand, max_demand);
                     _remaining_demand_list.Add(remaining);
                 }
-                
+
             }
         }
 
+
+        private Courier Nearest_Neighbour_Assignment(Mahalle mahalle, Courier courier, Double upper_bound)
+        {
+            var found = true;
+            while (found)
+            {
+                found = false;
+                var filtered_distance_list = _all_distances.Where(x => x.Get_From() == mahalle.Return_Mahalle_Id());
+                var sorted_distance_list = filtered_distance_list.OrderBy(x => x.Get_Distance()).ToList();
+                for (int j = 1; j < sorted_distance_list.Count && !found; j++)
+                {
+                    var candidate_mahalle = _mahalle_list.Find(x => x.Return_Mahalle_Id() == sorted_distance_list[j].Get_To());
+                    if (!candidate_mahalle.Return_Type() && candidate_mahalle.Return_Mahalle_Demand() != 0)
+                    {
+                        if (upper_bound - courier.Return_Total_Demand() - candidate_mahalle.Return_Mahalle_Demand() > 0)
+                        {
+                            if (compensation_parameter * sorted_distance_list[j].Get_Distance() <= candidate_mahalle.Return_Mahalle_Demand())
+                            {
+                                found = true;
+                                courier.Add_Mahalle_To_Courier(candidate_mahalle);
+                                courier.Demand_From_Mahalle(candidate_mahalle.Return_Mahalle_Demand());
+                                courier.Set_Total_Demand(candidate_mahalle.Return_Mahalle_Demand());
+                                _remaining_demand_list.Find(x => x.Get_ID() == candidate_mahalle.Return_Mahalle_Id()).Set_Min_Max_Demand(0);
+                                _mahalle_list.Find(x => x.Return_Mahalle_Id() == candidate_mahalle.Return_Mahalle_Id()).Set_Remaning_Demand(candidate_mahalle.Return_Mahalle_Demand());
+                                mahalle = candidate_mahalle;
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            return courier;
+        }
         private void Assign_Big_Mahalle_Completely()
         {
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
-            }            
+                if (_mahalle_list[i].Return_Type())
+                {
+                    var courier = new Courier($"{"Courier "}{courier_list.Count}");
+                    var upper_bound = _threshold - _remaining_demand_list[i].Get_Min_Demand();
+                    courier = Nearest_Neighbour_Assignment(_mahalle_list[i], courier, upper_bound);
+                    Console.WriteLine("dcsv");
+                }
+            }
         }
 
         private void Assign_Remaining_Mahalle()
         {
-
+            for (int i = 0; i < _mahalle_list.Count; i++)
+            {
+                if (_mahalle_list[i].Return_Mahalle_Demand() >= _courier_min_cap && _mahalle_list[i].Return_Mahalle_Demand() <= _threshold)
+                {
+                    var courier_ıd = $"{"Courier "}{courier_list.Count}";
+                    var new_courier = new Courier(courier_ıd);
+                    new_courier.Add_Mahalle_To_Courier(_mahalle_list[i]);
+                    new_courier.Set_Total_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                    new_courier.Demand_From_Mahalle(_mahalle_list[i].Return_Mahalle_Demand());
+                    _mahalle_list[i].Set_Remaning_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                    courier_list.Add(new_courier);
+                }
+            }
         }
 
         private void Complete_Final_Assignments()
         {
-            
+
         }
 
         public void Run_Assignment_Procedure()
@@ -123,19 +180,25 @@ namespace FMLMDelivery.Classes
         }
 
 
-    }
 
+
+    }
     internal class Remaining_Demand_List
     {
         private string ID;
         private Double _min_demand;
         private Double _max_demand;
 
-        public Remaining_Demand_List(string id,double min_demand,double max_demand)
+        public Remaining_Demand_List(string id, double min_demand, double max_demand)
         {
             ID = id;
             _max_demand = max_demand;
             _min_demand = min_demand;
+        }
+
+        public String Get_ID()
+        {
+            return ID;
         }
 
         public Double Get_Max_Demand()
@@ -146,5 +209,40 @@ namespace FMLMDelivery.Classes
         {
             return _min_demand;
         }
+
+        public void Set_Min_Max_Demand(Double demand)
+        {
+            _max_demand = demand;
+            _min_demand = demand;
+        }
     }
+
+    internal class Distance_Class
+    {
+        private string _from;
+        private string _to;
+        private Double _distance;
+        public Distance_Class(string from, string to, Double distance)
+        {
+            _from = from;
+            _to = to;
+            _distance = distance;
+        }
+
+        public string Get_From()
+        {
+            return _from;
+        }
+        public string Get_To()
+        {
+            return _to;
+        }
+        public Double Get_Distance()
+        {
+            return _distance;
+        }
+    }
+
+
 }
+
