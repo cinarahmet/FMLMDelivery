@@ -6,6 +6,7 @@ using ILOG.Concert;
 using System.Device.Location;
 using System.Linq;
 using FMLMDelivery.MetaHeuristics;
+using FMLMDelivery.Classes;
 
 /// <summary>
 /// IMPORTANT !!!!!!!!!
@@ -174,6 +175,11 @@ public class DemandxDockModel
     private List<xDocks> new_XDocks;
 
     /// <summary>
+    /// Creates the dictionary of assigned districts to a specific xDock
+    /// </summary>
+    private Dictionary<xDocks, List<Mahalle>> _xDock_Mahalle;
+
+    /// <summary>
     /// List of potential Hub locations
     /// </summary>
     private List<Hub> potential_Hubs;
@@ -267,6 +273,7 @@ public class DemandxDockModel
 
         record_list = new List<String>();
         xDock_names = new Dictionary<int, string>();
+        _xDock_Mahalle = new Dictionary<xDocks, List<Mahalle>>();
         demand_of_demand_point = new List<double>();
         new_XDocks = new List<xDocks>();
         potential_Hubs = new List<Hub>();
@@ -331,6 +338,48 @@ public class DemandxDockModel
                 }
             }
 
+        }
+    }
+    private void Create_xDock_Mahalle_Dict()
+    {
+        
+        for (int j= 0; j < _numOfXdocks; j++)
+        {
+            var list_mahalle = new List<Mahalle>();
+            if (_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal)
+            {
+                if (_solver.GetValue(y[j]) > 0.9)
+                {
+                    var city = _xDocks[j].Get_City();
+                    var district = _xDocks[j].Get_District();
+                    var county = _xDocks[j].Get_Id();
+                    var region = _xDocks[j].Get_Region();
+                    var valueslat = _xDocks[j].Get_Latitude();
+                    var valueslong = _xDocks[j].Get_Longitude();
+                    var distance_threshold = _xDocks[j].Get_Distance_Threshold();
+                    var demand = 0.0;
+                    var already_opened = _xDocks[j].If_Already_Opened();
+                    var is_agency = _xDocks[j].If_Agency();
+                    var min_cap = _xDocks[j].Get_Min_Cap();
+                    
+                    for (int i = 0; i < _num_of_demand_point; i++)
+                    {
+                        
+                        if (_solver.GetValue(x[i][j]) > 0.9)
+                        {
+                            demand += _demandpoint[i].Get_Demand();
+                            var mahalle_name = _demandpoint[i].Get_Id();
+                            var mahalle_demand = _demandpoint[i].Get_Demand();
+                            var mahalle_long = _demandpoint[i].Get_Longitude();
+                            var mahalle_lat = _demandpoint[i].Get_Latitude();
+                            var mahalle = new Mahalle(mahalle_name, mahalle_long,mahalle_lat,mahalle_demand);
+                            list_mahalle.Add(mahalle);
+                        }
+                    }
+                    var x_Dock = new xDocks(city, district, county, region, valueslong, valueslat, distance_threshold, min_cap, demand, already_opened, is_agency);
+                    _xDock_Mahalle.Add(x_Dock, list_mahalle);
+                }
+            }
         }
     }
 
@@ -420,7 +469,10 @@ public class DemandxDockModel
     {
         return new_XDocks;
     }
-
+    public Dictionary<xDocks,List<Mahalle>> Return_xDock_Mahalle()
+    {
+        return _xDock_Mahalle;
+    }
     private void Get_Distance_Matrix()
     {
         
@@ -531,6 +583,7 @@ public class DemandxDockModel
             Get_Num_XDocks();
             Get_Csv_Information();
             Get_Model_Status();
+            Create_xDock_Mahalle_Dict();
         }
         Print();
         ClearModel();

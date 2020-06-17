@@ -12,7 +12,7 @@ namespace FMLMDelivery.Classes
 
         private List<Double> _demand_from_mahalle=new List<Double>();
 
-        private Double _total_demand=new double();
+        private Double _total_demand= new double();
 
         public Courier(String ıd)
         { 
@@ -32,6 +32,10 @@ namespace FMLMDelivery.Classes
         public void Add_To_Total(Double addition)
         {
             _total_demand = _total_demand + addition;
+        }
+        public void Demand_From_Mahalle(Double demand)
+        {
+            _demand_from_mahalle.Add(demand);
         }
     }
 }

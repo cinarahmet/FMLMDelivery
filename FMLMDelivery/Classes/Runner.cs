@@ -117,11 +117,19 @@ namespace FMLMDelivery.Classes
             new_xDocks = first_phase.Return_XDock();  
             potential_Hubs = first_phase.Return_Potential_Hubs();
             stats.AddRange(first_phase.Get_Model_Stats_Info());
-
+            var assignment_dictionary = first_phase.Return_xDock_Mahalle();
+            Run_Courier_Problem(assignment_dictionary);
 
             return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info(),stats);
         }
-        
+        private void Run_Courier_Problem(Dictionary<xDocks,List<Mahalle>> mahalle_assigments)
+        {
+            for (int i = 0; i < mahalle_assigments.Count; i++)
+            {
+                var courier_assignment = new Courier_Assignment(mahalle_assigments.ElementAt(0).Key, mahalle_assigments.ElementAt(0).Value, 140, 100, 120);
+                courier_assignment.Run_Assignment_Procedure();
+            }
+        }
         private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key)
         {
             var city_points = new List<DemandPoint>();
