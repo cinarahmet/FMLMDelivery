@@ -58,20 +58,16 @@ namespace FMLMDelivery.Classes
         {
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
-                if (_mahalle_list[i].Return_Mahalle_Demand() > _threshold)
+                if (_mahalle_list[i].Return_Type())
                 {   var loop_until = Math.Floor(_mahalle_list[i].Return_Mahalle_Demand() / _threshold);
                     var demand_count = 0.0;
                     for (int j = 0; j < loop_until; j++)
                     {
                         demand_count += _threshold;
                         var courier_mahalle = _mahalle_list[i];
-                        var mahalle_demand = _threshold;
-                        var courier_total = _threshold;
-                        var number_courier = courier_list.Count;
-                        var new_courier = new Courier("");
+                        var number_courier = $"{"Courier "}{courier_list.Count}";
+                        var new_courier = new Courier(number_courier);
                         new_courier.Add_Mahalle_To_Courier(courier_mahalle);
-                        new_courier.Add_To_Total(courier_total);
-                        new_courier.Demand_From_Mahalle(mahalle_demand);
                         courier_list.Add(new_courier);
                     }
                     var mahalle_id = _mahalle_list[i].Return_Mahalle_Id();
