@@ -6,9 +6,13 @@ using System.Text;
 using FMLMDelivery.Classes;
 using System.Device.Location;
 using System.Security.Cryptography;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FMLMDelivery.Classes
 {
+
     public class Courier_Assignment
     {
         private xDocks _xDock;
@@ -20,14 +24,14 @@ namespace FMLMDelivery.Classes
         private List<Courier> courier_list = new List<Courier>();
         private List<List<Double>> _distance_matrix = new List<List<double>>();
         private List<Distance_Class> _all_distances = new List<Distance_Class>();
-        private List<Remaining_Demand_List> _remaining_demand_list = new List<Remaining_Demand_List>();
+        private List<Remaining_Demand> _remaining_demand_list = new List<Remaining_Demand>();
 
         public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_max_cap, Double courier_min_cap, Double threshold)
         {
             _xDock = xDock;
             //Sort Descending Order
             _mahalle_list = mahalles;
-            _mahalle_list = Filter_Run(_mahalle_list);
+            //_mahalle_list = Filter_Run(_mahalle_list);
             _mahalle_list = _mahalle_list.OrderByDescending(x => x.Return_Mahalle_Demand()).ToList();
             _courier_max_cap = courier_max_cap;
             _courier_min_cap = courier_min_cap;
@@ -94,7 +98,7 @@ namespace FMLMDelivery.Classes
                     {
                         max_demand = _mahalle_list[i].Return_Mahalle_Demand() - loop_until * _courier_min_cap;
                     }
-                    var remaining = new Remaining_Demand_List(mahalle_id, min_demand, max_demand);
+                    var remaining = new Remaining_Demand(mahalle_id, min_demand, max_demand);
                     _remaining_demand_list.Add(remaining);
                 }
                 else
@@ -102,25 +106,57 @@ namespace FMLMDelivery.Classes
                     var mahalle_id = _mahalle_list[i].Return_Mahalle_Id();
                     var max_demand = _mahalle_list[i].Return_Mahalle_Demand();
                     var min_demand = _mahalle_list[i].Return_Mahalle_Demand();
-                    var remaining = new Remaining_Demand_List(mahalle_id, min_demand, max_demand);
+                    var remaining = new Remaining_Demand(mahalle_id, min_demand, max_demand);
                     _remaining_demand_list.Add(remaining);
                 }
 
             }
         }
+        
 
 
-        private Courier Nearest_Neighbour_Assignment(Mahalle mahalle, Courier courier, Double upper_bound)
+        private Tuple<Courier,Double> Nearest_Neighbour_Assignment(Mahalle mahalle, Courier courier, Double upper_bound,bool test)
         {
             var found = true;
+            var total_distance_covered = 0.0;
             while (found)
             {
                 found = false;
+                var remaining_demand_list = new List<Remaining_Demand>();
+                var mahalle_list = new List<Mahalle>();
+                if (test)
+                {
+                    
+                    for (int a = 0; a < _mahalle_list.Count; a++)
+                    {
+                        var mahalle_id = _mahalle_list[a].Return_Mahalle_Id();
+                        var mahalle_long = _mahalle_list[a].Return_Longitude();
+                        var mahalle_lat = _mahalle_list[a].Return_Lattitude();
+                        var mahalle_demand = _mahalle_list[a].Return_Mahalle_Demand();
+                        var new_mahalle = new Mahalle(mahalle_id, mahalle_long, mahalle_lat, mahalle_demand);
+                        mahalle_list.Add(new_mahalle);
+                    }
+                    
+                    for (int b = 0; b < _remaining_demand_list.Count; b++)
+                    {
+                        var id = _remaining_demand_list[b].Get_ID();
+                        var min_demand = _remaining_demand_list[b].Get_Min_Demand();
+                        var max_demand = _remaining_demand_list[b].Get_Max_Demand();
+                        var rem_dem = new Remaining_Demand(id, min_demand, max_demand);
+                        remaining_demand_list.Add(rem_dem);
+                    }
+                }
+
+                
                 var filtered_distance_list = _all_distances.Where(x => x.Get_From() == mahalle.Return_Mahalle_Id());
                 var sorted_distance_list = filtered_distance_list.OrderBy(x => x.Get_Distance()).ToList();
                 for (int j = 1; j < sorted_distance_list.Count && !found; j++)
                 {
                     var candidate_mahalle = _mahalle_list.Find(x => x.Return_Mahalle_Id() == sorted_distance_list[j].Get_To());
+                    if (test)
+                    {
+                        candidate_mahalle = mahalle_list.Find(x => x.Return_Mahalle_Id() == sorted_distance_list[j].Get_To());
+                    }
                     if (!candidate_mahalle.Return_Type() && candidate_mahalle.Return_Mahalle_Demand() != 0)
                     {
                         if (upper_bound - courier.Return_Total_Demand() - candidate_mahalle.Return_Mahalle_Demand() > 0)
@@ -131,15 +167,24 @@ namespace FMLMDelivery.Classes
                                 courier.Add_Mahalle_To_Courier(candidate_mahalle);
                                 courier.Demand_From_Mahalle(candidate_mahalle.Return_Mahalle_Demand());
                                 courier.Set_Total_Demand(candidate_mahalle.Return_Mahalle_Demand());
-                                _remaining_demand_list.Find(x => x.Get_ID() == candidate_mahalle.Return_Mahalle_Id()).Set_Min_Max_Demand(0);
-                                _mahalle_list.Find(x => x.Return_Mahalle_Id() == candidate_mahalle.Return_Mahalle_Id()).Set_Remaning_Demand(candidate_mahalle.Return_Mahalle_Demand());
+                                if (test)
+                                {
+                                    remaining_demand_list.Find(x => x.Get_ID() == candidate_mahalle.Return_Mahalle_Id()).Set_Min_Max_Demand(0);
+                                    mahalle_list.Find(x => x.Return_Mahalle_Id() == candidate_mahalle.Return_Mahalle_Id()).Set_Remaning_Demand(candidate_mahalle.Return_Mahalle_Demand());
+                                }
+                                else
+                                {
+                                    _remaining_demand_list.Find(x => x.Get_ID() == candidate_mahalle.Return_Mahalle_Id()).Set_Min_Max_Demand(0);
+                                    _mahalle_list.Find(x => x.Return_Mahalle_Id() == candidate_mahalle.Return_Mahalle_Id()).Set_Remaning_Demand(candidate_mahalle.Return_Mahalle_Demand());
+                                }
                                 mahalle = candidate_mahalle;
+                                total_distance_covered += sorted_distance_list[j].Get_Distance();
                             }
                         }
                     }
                 }
             }
-            return courier;
+            return Tuple.Create(courier,total_distance_covered);
         }
         private void Assign_Big_Mahalle_Completely()
         {
@@ -147,9 +192,10 @@ namespace FMLMDelivery.Classes
             {
                 if (_mahalle_list[i].Return_Type())
                 {
+                    var total_dist = 0.0;
                     var courier = new Courier($"{"Courier "}{courier_list.Count}");
                     var upper_bound = _threshold - _remaining_demand_list[i].Get_Min_Demand();
-                    courier = Nearest_Neighbour_Assignment(_mahalle_list[i], courier, upper_bound);
+                    (courier,total_dist) = Nearest_Neighbour_Assignment(_mahalle_list[i], courier, upper_bound,false);
                     var total_demand_of_neighborhood = _mahalle_list[i].Return_Mahalle_Demand();
                     var assigned_demand_from_big_neighborhood = Math.Min(_remaining_demand_list[i].Get_Max_Demand(), _threshold - courier.Return_Total_Demand());
                     var remaining_demand_big_neighborhood = total_demand_of_neighborhood - assigned_demand_from_big_neighborhood;
@@ -194,27 +240,121 @@ namespace FMLMDelivery.Classes
                 }
             }
         }
+     
 
         private void Complete_Final_Assignments()
         {
             var starting_xdock = new Mahalle(_xDock.Get_Id(), _xDock.Get_Longitude(), _xDock.Get_Latitude(), 0);
+            var neighborhood_found = _mahalle_list.Find(x => x.Return_Mahalle_Id() == starting_xdock.Return_Mahalle_Id());
+            if (Object.Equals(neighborhood_found,null))
+            {
+                for (int j = 0; j < _mahalle_list.Count; j++)
+                {
+                    var distance = Calculate_Distances(starting_xdock.Return_Longitude(), starting_xdock.Return_Lattitude(), _mahalle_list[j].Return_Longitude(), _mahalle_list[j].Return_Lattitude());
+                    var Distance = new Distance_Class(starting_xdock.Return_Mahalle_Id(), _mahalle_list[j].Return_Mahalle_Id(), distance);
+                    _all_distances.Add(Distance);
+                }
+            }
             var keep_on = true;
             while (keep_on)
             {
-                var courier_id = $"{"Courier "}{courier_list.Count}";
-                var new_courier = new Courier(courier_id);
-                new_courier = Nearest_Neighbour_Assignment(starting_xdock,new_courier,_threshold);
-                if (new_courier.Return_Total_Demand() != 0)
-                {
-                    courier_list.Add(new_courier);
-                    
-                }
-                else
+                var filtered_list = _mahalle_list.Where(x => x.Return_Mahalle_Demand() != 0).ToList();
+                var best_potential_ratio = 0.0;
+                Courier selected_courier = null;
+                var selected_index = 0;
+                if (Object.Equals(filtered_list.Count,null))
                 {
                     keep_on = false;
                 }
-                
+                else
+                {
+                    for (int i = 0; i < filtered_list.Count; i++)
+                    {
+                        var potential_ratio = 0.0;
+                        var total_dist_covered = 0.0;
+                        var courier_ıd = $"{"Courier "}{courier_list.Count}";
+                        var new2_courier = new Courier(courier_ıd);
+                        (new2_courier, total_dist_covered) = Nearest_Neighbour_Assignment(filtered_list[i], new2_courier, _threshold-filtered_list[i].Return_Mahalle_Demand(),true);
+                        new2_courier.Add_Mahalle_To_Courier(filtered_list[i]);
+                        new2_courier.Demand_From_Mahalle(filtered_list[i].Return_Mahalle_Demand());
+                        new2_courier.Set_Total_Demand(filtered_list[i].Return_Mahalle_Demand());
+                        var dist = _all_distances.Where(x => x.Get_From() == starting_xdock.Return_Mahalle_Id() && x.Get_To() == filtered_list[i].Return_Mahalle_Id());
+                        total_dist_covered += dist.ElementAt(0).Get_Distance();
+                        potential_ratio = new2_courier.Return_Total_Demand() / total_dist_covered;
+                        if (potential_ratio > best_potential_ratio)
+                        {
+                            selected_courier = new2_courier;
+                            best_potential_ratio = potential_ratio;
+                            selected_index = i;
+                        }
+                    }
+
+                    if (!Object.Equals(selected_courier, null))
+                    {
+                        if (selected_courier.Return_Total_Demand() < _courier_min_cap)
+                        {
+                            keep_on = false;
+                        }
+
+                        else
+                        {
+                            var dist_cov = 0.0;
+                            var courier_ıd = $"{"Courier "}{courier_list.Count}";
+                            var selected_c = new Courier(courier_ıd);
+                            selected_c.Add_Mahalle_To_Courier(filtered_list[selected_index]);
+                            selected_c.Demand_From_Mahalle(filtered_list[selected_index].Return_Mahalle_Demand());
+                            selected_c.Set_Total_Demand(filtered_list[selected_index].Return_Mahalle_Demand());
+                            _remaining_demand_list.Find(x => x.Get_ID() == filtered_list[selected_index].Return_Mahalle_Id()).Set_Min_Max_Demand(0);
+                            _mahalle_list.Find(x => x.Return_Mahalle_Id() == filtered_list[selected_index].Return_Mahalle_Id()).Set_Remaning_Demand(filtered_list[selected_index].Return_Mahalle_Demand());
+                            (selected_c, dist_cov) = Nearest_Neighbour_Assignment(filtered_list[selected_index], selected_c, _threshold, false);
+                            
+                            courier_list.Add(selected_c);
+                        }
+                    }
+                    else
+                    {
+                        keep_on = false;
+                    }
+                }
+                //var courier_id = $"{"Courier "}{courier_list.Count}";
+                //var new_courier = new Courier(courier_id);
+                //new_courier = Nearest_Neighbour_Assignment(starting_xdock, new_courier, _threshold);
+                //if (new_courier.Return_Total_Demand() != 0)
+                //{
+                //    courier_list.Add(new_courier);
+
+                //}
+                //else
+                //{
+                //    keep_on = false;
+                //}
+
             }
+        }
+
+        private Mahalle Potential_Check(List<Mahalle> mahalles)
+        {
+            Mahalle selected_mahalle = null;
+            var best_potential = 0.0;
+            for (int i = 0; i < mahalles.Count; i++)
+            {
+                var potential = 0.0;
+                var index = _mahalle_list.FindIndex(x => x.Return_Mahalle_Id() == mahalles[i].Return_Mahalle_Id());
+                var distances = _distance_matrix[index];
+                for (int j = 0; j < _mahalle_list.Count; j++)
+                {
+                    if (_mahalle_list[j].Return_Mahalle_Demand() != 0 && distances[j] != 0)
+                    {
+                        potential += Math.Floor(_mahalle_list[j].Return_Mahalle_Demand() / (compensation_parameter * distances[j]))* _mahalle_list[j].Return_Mahalle_Demand();
+                    }
+                }
+                if (potential>best_potential)
+                {
+                    best_potential = potential;
+                    selected_mahalle = mahalles[i];
+                }
+            }
+            return selected_mahalle;
         }
 
         private void Termination_Phase()
@@ -291,13 +431,13 @@ namespace FMLMDelivery.Classes
         }
 
     }
-    internal class Remaining_Demand_List
+    internal class Remaining_Demand
     {
         private string ID;
         private Double _min_demand;
         private Double _max_demand;
 
-        public Remaining_Demand_List(string id, double min_demand, double max_demand)
+        public Remaining_Demand(string id, double min_demand, double max_demand)
         {
             ID = id;
             _max_demand = max_demand;
@@ -353,4 +493,5 @@ namespace FMLMDelivery.Classes
 
 
 }
+
 
