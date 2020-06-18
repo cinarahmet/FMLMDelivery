@@ -6,7 +6,7 @@ namespace FMLMDelivery.Classes
 {
     public class Courier
     {
-        private readonly string _Id;
+        private string _Id;
 
         private List<Mahalle> _mahalle_list=new List<Mahalle>();
 
@@ -36,6 +36,23 @@ namespace FMLMDelivery.Classes
         public Double Return_Total_Demand()
         {
             return _total_demand;
+        }
+        public List<Mahalle> Return_Assigned_Mahalle()
+        {
+            return _mahalle_list;
+        }
+
+        public List<Double> Return_Demand_At_Mahalle()
+        {
+            return _demand_from_mahalle;
+        }
+        public String Return_Courier_Id()
+        {
+            return _Id;
+        }
+        public void Revise_Courier_Id(String revised_id)
+        {
+            _Id = revised_id;
         }
     }
 }
