@@ -38,9 +38,38 @@ namespace Core_Form
             Hub_Cov_Box.Enabled = false;
             send_button.Enabled = false;
             Run_CitybyCity.Checked = true;
+            _threshold.Enabled = false;
+            Min_Cap.Enabled = false;
+            Km_başı_paket.Enabled = false;
+            Mahalle_xDock_Ataması.Enabled = false;
             Create_Dictionary_Month();
         }
         private void output_box_Enter(object sender, EventArgs e)
+        {
+
+        }
+        
+        
+
+        private void Mahalle_xDock_Ataması_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        
+        
+
+        private void _threshold_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Min_Cap_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Km_başı_paket_TextChanged(object sender, EventArgs e)
         {
 
         }
@@ -60,6 +89,10 @@ namespace Core_Form
                 Month_Selected.Enabled = true;
                 Hub_Cov_Box.Enabled = true;
                 send_button.Enabled = true;
+                _threshold.Enabled = true;
+                Min_Cap.Enabled = true;
+                Km_başı_paket.Enabled = true;
+                Mahalle_xDock_Ataması.Enabled = false;
                 only_cities = false;
             }
            
@@ -79,6 +112,10 @@ namespace Core_Form
                 Hub_Cov_Box.Enabled = true;
                 send_button.Enabled = true;
                 Presolved_box.Enabled = true;
+                Mahalle_xDock_Ataması.Enabled = true;
+                _threshold.Enabled = true;
+                Min_Cap.Enabled = true;
+                Km_başı_paket.Enabled = true;
                 partial_solution = true;
                 only_cities = false;
                 
@@ -86,6 +123,7 @@ namespace Core_Form
         }
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
+
             if (Run_CitybyCity.Checked)
             {
                 Demand_box.Enabled = true;
@@ -98,9 +136,34 @@ namespace Core_Form
                 Month_Selected.Enabled = true;
                 Hub_Cov_Box.Enabled = false;
                 send_button.Enabled = true;
+                _threshold.Enabled = true;
+                Min_Cap.Enabled = true;
+                Km_başı_paket.Enabled = true;
+                Mahalle_xDock_Ataması.Enabled = false;
                 partial_solution = false;
                 only_cities = true;
             }
+        }
+        private void Courier_Checked(object sender, EventArgs e)
+        {
+            if (Courier_Run.Checked)
+            {
+                Demand_box.Enabled = false;
+                Pot_xDock_Box.Enabled = false;
+                Partial_Run.Enabled = true;
+                Seller_Box.Enabled = false;
+                Parameter_Box.Enabled = false;
+                Presolved_box.Enabled = false;
+                Outbut_loc.Enabled = true;
+                Month_Selected.Enabled = false;
+                Hub_Cov_Box.Enabled = false;
+                send_button.Enabled = true;
+                _threshold.Enabled = true;
+                Min_Cap.Enabled = true;
+                Km_başı_paket.Enabled = true;
+
+            }
+
         }
         private void Network_Design_Form_Load(object sender, EventArgs e)
         {
@@ -133,6 +196,23 @@ namespace Core_Form
             var direct = openFileDialog1.FileName;
             Seller_Box.Text = direct;
         }
+        
+        private void Parameter_box_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.InitialDirectory = direct_initial;
+            openFileDialog1.ShowDialog();
+            openFileDialog1.RestoreDirectory = true;
+            var direct = openFileDialog1.FileName;
+            Parameter_Box.Text = direct;
+        }
+        private void Mahalle_xDock_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.InitialDirectory = @"C:\";
+            openFileDialog1.ShowDialog();
+            openFileDialog1.RestoreDirectory = true;
+            direct_initial = openFileDialog1.FileName;
+            Mahalle_xDock_Ataması.Text = direct_initial;
+        }
         private void Create_Dictionary_Month()
         {
             var dict = new Dictionary<String, int>();
@@ -151,16 +231,6 @@ namespace Core_Form
 
             month_dict = dict;
         }
-
-        private void Parameter_box_Click(object sender, EventArgs e)
-        {
-            openFileDialog1.InitialDirectory = direct_initial;
-            openFileDialog1.ShowDialog();
-            openFileDialog1.RestoreDirectory = true;
-            var direct = openFileDialog1.FileName;
-            Parameter_Box.Text = direct;
-        }
-
         private void Presolved_box_Click(object sender, EventArgs e)
         {
             openFileDialog1.InitialDirectory = direct_initial;
@@ -234,6 +304,7 @@ namespace Core_Form
                 (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
                 //Console.ReadKey();
             }
+
             var path = directory + "\\";
             var dirname = new DirectoryInfo(path).Name;
             MessageBoxButtons buttons= MessageBoxButtons.OK;

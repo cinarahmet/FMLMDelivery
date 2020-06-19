@@ -87,5 +87,42 @@ namespace Framework_Form
         {
 
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void Mahalle_xDock_Ataması_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Mahalle_xDock_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void _threshold_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Min_Cap_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Km_başı_paket_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Courier_Checked(object sender, EventArgs e)
+        {
+
+        }
     }
 }
