@@ -294,9 +294,9 @@
             "Haziran",
             "Temmuz",
             "Ağustos",
-            "Eylül ",
-            "Ekim ",
-            "Kasım ",
+            "Eylül",
+            "Ekim",
+            "Kasım",
             "Aralık"});
             this.Month_Selected.Location = new System.Drawing.Point(341, 38);
             this.Month_Selected.Name = "Month_Selected";

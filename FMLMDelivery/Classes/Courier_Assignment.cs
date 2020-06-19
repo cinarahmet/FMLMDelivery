@@ -25,6 +25,7 @@ namespace FMLMDelivery.Classes
         private List<List<Double>> _distance_matrix = new List<List<double>>();
         private List<Distance_Class> _all_distances = new List<Distance_Class>();
         private List<Remaining_Demand> _remaining_demand_list = new List<Remaining_Demand>();
+        private List<String> _assigned_courier_list = new List<string>();
         
 
         public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_max_cap, Double courier_min_cap, Double threshold)
@@ -420,7 +421,29 @@ namespace FMLMDelivery.Classes
                 }
             }
         }
+        private void Courier_Assignments()
+        {
+            var xdock_city = _xDock.Get_City();
+            var xdock_district = _xDock.Get_District();
+            var xdock_id = _xDock.Get_Id();
+            for (int i = 0; i < courier_list.Count; i++)
+            {
+                for (int j = 0; j < courier_list[i].Return_Assigned_Mahalle().Count; j++)
+                {
+                    var courier_id = courier_list[i].Return_Courier_Id();
+                    var courier_mahalle_demand = courier_list[i].Return_Demand_At_Mahalle()[j];
+                    var courier_mahalle_name = courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id();
+                    var list= $"{xdock_city },{xdock_district},{xdock_id},{courier_id},{courier_mahalle_name},{courier_mahalle_demand}";
+                    _assigned_courier_list.Add(list);
+                }
+            }
 
+        }
+
+        public List<String> Return_Courier_Assignments()
+        {
+            return _assigned_courier_list;
+        }
         public void Run_Assignment_Procedure()
         {
             Create_Distance_Matrix();
@@ -429,6 +452,7 @@ namespace FMLMDelivery.Classes
             Assign_Remaining_Mahalle();
             Complete_Final_Assignments();
             Termination_Phase();
+            Return_Courier_Assignments();
         }
 
     }
