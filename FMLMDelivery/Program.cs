@@ -37,8 +37,8 @@ namespace FMLMDelivery
             var prior_big_sellers = reader.Get_Prior_Big_Sellers();
             var regular_big_sellers = reader.Get_Regular_Big_Sellers();
             var parameter_list = reader.Get_Parameter_List();
-            var partial_solution = false;
-            var only_courier_assignmnets = false;
+            var partial_solution = true;
+            var only_courier_assignmnets = true;
             
             if (!partial_solution)
             {

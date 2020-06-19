@@ -245,16 +245,17 @@ public class CSVReader
                 var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
                 var neighborhood = new Mahalle(demand_point_id, demand_point_long, demand_point_lat, demand);
                 var neighborhood_list = new List<Mahalle>();
+                var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
                 
-                if (_xDock_neighborhood_assignments.ContainsKey(dummy_xDock))
+                if (list_contains.Count>0)
                 {
-                    _xDock_neighborhood_assignments[dummy_xDock].Add(neighborhood);
+                    _xDock_neighborhood_assignments[list_contains[0]].Add(neighborhood);
 
                 }
                 else
                 { 
                     neighborhood_list.Add(neighborhood);
-                    _xDock_neighborhood_assignments.Add(_partial_xdocks[0], neighborhood_list);
+                    _xDock_neighborhood_assignments.Add(dummy_xDock, neighborhood_list);
                 }
 
             }
