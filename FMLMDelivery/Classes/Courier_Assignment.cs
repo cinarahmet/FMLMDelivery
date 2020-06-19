@@ -25,6 +25,7 @@ namespace FMLMDelivery.Classes
         private List<List<Double>> _distance_matrix = new List<List<double>>();
         private List<Distance_Class> _all_distances = new List<Distance_Class>();
         private List<Remaining_Demand> _remaining_demand_list = new List<Remaining_Demand>();
+        
 
         public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_max_cap, Double courier_min_cap, Double threshold)
         {

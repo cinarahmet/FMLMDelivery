@@ -34,6 +34,8 @@ public class CSVReader
 
     private readonly string _parameter_file;
 
+    private readonly string _xDock_neighborhood_assignments_file;
+
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
     private Dictionary<String, Double> region_xDock_threshold = new Dictionary<string, double>();
@@ -44,14 +46,17 @@ public class CSVReader
 
     private Double scope_out_threshold = 10;
 
+    private Dictionary<xDocks, List<Mahalle>> _xDock_neighborhood_assignments = new Dictionary<xDocks, List<Mahalle>>();
 
-    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file, Int32 month)
+
+    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments, Int32 month)
     {
         _demand_point_file = county_file;
         _xDocks_file = xDock_file;
         _month = month + 7;
         _seller_file = Seller_file;
         _parameter_file = parameter_file;
+        _xDock_neighborhood_assignments_file = assignments;
     }
 
     private void Create_Demand_Point_Region_Threshold()
@@ -173,6 +178,12 @@ public class CSVReader
         }
     }
 
+    public void Read_Partially()
+    {
+        Read_Partial_Solution_Xdocks();
+        Read_xDock_Neighborhood_Assignments();
+    }
+
     public void Read_Partial_Solution_Xdocks()
     {
         using(var sr = File.OpenText(_xDocks_file))
@@ -209,8 +220,47 @@ public class CSVReader
                 _partial_xdocks.Add(xDock);
             }
         }
-
     }
+
+    public void Read_xDock_Neighborhood_Assignments()
+    {
+        using (var sr = File.OpenText(_xDock_neighborhood_assignments_file))
+        {
+            String s = sr.ReadLine();
+            while ((s = sr.ReadLine()) != null)
+            {
+                var line = s.Split(',');
+                var xdock_city = line[0];
+                var xdock_district = line[1];
+                var xdock_id = line[2];
+                var xdock_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                var xdock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                var demand_point_city = line[5];
+                var demand_point_district = line[6];
+                var demand_point_id = line[7];
+                var demand_point_lat = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
+                var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
+                var neighborhood = new Mahalle(demand_point_id, demand_point_long, demand_point_lat, demand);
+                var neighborhood_list = new List<Mahalle>();
+                
+                if (_xDock_neighborhood_assignments.ContainsKey(dummy_xDock))
+                {
+                    _xDock_neighborhood_assignments[dummy_xDock].Add(neighborhood);
+
+                }
+                else
+                { 
+                    neighborhood_list.Add(neighborhood);
+                    _xDock_neighborhood_assignments.Add(_partial_xdocks[0], neighborhood_list);
+                }
+
+            }
+        }
+    }
+
 
     private void Read_Parameters()
     {
@@ -323,6 +373,10 @@ public class CSVReader
 
     }
 
+    public Dictionary<xDocks, List<Mahalle>> Get_xDock_neighborhood_Assignments()
+    {
+        return _xDock_neighborhood_assignments;
+    }
 
     public List<xDocks> Get_XDocks()
     {
