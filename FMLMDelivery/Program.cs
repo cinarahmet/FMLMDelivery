@@ -21,6 +21,9 @@ namespace FMLMDelivery
             var partial_xDocks = new List<xDocks>();
             var parameters = new List<Parameters>();
             var xDock_neighborhood_assignments = new Dictionary<xDocks, List<Mahalle>>();
+            var courier_parameter_list = new List<Double> {100,120,2};
+            var courier_list = new Dictionary<xDocks, List<Mahalle>>();
+
 
             //This variable decides which solution methıd will be run. If true; every city individually assigned, else regions are assigned as a whole
             var discrete_solution = true;
@@ -42,7 +45,7 @@ namespace FMLMDelivery
             
             if (!partial_solution)
             {
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"",hub_demand_coverage,false);
+                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"",hub_demand_coverage,false, xDock_neighborhood_assignments,courier_parameter_list);
                 (xDocks, hubs) = runner.Run();
                 Console.ReadKey();
             }
@@ -58,7 +61,7 @@ namespace FMLMDelivery
                 partial_reader.Read_Partially();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"",hub_demand_coverage,false);
+                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution,"",hub_demand_coverage,false, xDock_neighborhood_assignments,courier_parameter_list);
                 (xDocks, hubs) = runner_partial.Run();
                 Console.ReadKey();
             }

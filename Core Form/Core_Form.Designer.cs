@@ -149,7 +149,7 @@
             this.presolved_xDock_label.Name = "presolved_xDock_label";
             this.presolved_xDock_label.Size = new System.Drawing.Size(170, 20);
             this.presolved_xDock_label.TabIndex = 4;
-            this.presolved_xDock_label.Text = "Açılmış xDock Dosyası:";
+            this.presolved_xDock_label.Text = "Kısmi Çalıştırma Dosyası:";
             // 
             // month_label
             // 

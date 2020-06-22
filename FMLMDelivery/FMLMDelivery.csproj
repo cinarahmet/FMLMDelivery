@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Classes\Csv_Writer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Device.Location.Portable" Version="1.0.0" />
     <PackageReference Include="System.Security.Permissions" Version="4.7.0" />
   </ItemGroup>

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using FMLMDelivery;
 
 namespace Core_Form
 {
@@ -28,6 +29,7 @@ namespace Core_Form
         private Boolean only_courier_assignments = new bool();
         private Dictionary<String, int> month_dict = new Dictionary<string, int>();
         private Boolean full_run = new bool();
+        private List<String> courier_assignment_list = new List<string>();
         public Network_Design_Form_Core()
         {
             InitializeComponent();
@@ -40,7 +42,9 @@ namespace Core_Form
             Month_Selected.Enabled = false;
             Hub_Cov_Box.Enabled = false;
             send_button.Enabled = false;
-            Run_CitybyCity.Checked = true;
+            Run_CitybyCity.Checked= false;
+            Full_Run.Checked = false;
+            Partial_Run.Checked = false;
             _threshold.Enabled = false;
             Min_Cap.Enabled = false;
             Km_başı_paket.Enabled = false;
@@ -174,6 +178,7 @@ namespace Core_Form
                 _threshold.Enabled = true;
                 Min_Cap.Enabled = true;
                 Km_başı_paket.Enabled = true;
+                Mahalle_xDock_Ataması.Enabled = true;
 
                 full_run = false;
                 partial_solution = false;
@@ -270,24 +275,43 @@ namespace Core_Form
         {
 
         }
-
+        private void Courier_Runner_Writer(Dictionary<xDocks,List<Mahalle>> mahalle_list, List<Double> parameter_list,String output_loc)
+        {
+            for (int i = 0; i < mahalle_list.Count; i++)
+            {
+                var courier_assignment = new Courier_Assignment(mahalle_list.ElementAt(i).Key, mahalle_list[mahalle_list.ElementAt(i).Key], parameter_list[0], parameter_list[1], parameter_list[2]);
+                courier_assignment.Run_Assignment_Procedure();
+                var list = courier_assignment.Return_Courier_Assignments();
+                courier_assignment_list.AddRange(list);
+            }
+            var header_xdock_demand_point = "";
+            var write_the_xdocks = new Csv_Writer(courier_assignment_list, "Kurye Atamaları", header_xdock_demand_point, output_loc);
+            write_the_xdocks.Write_Records();
+        }
         private void Outbut_loc_Click(object sender, EventArgs e)
         {
             folderBrowserDialog1.ShowDialog();         
-            
             var direct = folderBrowserDialog1.SelectedPath;
             Outbut_loc.Text = direct;
         }
         
         private async void send_button_Click(object sender, EventArgs e)
         {
+            var month = 1;
             demand_file = Demand_box.Text ;
             pot_xDock_file = Pot_xDock_Box.Text;
             seller_file = Seller_Box.Text ;
             parameter_file = Parameter_Box.Text;
             presolved_xDock_file = Presolved_box.Text ;
             mahalle_xdock_file = Mahalle_xDock_Ataması.Text;
-            var month = month_dict[Month_Selected.SelectedItem.ToString()];
+            var courier_min_cap = Convert.ToDouble(Min_Cap.Text);
+            var desired_efficiency = Convert.ToDouble(_threshold.Text);
+            var compensation = Convert.ToDouble(Km_başı_paket.Text);
+            var courier_parameter_list = new List<Double> { courier_min_cap, desired_efficiency, compensation};
+            if (!Courier_Run.Checked)
+            {
+               month = month_dict[Month_Selected.SelectedItem.ToString()];
+            }
             if (Hub_Cov_Box.Text != "") hub_demand_coverage = Convert.ToDouble(Hub_Cov_Box.Text);
             directory = Outbut_loc.Text;
             //Application.Run(new Form1());
@@ -305,21 +329,24 @@ namespace Core_Form
 
             //Provide the month index (1-January, 12-December)
             //var reader = new CSVReader("Demand_Points.csv", "2020_Potential_xDocks_Case3.csv", "2020_FM_Ekim.csv", "Parameters.csv", month);
-            var reader = new CSVReader(demand_file, pot_xDock_file, seller_file, parameter_file,"", month);
             
-            reader.Read();
-            demand_point = reader.Get_County();
-            potential_xDocks = reader.Get_XDocks();
-            agency = reader.Get_Agency();
-            var prior_small_sellers = reader.Get_Prior_Small_Sellers();
-            var regular_small_sellers = reader.Get_Regular_Small_Sellers();
-            var prior_big_sellers = reader.Get_Prior_Big_Sellers();
-            var regular_big_sellers = reader.Get_Regular_Big_Sellers();
-            var parameter_list = reader.Get_Parameter_List();
 
             if (full_run)
             {
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities);
+                var reader = new CSVReader(demand_file, pot_xDock_file, seller_file, parameter_file, "", month);
+
+                reader.Read();
+                demand_point = reader.Get_County();
+                potential_xDocks = reader.Get_XDocks();
+                agency = reader.Get_Agency();
+                var prior_small_sellers = reader.Get_Prior_Small_Sellers();
+                var regular_small_sellers = reader.Get_Regular_Small_Sellers();
+                var prior_big_sellers = reader.Get_Prior_Big_Sellers();
+                var regular_big_sellers = reader.Get_Regular_Big_Sellers();
+                var parameter_list = reader.Get_Parameter_List();
+
+
+                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
                 (xDocks, hubs) = await Task.Run(() => runner.Run());
                 //Console.ReadKey();
             }
@@ -328,14 +355,28 @@ namespace Core_Form
                 var partial_reader = new CSVReader("", "", "", "", mahalle_xdock_file, month);
                 partial_reader.Read_xDock_Neighborhood_Assignments();
                 xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
+                Courier_Runner_Writer(xDock_neighborhood_assignments, courier_parameter_list,directory);
             }
             else if (partial_solution)
             {
+                var reader = new CSVReader(demand_file, pot_xDock_file, seller_file, parameter_file, "", month);
+
+                reader.Read();
+                demand_point = reader.Get_County();
+                potential_xDocks = reader.Get_XDocks();
+                agency = reader.Get_Agency();
+                var prior_small_sellers = reader.Get_Prior_Small_Sellers();
+                var regular_small_sellers = reader.Get_Regular_Small_Sellers();
+                var prior_big_sellers = reader.Get_Prior_Big_Sellers();
+                var regular_big_sellers = reader.Get_Regular_Big_Sellers();
+                var parameter_list = reader.Get_Parameter_List();
+
                 var partial_reader = new CSVReader("", presolved_xDock_file, "", "", mahalle_xdock_file, month);
                 partial_reader.Read_Partial_Solution_Xdocks();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
+                partial_reader.Read_xDock_Neighborhood_Assignments();
                 xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities);
+                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments,courier_parameter_list);
                 (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
                 //Console.ReadKey();
             }

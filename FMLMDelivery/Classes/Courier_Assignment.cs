@@ -17,10 +17,9 @@ namespace FMLMDelivery.Classes
     {
         private xDocks _xDock;
         private List<Mahalle> _mahalle_list;
-        private Double _courier_max_cap;
         private Double _courier_min_cap;
         private Double _threshold;
-        private Double compensation_parameter = 2;
+        private Double _compensation_parameter;
         private List<Courier> courier_list = new List<Courier>();
         private List<List<Double>> _distance_matrix = new List<List<double>>();
         private List<Distance_Class> _all_distances = new List<Distance_Class>();
@@ -28,16 +27,16 @@ namespace FMLMDelivery.Classes
         private List<String> _assigned_courier_list = new List<string>();
         
 
-        public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_max_cap, Double courier_min_cap, Double threshold)
+        public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_min_cap, Double threshold,Double compansation)
         {
             _xDock = xDock;
             //Sort Descending Order
             _mahalle_list = mahalles;
             //_mahalle_list = Filter_Run(_mahalle_list);
             _mahalle_list = _mahalle_list.OrderByDescending(x => x.Return_Mahalle_Demand()).ToList();
-            _courier_max_cap = courier_max_cap;
             _courier_min_cap = courier_min_cap;
             _threshold = threshold;
+            _compensation_parameter = compansation;
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
                 if (_mahalle_list[i].Return_Mahalle_Demand() >= _threshold) _mahalle_list[i].Set_Type_of_Mahalle(true);
@@ -163,7 +162,7 @@ namespace FMLMDelivery.Classes
                     {
                         if (upper_bound - courier.Return_Total_Demand() - candidate_mahalle.Return_Mahalle_Demand() > 0)
                         {
-                            if (compensation_parameter * sorted_distance_list[j].Get_Distance() <= candidate_mahalle.Return_Mahalle_Demand())
+                            if (_compensation_parameter * sorted_distance_list[j].Get_Distance() <= candidate_mahalle.Return_Mahalle_Demand())
                             {
                                 found = true;
                                 courier.Add_Mahalle_To_Courier(candidate_mahalle);
@@ -347,7 +346,7 @@ namespace FMLMDelivery.Classes
                 {
                     if (_mahalle_list[j].Return_Mahalle_Demand() != 0 && distances[j] != 0)
                     {
-                        potential += Math.Floor(_mahalle_list[j].Return_Mahalle_Demand() / (compensation_parameter * distances[j]))* _mahalle_list[j].Return_Mahalle_Demand();
+                        potential += Math.Floor(_mahalle_list[j].Return_Mahalle_Demand() / (_compensation_parameter * distances[j]))* _mahalle_list[j].Return_Mahalle_Demand();
                     }
                 }
                 if (potential>best_potential)
@@ -452,7 +451,7 @@ namespace FMLMDelivery.Classes
             Assign_Remaining_Mahalle();
             Complete_Final_Assignments();
             Termination_Phase();
-            Return_Courier_Assignments();
+            Courier_Assignments();
         }
 
     }

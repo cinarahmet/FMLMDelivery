@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 
@@ -35,7 +36,10 @@ namespace FMLMDelivery.Classes
         private String _output_files;
         private double _hub_demand_coverage;
         private bool _only_cities;
-        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files,double hub_demand_coverage,Boolean only_cities)
+        private List<Double> _courier_parameters;
+        private Dictionary<xDocks, List<Mahalle>> _courier_document;
+        private List<String> courier_writer = new List<String>();
+        public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files,double hub_demand_coverage,Boolean only_cities,Dictionary<xDocks,List<Mahalle>> courier_file, List<Double> courier_parameters)
         {
             partial_xdocks=_partial_xdocks;
             xDocks = _xDocks;
@@ -50,6 +54,8 @@ namespace FMLMDelivery.Classes
             _output_files = Output_files;
             _hub_demand_coverage = hub_demand_coverage;
             _only_cities = only_cities;
+            _courier_parameters = courier_parameters;
+            _courier_document = courier_file;
         }
 
         private Tuple<List<xDocks>, List<Hub>, List<String>,List<String>> Run_Demand_Point_xDock_Model(List<DemandPoint> demandPoints, List<xDocks> xDocks,Double demand_cov, String key,double gap)
@@ -126,8 +132,10 @@ namespace FMLMDelivery.Classes
         {
             for (int i = 0; i < mahalle_assigments.Count; i++)
             {
-                var courier_assignment = new Courier_Assignment(mahalle_assigments.ElementAt(0).Key, mahalle_assigments.ElementAt(0).Value, 140, 100, 120);
+                var courier_assignment = new Courier_Assignment(mahalle_assigments.ElementAt(i).Key, mahalle_assigments.ElementAt(i).Value, _courier_parameters[0], _courier_parameters[1], _courier_parameters[2]);
                 courier_assignment.Run_Assignment_Procedure();
+                var list = courier_assignment.Return_Courier_Assignments();
+                courier_writer.AddRange(list);
             }
         }
         private Tuple<List<DemandPoint>, List<xDocks>> Get_City_Information(string key)
@@ -310,6 +318,8 @@ namespace FMLMDelivery.Classes
                 potential_hub_locations = Convert_to_Potential_Hubs(partial_xdocks);
                 Add_Already_Open_Main_Hubs();
                 new_xDocks = partial_xdocks;
+                //Courier Assignment 
+                Run_Courier_Problem(_courier_document);
                 //Seller-xDock Assignment
                 (assigned_prior_sellers, assigned_regular_sellers) = Second_Phase();
                 //xDock-Seller-Hub Assignment
@@ -348,8 +358,10 @@ namespace FMLMDelivery.Classes
             String csv4 = r_small + String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Atanmış Sıradan Küçük Tedarikçiler.csv", csv4, Encoding.UTF8);
 
+            var header_courier = "";
+            var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
+            write_courier.Write_Records();
 
-           
 
             Console.WriteLine("Hello World!");
 
