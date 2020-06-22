@@ -60,6 +60,7 @@
             this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
             this.Full_Run = new System.Windows.Forms.RadioButton();
             this.toolTip3 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip4 = new System.Windows.Forms.ToolTip(this.components);
             this.Partial_Run = new System.Windows.Forms.RadioButton();
             this.Min_Cap = new System.Windows.Forms.TextBox();
             this._threshold = new System.Windows.Forms.TextBox();
@@ -328,7 +329,9 @@
             this.Run_CitybyCity.Size = new System.Drawing.Size(190, 24);
             this.Run_CitybyCity.TabIndex = 2;
             this.Run_CitybyCity.Text = "İl Bazlı xDock Ataması";
-            //this.toolTip1.SetToolTip(this.Run_CitybyCity, resources.GetString("Run_CitybyCity.ToolTip"));
+            this.toolTip1.SetToolTip(this.Run_CitybyCity, "Kullanıcı belirli illerin çalışmasını yapmak istiyorsa bu modeli seçmelidir." +
+               "\r\n Bu modelin sonucunda çalıştırılan illerde belirlenen parametreler kullanılarak xDock" +
+               "\r\nalokasyonu ile birlikte mahalle atamaları gerçekleşmektedir.");
             this.Run_CitybyCity.UseVisualStyleBackColor = true;
             this.Run_CitybyCity.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
@@ -371,7 +374,8 @@
             this.Partial_Run.Size = new System.Drawing.Size(244, 24);
             this.Partial_Run.TabIndex = 1;
             this.Partial_Run.Text = "Xdock-Tedarikçi-Hub Ataması";
-            //this.toolTip3.SetToolTip(this.Partial_Run, resources.GetString("Partial_Run.ToolTip"));
+            this.toolTip3.SetToolTip(this.Partial_Run, "Bu modelde önceden alokasyonu yapılmış olan xDocklar\r\n'Kısmi Çalıştırma Dosyası' kullanılarak sisteme verilmelidir." +
+                "\r\nModel xDock bilgilerini kullanarak küçük tedarikçi atamalarını,\r\n Hub alokasyonu ve büyük tedarikçi atamalarını gerçekleştirir.");
             this.Partial_Run.UseVisualStyleBackColor = true;
             this.Partial_Run.CheckedChanged += new System.EventHandler(this.no_button_CheckedChanged);
             // 
@@ -462,6 +466,14 @@
             this.run_option_group_box.TabStop = false;
             this.run_option_group_box.Text = "Model Tipi ";
             // 
+            // toolTip2
+            // 
+            this.toolTip4.AutoPopDelay = 20000;
+            this.toolTip4.InitialDelay = 500;
+            this.toolTip4.ReshowDelay = 100;
+            this.toolTip4.ToolTipTitle = "Açıklama";
+            this.toolTip4.UseFading = false;
+            // 
             // Courier_Run
             // 
             this.Courier_Run.AutoSize = true;
@@ -472,6 +484,8 @@
             this.Courier_Run.TabStop = true;
             this.Courier_Run.Text = "Sadece Kurye Ataması";
             this.Courier_Run.UseVisualStyleBackColor = true;
+            this.toolTip4.SetToolTip(this.Courier_Run, "Bu model tipinde sadece kurye atamaları gerçekleşmektedir\r\n bir önceki çalıştırmadan çıktı olan ya da" +
+                "\r\n manuel hazılanabilecek 'Mahalle xDock Atamaları' dosyası\r\n kullanılarak gerekli parametreler ışığında kurye atamaları gerçekleşir.");
             this.Courier_Run.CheckedChanged += new System.EventHandler(this.Courier_Checked);
             // 
             // Network_Design_Form
@@ -527,6 +541,7 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolTip toolTip3;
         private System.Windows.Forms.ToolTip toolTip2;
+        private System.Windows.Forms.ToolTip toolTip4;
         private System.Windows.Forms.ComboBox Month_Selected;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox Mahalle_xDock_Ataması;

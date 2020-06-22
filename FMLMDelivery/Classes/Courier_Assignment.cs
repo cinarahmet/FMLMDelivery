@@ -282,7 +282,7 @@ namespace FMLMDelivery.Classes
                         var dist = _all_distances.Where(x => x.Get_From() == starting_xdock.Return_Mahalle_Id() && x.Get_To() == filtered_list[i].Return_Mahalle_Id());
                         total_dist_covered += dist.ElementAt(0).Get_Distance();
                         potential_ratio = new2_courier.Return_Total_Demand() / total_dist_covered;
-                        if (potential_ratio > best_potential_ratio)
+                        if (potential_ratio > best_potential_ratio && new2_courier.Return_Total_Demand()>=_courier_min_cap)
                         {
                             selected_courier = new2_courier;
                             best_potential_ratio = potential_ratio;
@@ -292,11 +292,10 @@ namespace FMLMDelivery.Classes
 
                     if (!Object.Equals(selected_courier, null))
                     {
-                        if (selected_courier.Return_Total_Demand() < _courier_min_cap)
+                        if (selected_courier.Return_Total_Demand() <_courier_min_cap)
                         {
                             keep_on = false;
                         }
-
                         else
                         {
                             var dist_cov = 0.0;
@@ -412,13 +411,13 @@ namespace FMLMDelivery.Classes
                 }
             }
             var count = 0;
-            for (int i = 0; i < _mahalle_list.Count; i++)
-            {
-                if (_mahalle_list[i].Return_Mahalle_Demand()>0)
-                {
-                    count = count + 1;
-                }
-            }
+            //for (int i = 0; i < _mahalle_list.Count; i++)
+            //{
+            //    if (_mahalle_list[i].Return_Mahalle_Demand()>0)
+            //    {
+            //        count = count + 1;
+            //    }
+            //}
         }
         private void Courier_Assignments()
         {
