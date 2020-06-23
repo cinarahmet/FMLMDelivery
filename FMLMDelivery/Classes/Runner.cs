@@ -358,7 +358,7 @@ namespace FMLMDelivery.Classes
             String csv4 = r_small + String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Atanmış Sıradan Küçük Tedarikçiler.csv", csv4, Encoding.UTF8);
 
-            var header_courier = "";
+            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
             write_courier.Write_Records();
 
