@@ -383,41 +383,62 @@ namespace FMLMDelivery.Classes
                     var filtered_distance_list = _all_distances.Where(x => x.Get_From() == _mahalle_list[i].Return_Mahalle_Id());
                     var sorted_distance_list = filtered_distance_list.OrderBy(x => x.Get_Distance()).ToList();
                     var neighborhood = sorted_distance_list[1];
-                    var assigned = true;
-                    for (int d = 1; d < sorted_distance_list.Count && assigned; d++)
+                    var neighborhood_assigned = false;
+                    for (int d = 1; d < sorted_distance_list.Count && !neighborhood_assigned; d++)
                     {
                         var demand = _mahalle_list.Find(x => x.Return_Mahalle_Id() == sorted_distance_list[d].Get_To()).Return_Mahalle_Demand();
+                        var neighborhood_found = false;
                         if (demand == 0)
                         {
-                            assigned = false;
+                            neighborhood_found = true;
                             neighborhood = sorted_distance_list[d];
                         }
-                    }
-                    var go_in = true;
-                    for (int j = 0; j < courier_list.Count&& go_in; j++)
-                    {
-                        for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count && go_in ; k++)
-                        {   
-                            if (courier_list[j].Return_Assigned_Mahalle()[k].Return_Mahalle_Id() == neighborhood.Get_To()) 
-                            {   
-                                courier_list[j].Add_Mahalle_To_Courier(_mahalle_list[i]);
-                                courier_list[j].Demand_From_Mahalle(_mahalle_list[i].Return_Mahalle_Demand());
-                                courier_list[j].Set_Total_Demand(_mahalle_list[i].Return_Mahalle_Demand());
-                                _mahalle_list[i].Set_Remaning_Demand(_mahalle_list[i].Return_Mahalle_Demand());
-                                go_in = false;
+
+
+                        var go_in = true;
+                        neighborhood_assigned = false;
+
+                        for (int j = 0; j < courier_list.Count && go_in; j++)
+                        {
+                            for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count && go_in && neighborhood_found; k++)
+                            {
+                                if (courier_list[j].Return_Assigned_Mahalle()[k].Return_Mahalle_Id() == neighborhood.Get_To() && courier_list[j].Return_Total_Demand() < 2 * _threshold - _mahalle_list[i].Return_Mahalle_Demand())
+                                {
+                                    neighborhood_assigned = true;
+                                    courier_list[j].Add_Mahalle_To_Courier(_mahalle_list[i]);
+                                    courier_list[j].Demand_From_Mahalle(_mahalle_list[i].Return_Mahalle_Demand());
+                                    courier_list[j].Set_Total_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                                    _mahalle_list[i].Set_Remaning_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                                    go_in = false;
+                                }
                             }
                         }
+
+                        //if (demand == 0)
+                        //{
+                        //    assigned = false;
+                        //    neighborhood = sorted_distance_list[d];
+                        //}
                     }
+
+                    //go_in = true;
+                    //for (int j = 0; j < courier_list.Count&& go_in; j++)
+                    //{
+                    //    for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count && go_in; k++)
+                    //    {   
+                    //        if (courier_list[j].Return_Assigned_Mahalle()[k].Return_Mahalle_Id() == neighborhood.Get_To() && courier_list[j].Return_Total_Demand() < 2*_threshold - _mahalle_list[i].Return_Mahalle_Demand()) 
+                    //        {   
+                    //            courier_list[j].Add_Mahalle_To_Courier(_mahalle_list[i]);
+                    //            courier_list[j].Demand_From_Mahalle(_mahalle_list[i].Return_Mahalle_Demand());
+                    //            courier_list[j].Set_Total_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                    //            _mahalle_list[i].Set_Remaning_Demand(_mahalle_list[i].Return_Mahalle_Demand());
+                    //            go_in = false;
+                    //        }
+                    //    }
+                    //}
                 }
             }
-            var count = 0;
-            //for (int i = 0; i < _mahalle_list.Count; i++)
-            //{
-            //    if (_mahalle_list[i].Return_Mahalle_Demand()>0)
-            //    {
-            //        count = count + 1;
-            //    }
-            //}
+            
         }
         private void Courier_Assignments()
         {
