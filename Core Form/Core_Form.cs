@@ -46,7 +46,7 @@ namespace Core_Form
             Full_Run.Checked = false;
             Partial_Run.Checked = false;
             _threshold.Enabled = false;
-            Min_Cap.Enabled = false;
+            Min_cap_courier.Enabled = false;
             Km_başı_paket.Enabled = false;
             Mahalle_xDock_Ataması.Enabled = false;
             Create_Dictionary_Month();
@@ -96,7 +96,7 @@ namespace Core_Form
                 Hub_Cov_Box.Enabled = true;
                 send_button.Enabled = true;
                 _threshold.Enabled = true;
-                Min_Cap.Enabled = true;
+                Min_cap_courier.Enabled = true;
                 Km_başı_paket.Enabled = true;
                 Mahalle_xDock_Ataması.Enabled = false;
 
@@ -124,7 +124,7 @@ namespace Core_Form
                 Presolved_box.Enabled = true;
                 Mahalle_xDock_Ataması.Enabled = true;
                 _threshold.Enabled = true;
-                Min_Cap.Enabled = true;
+                Min_cap_courier.Enabled = true;
                 Km_başı_paket.Enabled = true;
 
                 full_run = false;
@@ -143,7 +143,7 @@ namespace Core_Form
                 Demand_box.Enabled = true;
                 Pot_xDock_Box.Enabled = true;
                 Partial_Run.Enabled = true;
-                Seller_Box.Enabled = true;
+                Seller_Box.Enabled = false;
                 Parameter_Box.Enabled = true;
                 Presolved_box.Enabled = false;
                 Outbut_loc.Enabled = true;
@@ -151,7 +151,7 @@ namespace Core_Form
                 Hub_Cov_Box.Enabled = false;
                 send_button.Enabled = true;
                 _threshold.Enabled = true;
-                Min_Cap.Enabled = true;
+                Min_cap_courier.Enabled = true;
                 Km_başı_paket.Enabled = true;
                 Mahalle_xDock_Ataması.Enabled = false;
 
@@ -176,7 +176,7 @@ namespace Core_Form
                 Hub_Cov_Box.Enabled = false;
                 send_button.Enabled = true;
                 _threshold.Enabled = true;
-                Min_Cap.Enabled = true;
+                Min_cap_courier.Enabled = true;
                 Km_başı_paket.Enabled = true;
                 Mahalle_xDock_Ataması.Enabled = true;
 
@@ -279,7 +279,7 @@ namespace Core_Form
         {
             for (int i = 0; i < mahalle_list.Count; i++)
             {
-                var courier_assignment = new Courier_Assignment(mahalle_list.ElementAt(i).Key, mahalle_list[mahalle_list.ElementAt(i).Key], parameter_list[0], parameter_list[1], parameter_list[2]);
+                var courier_assignment = new Courier_Assignment(mahalle_list.ElementAt(i).Key, mahalle_list[mahalle_list.ElementAt(i).Key], parameter_list[0], parameter_list[1], parameter_list[2],parameter_list[3]);
                 courier_assignment.Run_Assignment_Procedure();
                 var list = courier_assignment.Return_Courier_Assignments();
                 courier_assignment_list.AddRange(list);
@@ -304,10 +304,11 @@ namespace Core_Form
             parameter_file = Parameter_Box.Text;
             presolved_xDock_file = Presolved_box.Text ;
             mahalle_xdock_file = Mahalle_xDock_Ataması.Text;
-            var courier_min_cap = Convert.ToDouble(Min_Cap.Text);
+            var courier_min_cap = Convert.ToDouble(Min_cap_courier.Text);
             var desired_efficiency = Convert.ToDouble(_threshold.Text);
+            var courier_max_cap = Convert.ToDouble(Max_cap_courier.Text);
             var compensation = Convert.ToDouble(Km_başı_paket.Text);
-            var courier_parameter_list = new List<Double> { courier_min_cap, desired_efficiency, compensation};
+            var courier_parameter_list = new List<Double> { courier_min_cap,courier_max_cap, desired_efficiency, compensation};
             if (!Courier_Run.Checked)
             {
                month = month_dict[Month_Selected.SelectedItem.ToString()];
@@ -332,7 +333,7 @@ namespace Core_Form
             
 
             if (full_run)
-            {
+            {   
                 var reader = new CSVReader(demand_file, pot_xDock_file, seller_file, parameter_file, "", month);
 
                 reader.Read();

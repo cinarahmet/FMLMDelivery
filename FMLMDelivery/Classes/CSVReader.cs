@@ -329,49 +329,51 @@ public class CSVReader
     }
     public void Read_Sellers()
     {
-        using ( var sr = File.OpenText(_seller_file))
+        if (_seller_file != "")
         {
-            String s = sr.ReadLine();
-            while ((s = sr.ReadLine()) != null)
+            using (var sr = File.OpenText(_seller_file))
             {
-                var line = s.Split(",");
-                var seller_name = line[0];
-                var seller_id = line[1];
-                var seller_city = line[2];
-                var seller_district = line[3];
-                var seller_priority = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
-                var seller_dist = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);                
-                var seller_size = line[9];
-                if (seller_size=="Small")
+                String s = sr.ReadLine();
+                while ((s = sr.ReadLine()) != null)
                 {
-                    var small_seller = new Seller(seller_name,seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist, seller_size);
-                    if (seller_priority == 1)
+                    var line = s.Split(",");
+                    var seller_name = line[0];
+                    var seller_id = line[1];
+                    var seller_city = line[2];
+                    var seller_district = line[3];
+                    var seller_priority = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_dist = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_size = line[9];
+                    if (seller_size == "Small")
                     {
-                        _prior_small_seller.Add(small_seller);
+                        var small_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist, seller_size);
+                        if (seller_priority == 1)
+                        {
+                            _prior_small_seller.Add(small_seller);
+                        }
+                        else
+                        {
+                            _regular_small_seller.Add(small_seller);
+                        }
                     }
                     else
                     {
-                        _regular_small_seller.Add(small_seller);
+                        var big_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist, seller_size);
+                        if (seller_priority == 1)
+                        {
+                            _prior_big_seller.Add(big_seller);
+                        }
+                        _regular_big_seller.Add(big_seller);
                     }
+                    var total_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist, seller_size);
+                    _total_seller.Add(total_seller);
                 }
-                else
-                {
-                    var big_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist,  seller_size);
-                    if (seller_priority==1)
-                    {
-                        _prior_big_seller.Add(big_seller);
-                    }
-                    _regular_big_seller.Add(big_seller);
-                }
-                var total_seller = new Seller(seller_name, seller_id, seller_city, seller_district, seller_priority, seller_long, seller_lat, seller_demand, seller_dist,  seller_size);
-                _total_seller.Add(total_seller);
             }
+
         }
-
-
     }
 
     public Dictionary<xDocks, List<Mahalle>> Get_xDock_neighborhood_Assignments()

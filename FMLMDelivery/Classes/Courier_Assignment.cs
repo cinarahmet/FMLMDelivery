@@ -25,9 +25,10 @@ namespace FMLMDelivery.Classes
         private List<Distance_Class> _all_distances = new List<Distance_Class>();
         private List<Remaining_Demand> _remaining_demand_list = new List<Remaining_Demand>();
         private List<String> _assigned_courier_list = new List<string>();
+        private Double _courier_max_cap;
         
 
-        public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_min_cap, Double threshold,Double compansation)
+        public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_min_cap, Double courier_max_cap, Double threshold,Double compansation)
         {
             _xDock = xDock;
             //Sort Descending Order
@@ -35,6 +36,7 @@ namespace FMLMDelivery.Classes
             //_mahalle_list = Filter_Run(_mahalle_list);
             _mahalle_list = _mahalle_list.OrderByDescending(x => x.Return_Mahalle_Demand()).ToList();
             _courier_min_cap = courier_min_cap;
+            _courier_max_cap = courier_max_cap;
             _threshold = threshold;
             _compensation_parameter = compansation;
             for (int i = 0; i < _mahalle_list.Count; i++)
@@ -402,7 +404,7 @@ namespace FMLMDelivery.Classes
                         {
                             for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count && go_in && neighborhood_found; k++)
                             {
-                                if (courier_list[j].Return_Assigned_Mahalle()[k].Return_Mahalle_Id() == neighborhood.Get_To() && courier_list[j].Return_Total_Demand() < 2 * _threshold - _mahalle_list[i].Return_Mahalle_Demand())
+                                if (courier_list[j].Return_Assigned_Mahalle()[k].Return_Mahalle_Id() == neighborhood.Get_To() && courier_list[j].Return_Total_Demand() < _courier_max_cap - _mahalle_list[i].Return_Mahalle_Demand())
                                 {
                                     neighborhood_assigned = true;
                                     courier_list[j].Add_Mahalle_To_Courier(_mahalle_list[i]);

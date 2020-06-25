@@ -132,7 +132,7 @@ namespace FMLMDelivery.Classes
         {
             for (int i = 0; i < mahalle_assigments.Count; i++)
             {
-                var courier_assignment = new Courier_Assignment(mahalle_assigments.ElementAt(i).Key, mahalle_assigments.ElementAt(i).Value, _courier_parameters[0], _courier_parameters[1], _courier_parameters[2]);
+                var courier_assignment = new Courier_Assignment(mahalle_assigments.ElementAt(i).Key, mahalle_assigments.ElementAt(i).Value, _courier_parameters[0], _courier_parameters[1], _courier_parameters[2], _courier_parameters[3]);
                 courier_assignment.Run_Assignment_Procedure();
                 var list = courier_assignment.Return_Courier_Assignments();
                 courier_writer.AddRange(list);
@@ -305,10 +305,10 @@ namespace FMLMDelivery.Classes
                 potential_hub_locations = Convert_to_Potential_Hubs(new_xDocks);
                 Add_Already_Open_Main_Hubs();
 
-                //Seller-xDock Assignment
-                (assigned_prior_sellers,assigned_regular_sellers) = Second_Phase();
+                
                 if (!_only_cities)
-                {
+                {   //Seller-xDock Assignment
+                    (assigned_prior_sellers, assigned_regular_sellers) = Second_Phase();
                     //xDock-Seller-Hub Assignment
                     (new_hubs, assigned_big_sellers) = Third_Phase();
                 }
@@ -339,24 +339,24 @@ namespace FMLMDelivery.Classes
                 String csv5 = big_s + String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Atanmış Büyük Tedarikçiler.csv", csv5, Encoding.UTF8);
 
+
+                string[] prior_small_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi" };
+                String p_small = String.Join(",", prior_small_seller) + Environment.NewLine;
+                String csv3 = p_small + String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
+                System.IO.File.WriteAllText(@"" + _output_files + "\\Atanmış Öncelikli Küçük Tedarikçiler.csv", csv3, Encoding.UTF8);
+
+
+                string[] regular_small_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi" };
+                String r_small = String.Join(",", regular_small_seller) + Environment.NewLine;
+                String csv4 = r_small + String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
+                System.IO.File.WriteAllText(@"" + _output_files + "\\Atanmış Sıradan Küçük Tedarikçiler.csv", csv4, Encoding.UTF8);
+
             }
 
             string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi","Önceden Açılmış","Acente"};
             String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
             String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()},{d.If_Agency()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
-
-
-            string[] prior_small_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi"};
-            String p_small = String.Join(",", prior_small_seller) + Environment.NewLine;
-            String csv3 = p_small + String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"" + _output_files +"\\Atanmış Öncelikli Küçük Tedarikçiler.csv", csv3, Encoding.UTF8);
-
-
-            string[] regular_small_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi" };
-            String r_small = String.Join(",", regular_small_seller) + Environment.NewLine;
-            String csv4 = r_small + String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
-            System.IO.File.WriteAllText(@"" + _output_files +"\\Atanmış Sıradan Küçük Tedarikçiler.csv", csv4, Encoding.UTF8);
 
             var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
