@@ -14,7 +14,7 @@ namespace FMLMDelivery.Classes
 
         private Double _total_demand= new double();
 
-        private Double _total_distance_covered = 0.0;
+        private List<Double> distance_list = new List<double>();
 
         public Courier(String ıd)
         { 
@@ -23,12 +23,12 @@ namespace FMLMDelivery.Classes
 
         public void Add_Distance_to_Courier(Double distance)
         {
-            _total_distance_covered += distance;
+            distance_list.Add(distance);
         }
 
-        public Double Return_Total_Distance_Covered()
+        public List<Double> Return_Distance_List()
         {
-            return _total_distance_covered;
+            return distance_list;
         }
 
         public void Set_Total_Demand(Double addition)

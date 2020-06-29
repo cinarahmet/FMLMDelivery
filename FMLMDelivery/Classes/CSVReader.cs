@@ -98,13 +98,13 @@ public class CSVReader
         var s_4 = "Ege";
         var value_4 = 220;
         var s_5 = "Güneydoğu";
-        var value_5 = 320;
+        var value_5 = 200;
         var s_6 = "Karadeniz";
-        var value_6 = 320;
+        var value_6 = 200;
         var s_7 = "Güneydoğu Anadolu";
-        var value_7 = 320;
+        var value_7 = 200;
         var s_8 = "Doğu Anadolu";
-        var value_8 = 320;
+        var value_8 = 200;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);

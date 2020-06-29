@@ -197,14 +197,14 @@ namespace FMLMDelivery.Classes
                 }
                 else if (xDocks[i].Get_District() == "YÜREĞİR" && xDocks[i].Get_Id() == "İNCİRLİK CUMHURİYET")
                 {
-                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 400000);
+                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 50000);
                 }
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
-                    Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 200000);
+                    Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 227000);
                 }else if (xDocks[i].Get_District() == "KEMALPAŞA" && xDocks[i].Get_Id() == "KIZILÜZÜM")
                 {
-                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 200000);
+                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 65000);
                 }
             }
         }
@@ -361,7 +361,7 @@ namespace FMLMDelivery.Classes
             String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()},{d.If_Agency()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
 
-            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket,Kapasite Aşımı";
+            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
             write_courier.Write_Records();
 
