@@ -75,6 +75,8 @@ public class CSVReader
         var value_6 = 30;
         var s_7 = "Güneydoğu Anadolu";
         var value_7 = 30;
+        var s_8 = "Doğu Anadolu";
+        var value_8 = 30;
         region_county_threshold.TryAdd(s_1, value);
         region_county_threshold.TryAdd(s_2, value_2);
         region_county_threshold.TryAdd(s_3, value_3);
@@ -82,6 +84,7 @@ public class CSVReader
         region_county_threshold.TryAdd(s_5, value_5);
         region_county_threshold.TryAdd(s_6, value_6);
         region_county_threshold.TryAdd(s_7, value_7);
+        region_county_threshold.TryAdd(s_8, value_8);
     }
 
     private void Create_xDock_Region_Threshold()
@@ -100,6 +103,8 @@ public class CSVReader
         var value_6 = 320;
         var s_7 = "Güneydoğu Anadolu";
         var value_7 = 320;
+        var s_8 = "Doğu Anadolu";
+        var value_8 = 320;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
@@ -107,6 +112,7 @@ public class CSVReader
         region_xDock_threshold.TryAdd(s_5, value_5);
         region_xDock_threshold.TryAdd(s_6, value_6);
         region_xDock_threshold.TryAdd(s_7, value_7);
+        region_xDock_threshold.TryAdd(s_8, value_8);
     }
 
     public void Read()

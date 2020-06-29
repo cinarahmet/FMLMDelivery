@@ -14,9 +14,21 @@ namespace FMLMDelivery.Classes
 
         private Double _total_demand= new double();
 
+        private Double _total_distance_covered = 0.0;
+
         public Courier(String ıd)
         { 
             _Id = ıd;
+        }
+
+        public void Add_Distance_to_Courier(Double distance)
+        {
+            _total_distance_covered += distance;
+        }
+
+        public Double Return_Total_Distance_Covered()
+        {
+            return _total_distance_covered;
         }
 
         public void Set_Total_Demand(Double addition)
@@ -29,7 +41,7 @@ namespace FMLMDelivery.Classes
             _mahalle_list.Add(mahalle);
         }
 
-        public void Demand_From_Mahalle(Double demand)
+        public void Add_Demand_From_Mahalle(Double demand)
         {
             _demand_from_mahalle.Add(demand);
         }
