@@ -487,6 +487,7 @@ namespace FMLMDelivery.Classes
         }
         public void Run_Assignment_Procedure()
         {
+            Create_Starting_xDock();
             Create_Distance_Matrix();
             Assign_Big_Mahalle_Partially();
             Assign_Big_Mahalle_Completely();

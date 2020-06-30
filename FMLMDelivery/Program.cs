@@ -21,7 +21,7 @@ namespace FMLMDelivery
             var partial_xDocks = new List<xDocks>();
             var parameters = new List<Parameters>();
             var xDock_neighborhood_assignments = new Dictionary<xDocks, List<Mahalle>>();
-            var courier_parameter_list = new List<Double> {100,120,2};
+            var courier_parameter_list = new List<Double> {100,150,120,2};
             var courier_list = new Dictionary<xDocks, List<Mahalle>>();
 
 
