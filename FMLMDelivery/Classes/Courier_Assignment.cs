@@ -425,7 +425,7 @@ namespace FMLMDelivery.Classes
                     var assigned = true;
                     for (int j = 0;  j < courier_list.Count & assigned ;  j++)
                     {
-                        for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count; k++)
+                        for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count & assigned; k++)
                         {   
                             for (int d = 1; d < sorted_distance_list.Count & go_in; d++)
                             {
