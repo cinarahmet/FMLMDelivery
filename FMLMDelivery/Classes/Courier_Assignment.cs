@@ -34,6 +34,7 @@ namespace FMLMDelivery.Classes
             _xDock = xDock;
             //Sort Descending Order
             _mahalle_list = mahalles;
+            Return_Duplicated_Mahalle(mahalles);
             //_mahalle_list = Filter_Run(_mahalle_list);
             _mahalle_list = _mahalle_list.OrderByDescending(x => x.Return_Mahalle_Demand()).ToList();
             _courier_min_cap = courier_min_cap;
@@ -45,6 +46,26 @@ namespace FMLMDelivery.Classes
                 if (_mahalle_list[i].Return_Mahalle_Demand() >= _threshold) _mahalle_list[i].Set_Type_of_Mahalle(true);
             }
 
+        }
+
+        private void Return_Duplicated_Mahalle(List<Mahalle> mahalle_list)
+        {   
+            for (int i = 0; i < mahalle_list.Count; i++)
+            {
+                var count = 0;
+                for (int j = 0; j < mahalle_list.Count; j++)
+                {   
+                    if (mahalle_list[i].Return_Mahalle_Id() == mahalle_list[j].Return_Mahalle_Id())
+                    {
+                        count += 1;
+                        if (count >= 2)
+                        {
+                            var mahalle = new Mahalle(mahalle_list[j].Return_Mahalle_Id() +" "+ count.ToString(), mahalle_list[j].Return_Longitude(), mahalle_list[j].Return_Lattitude(), mahalle_list[j].Return_Mahalle_Demand());
+                            mahalle_list[j] = mahalle;
+                        }
+                    }
+                }
+            }
         }
         private List<Mahalle> Filter_Run(List<Mahalle> mahalle_list)
         {
