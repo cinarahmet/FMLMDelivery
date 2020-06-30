@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using FMLMDelivery.Classes;
 using System.Device.Location;
-using System.Security.Cryptography;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+
 
 namespace FMLMDelivery.Classes
 {
