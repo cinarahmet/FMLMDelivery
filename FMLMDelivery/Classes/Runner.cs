@@ -299,9 +299,9 @@ namespace FMLMDelivery.Classes
                 write_the_xdocks.Write_Records();
 
 
-                string[] new_header_already_opened = { "İl", "İlçe", "Mahalle", "Bölge", "Acente", "Boylam", "Enlem","Açık xDock", "Atanma Km'si", "LM Hacim", "FM Hacim" };
+                string[] new_header_already_opened = { "İl", "İlçe", "Mahalle", "Bölge", "Boylam", "Enlem","Açık xDock veya Acente", "Atanma Km'si", "LM Hacim", "FM Hacim" };
                 String header_already_opened = String.Join(",", new_header_already_opened) + Environment.NewLine;
-                String csv_new =header_already_opened + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Region()},{d.If_Agency()},{d.Get_Longitude()},{d.Get_Latitude()},{d.If_Already_Opened()},{d.Get_Distance_Threshold()},{d.Get_LM_Demand()},{d.Get_FM_Demand()}"));
+                String csv_new =header_already_opened + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Region()},{d.Get_Longitude()},{d.Get_Latitude()},{d.If_Already_Opened()},{d.Get_Distance_Threshold()},{d.Get_LM_Demand()},{d.Get_FM_Demand()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Kısmi Çalıştırma Dosyası.csv", csv_new, Encoding.UTF8);
 
                 Modify_xDocks(new_xDocks);
@@ -356,9 +356,9 @@ namespace FMLMDelivery.Classes
 
             }
 
-            string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi","Önceden Açılmış","Acente"};
+            string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi","Açık xDock veya Acente"};
             String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
-            String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()},{d.If_Agency()}"));
+            String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
             System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
 
             var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";

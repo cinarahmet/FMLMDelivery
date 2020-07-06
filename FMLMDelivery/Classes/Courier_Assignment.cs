@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using FMLMDelivery.Classes;
 using System.Device.Location;
-using System.Security.Cryptography;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+
 
 namespace FMLMDelivery.Classes
 {
@@ -490,7 +484,7 @@ namespace FMLMDelivery.Classes
                     var courier_mahalle_demand = courier_list[i].Return_Demand_At_Mahalle()[j];
                     var courier_mahalle_name = courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id();
                     var courier_distance = courier_list[i].Return_Distance_List()[j];
-                    var overload = "No overload";
+                    var overload = "";
                     if (courier_list[i].Return_Total_Demand() > _courier_max_cap)
                     {
                         overload = "Overload";
