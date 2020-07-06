@@ -29,7 +29,7 @@ namespace FMLMDelivery
             var discrete_solution = true;
             var hub_demand_coverage = 0.97;
             //Provide the month index (1-January, 12-December)
-            var month = 10;
+            var month = 11;
             var reader = new CSVReader("Demand_Points.csv", "Potential_xDocks.csv", "First_Mile_Ekim.csv", "Parameters.csv","", month);
             reader.Read();
             demand_point = reader.Get_County();

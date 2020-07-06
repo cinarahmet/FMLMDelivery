@@ -490,7 +490,7 @@ namespace FMLMDelivery.Classes
                     var courier_mahalle_demand = courier_list[i].Return_Demand_At_Mahalle()[j];
                     var courier_mahalle_name = courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id();
                     var courier_distance = courier_list[i].Return_Distance_List()[j];
-                    var overload = "No overload";
+                    var overload = "";
                     if (courier_list[i].Return_Total_Demand() > _courier_max_cap)
                     {
                         overload = "Overload";
