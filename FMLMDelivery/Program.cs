@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using FMLMDelivery;
 using FMLMDelivery.Classes;
-using FMLMDelivery.MetaHeuristics;
 
 namespace FMLMDelivery
 {

@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using FMLMDelivery.Classes;
 using System.Device.Location;
-using System.Security.Cryptography;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+
 
 namespace FMLMDelivery.Classes
 {
@@ -446,7 +440,7 @@ namespace FMLMDelivery.Classes
                     var assigned = true;
                     for (int j = 0;  j < courier_list.Count & assigned ;  j++)
                     {
-                        for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count; k++)
+                        for (int k = 0; k < courier_list[j].Return_Assigned_Mahalle().Count & assigned; k++)
                         {   
                             for (int d = 1; d < sorted_distance_list.Count & go_in; d++)
                             {
