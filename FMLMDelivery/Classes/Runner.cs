@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMLMDelivery.MetaHeuristics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,7 @@ namespace FMLMDelivery.Classes
 {
     public class Runner
     {
-        private Boolean is_genetic = false;
+        private Boolean is_genetic = true;
         private List<xDocks> xDocks;
         private List<DemandPoint> demand_Points;
         private List<xDocks> agency;
@@ -90,16 +91,21 @@ namespace FMLMDelivery.Classes
             var opened_xDocks = first_phase.Return_Opened_xDocks();
             var assignments = first_phase.Return_Assignments();
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
-
-
-            //if (is_genetic)
-            //{
-            //    var heuristic = new Genetic_Algorithm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
-            //    heuristic.Run();
-            //    (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
-            //    demand_covarage = heuristic.Return_Covered_Demand();
-            //}
-
+            var list_assign = new List<List<Double>>();
+            
+            if (is_genetic)
+            {
+                var heuristic = new Genetic_Algorithm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+                heuristic.Run();
+                (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
+                list_assign = heuristic.Return_Assignments_District();
+                demand_covarage = heuristic.Return_Covered_Demand();
+            }
+            var xdocks = new List<xDocks>();
+            var xdock_mahalle = new List<String>();
+            (xdocks, xdock_mahalle) =Print_Solutions(opened_xDocks, list_assign, _demand_points, _pot_xDocks);
+            
+            
             //if (!is_genetic)
             //{
             //    var heuristic1 = new Simulated_Annealing(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
@@ -110,23 +116,63 @@ namespace FMLMDelivery.Classes
             //var heuristic_particle = new Particle_Swarm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
             //heuristic_particle.Run();
 
-            
-            //Part 2 for county-xDock pair
-            min_model_model = false;
-            demand_weighted_model = true;
-            phase_2 = true;
-            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true,gap,3600,false);
-            first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
-            first_phase.Run();
-            objVal = first_phase.GetObjVal();
-            //xDocks are assigned
-            new_xDocks = first_phase.Return_XDock();  
-            potential_Hubs = first_phase.Return_Potential_Hubs();
-            stats.AddRange(first_phase.Get_Model_Stats_Info());
-            var assignment_dictionary = first_phase.Return_xDock_Mahalle();
-            Run_Courier_Problem(assignment_dictionary);
 
-            return Tuple.Create(new_xDocks, potential_Hubs, first_phase.Get_Xdock_County_Info(),stats);
+            //Part 2 for county-xDock pair
+            //min_model_model = false;
+            //demand_weighted_model = true;
+            //phase_2 = true;
+            //first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true,gap,3600,false);
+            //first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
+            //first_phase.Run();
+            //objVal = first_phase.GetObjVal();
+            ////xDocks are assigned
+            //new_xDocks = first_phase.Return_XDock();  
+            //potential_Hubs = first_phase.Return_Potential_Hubs();
+            //stats.AddRange(first_phase.Get_Model_Stats_Info());
+            //var assignment_dictionary = first_phase.Return_xDock_Mahalle();
+            //Run_Courier_Problem(assignment_dictionary);
+
+            return Tuple.Create(xdocks, potential_Hubs, xdock_mahalle, stats);
+        }
+        private Tuple<List<xDocks>, List<String>> Print_Solutions(List<Double> opened_xdocks, List<List<Double>> assignments, List<DemandPoint> demand_points, List<xDocks> pot_xdocks)
+        {
+            var loopcount = (assignments.Count / pot_xdocks.Count);
+            var count = 0;
+            var list_xdocks = new List<xDocks>();
+            var list_demand = new List<DemandPoint>();
+            var record_list = new List<String>();
+            for (int i = 0; i < opened_xdocks.Count; i++)
+            {
+                if (opened_xdocks[i] == 1)
+                {   var xdock_city = pot_xdocks[i].Get_City();
+                    var xdock_district = pot_xdocks[i].Get_District();
+                    var xdock_id = pot_xdocks[i].Get_Id();
+                    var xdock_lat = pot_xdocks[i].Get_Latitude();
+                    var xdock_long = pot_xdocks[i].Get_Longitude();
+                    list_xdocks.Add(pot_xdocks[i]);
+                    count += 1;
+                    for (int k = 0; k < assignments[count-1].Count; k++)
+                    {
+                        if (assignments[count-1][k] == 1)
+                        {
+                            var x_dock_ranking = "Xdock" + count;
+                            var demand_point_city = demand_points[k].Get_City();
+                            var demand_point_district = demand_points[k].Get_District();
+                            var demand_point_id = demand_points[k].Get_Id();
+                            var demand_point_lat = demand_points[k].Get_Latitude();
+                            var demand_point_long = demand_points[k].Get_Longitude();
+                            var demand = demand_points[k].Get_Demand();
+                            var distance_xdock_county = 0;
+                            var result = $"{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{demand_point_city},{demand_point_district},{demand_point_id},{demand_point_lat},{demand_point_long},{distance_xdock_county},{demand}";
+                            record_list.Add(result);
+                        }
+                    }
+
+                }
+            }
+
+            return Tuple.Create(list_xdocks, record_list);
+            
         }
         private void Run_Courier_Problem(Dictionary<xDocks,List<Mahalle>> mahalle_assigments)
         {
@@ -295,9 +341,17 @@ namespace FMLMDelivery.Classes
                     }
                 }
                 var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Talep Noktası Enlem,Talep Noktası Boylam,Uzaklık,Talep Noktası Talebi";
-                var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point,_output_files);
+                var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point, "C:\\Workspace\\FMLMDelivery\\FMLMDelivery\\bin\\Debug\\netcoreapp2.1\\Output");
                 write_the_xdocks.Write_Records();
 
+                //var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Talep Noktası Enlem,Talep Noktası Boylam,Uzaklık,Talep Noktası Talebi";
+                //var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point, _output_files);
+                //write_the_xdocks.Write_Records();
+
+                string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi", "Açık xDock veya Acente" };
+                String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
+                String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
+                System.IO.File.WriteAllText(@"" + "C:\\Workspace\\FMLMDelivery\\FMLMDelivery\\bin\\Debug\\netcoreapp2.1\\Output" + "\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
 
                 string[] new_header_already_opened = { "İl", "İlçe", "Mahalle", "Bölge", "Boylam", "Enlem","Açık xDock veya Acente", "Atanma Km'si", "LM Hacim", "FM Hacim" };
                 String header_already_opened = String.Join(",", new_header_already_opened) + Environment.NewLine;
@@ -356,10 +410,10 @@ namespace FMLMDelivery.Classes
 
             }
 
-            string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi","Açık xDock veya Acente"};
-            String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
-            String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
-            System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
+            //string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi","Açık xDock veya Acente"};
+            //String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
+            //String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
+            //System.IO.File.WriteAllText(@"" + _output_files +"\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
 
             var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);

@@ -20,7 +20,7 @@ namespace FMLMDelivery.MetaHeuristics
         private Int32 elitist_size = 2;
         private Random rand = new Random();
         private Int32 chromosome_length;
-        private Int32 iteration_count = 1000;
+        private Int32 iteration_count = 100;
         private Double infeasible_acceptance_percentage = 0.00;
         private Double alpha = 0.005;
         private Dictionary<Int32,Double> best_score_matrix = new Dictionary<Int32, Double>();
@@ -33,6 +33,7 @@ namespace FMLMDelivery.MetaHeuristics
         private Double covered_demand = new double();
         private Dictionary<String, Double> solution_list = new Dictionary<string, double>();
         private String heuristic_name = "Genetic Algorithm";
+        private List<List<Double>> model_assign = new List<List<Double>>();
 
 
 
@@ -265,7 +266,11 @@ namespace FMLMDelivery.MetaHeuristics
                     (final_chromosome, objective_value, chromosome_status) = Suitability_Check(selected_chromosome, new_population.Count, current_infeasible_count, new_xDocks);
                     new_population.Add(final_chromosome);
                     string_sol = String.Join(',', final_chromosome);
-                    solution_list.Add(string_sol, objective_value);
+                    if (!(solution_list.ContainsKey(string_sol)))
+                    {
+                        solution_list.Add(string_sol, objective_value);
+                    }
+                   
                 }
                 var score = new Score(i, objective_value);
                 new_scores.Add(score);
@@ -547,10 +552,16 @@ namespace FMLMDelivery.MetaHeuristics
             var final_xDocks = model.Return_XDock();
             covered_demand = Find_Covered_Demand(final_xDocks);
             var model_assignments = model.Return_Heuristic_Assignment();
+            model_assign = model.Return_Heuristic_Assignment();
             heuristic_pairs = Create_Initial_Solution_Procedure(best_solution, model_assignments);
             Console.WriteLine("Finish");
         }
+        public List<List<Double>> Return_Assignments_District()
+        {
+            return model_assign;
+        }
     }
+    
 
     internal class Score
     {
