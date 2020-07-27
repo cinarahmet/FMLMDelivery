@@ -476,11 +476,13 @@ namespace FMLMDelivery.Classes
             var xdock_city = _xDock.Get_City();
             var xdock_district = _xDock.Get_District();
             var xdock_id = _xDock.Get_Id();
+            var count = 1;
             for (int i = 0; i < courier_list.Count; i++)
             {
+                count += 1;
                 for (int j = 0; j < courier_list[i].Return_Assigned_Mahalle().Count; j++)
                 {
-                    var courier_id = courier_list[i].Return_Courier_Id();
+                    var courier_id =count;
                     var courier_mahalle_demand = courier_list[i].Return_Demand_At_Mahalle()[j];
                     var courier_mahalle_name = courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id();
                     var courier_distance = courier_list[i].Return_Distance_List()[j];
