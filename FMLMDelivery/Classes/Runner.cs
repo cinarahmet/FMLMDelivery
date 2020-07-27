@@ -93,19 +93,19 @@ namespace FMLMDelivery.Classes
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
             var list_assign = new List<List<Double>>();
             
-            if (is_genetic)
-            {
-                var heuristic = new Genetic_Algorithm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
-                heuristic.Run();
-                (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
-                list_assign = heuristic.Return_Assignments_District();
-                demand_covarage = heuristic.Return_Covered_Demand();
-            }
-            var xdocks = new List<xDocks>();
-            var xdock_mahalle = new List<String>();
-            (xdocks, xdock_mahalle) =Print_Solutions(opened_xDocks, list_assign, _demand_points, _pot_xDocks);
-            
-            
+            //if (is_genetic)
+            //{
+            //    var heuristic = new Genetic_Algorithm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
+            //    heuristic.Run();
+            //    (opened_xDocks, assignments) = heuristic.Return_Best_Solution();
+            //    list_assign = heuristic.Return_Assignments_District();
+            //    demand_covarage = heuristic.Return_Covered_Demand();
+            //}
+            //var xdocks = new List<xDocks>();
+            //var xdock_mahalle = new List<String>();
+            //(xdocks, xdock_mahalle) =Print_Solutions(opened_xDocks, list_assign, _demand_points, _pot_xDocks);
+
+
             //if (!is_genetic)
             //{
             //    var heuristic1 = new Simulated_Annealing(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
@@ -117,22 +117,23 @@ namespace FMLMDelivery.Classes
             //heuristic_particle.Run();
 
 
-            //Part 2 for county-xDock pair
-            //min_model_model = false;
-            //demand_weighted_model = true;
-            //phase_2 = true;
-            //first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true,gap,3600,false);
-            //first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
-            //first_phase.Run();
-            //objVal = first_phase.GetObjVal();
-            ////xDocks are assigned
-            //new_xDocks = first_phase.Return_XDock();  
-            //potential_Hubs = first_phase.Return_Potential_Hubs();
-            //stats.AddRange(first_phase.Get_Model_Stats_Info());
-            //var assignment_dictionary = first_phase.Return_xDock_Mahalle();
-            //Run_Courier_Problem(assignment_dictionary);
+            //Part 2 for county - xDock pair
+            min_model_model = false;
+            demand_weighted_model = true;
+            phase_2 = true;
+            first_phase = new DemandxDockModel(_demand_points, _pot_xDocks, _key, demand_weighted_model, min_model_model, demand_covarage, phase_2, min_num, true, gap, 3600, false);
+            first_phase.Provide_Initial_Solution(opened_xDocks, assignments);
+            first_phase.Run();
+            objVal = first_phase.GetObjVal();
+            //xDocks are assigned
+            new_xDocks = first_phase.Return_XDock();
+            potential_Hubs = first_phase.Return_Potential_Hubs();
+            stats.AddRange(first_phase.Get_Model_Stats_Info());
+            var assignment_dictionary = first_phase.Return_xDock_Mahalle();
+            var xdock_mahalle = first_phase.Get_Xdock_County_Info();
+            Run_Courier_Problem(assignment_dictionary);
 
-            return Tuple.Create(xdocks, potential_Hubs, xdock_mahalle, stats);
+            return Tuple.Create(new_xDocks, potential_Hubs, xdock_mahalle, stats);
         }
         private Tuple<List<xDocks>, List<String>> Print_Solutions(List<Double> opened_xdocks, List<List<Double>> assignments, List<DemandPoint> demand_points, List<xDocks> pot_xdocks)
         {

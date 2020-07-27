@@ -895,6 +895,7 @@ public class DemandxDockModel
             Open_Located_xDocks();
             Capacity_Constraint();
             Min_County_Constraint();
+            //One_Zero_Constraint();
         }
         if (_min_xDock_model)
         {
@@ -903,6 +904,20 @@ public class DemandxDockModel
             Min_County_Constraint();
         }
 
+    }
+
+    private void One_Zero_Constraint()
+    {
+        var constraint = _solver.LinearNumExpr();
+        for (int i = 0; i < _num_of_demand_point; i++)
+        {
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                constraint.AddTerm(x[i][j], 1);
+                _solver.AddLe(constraint, a[i][j]);
+            }
+        }
+        
     }
 
     private void Open_Located_xDocks()
