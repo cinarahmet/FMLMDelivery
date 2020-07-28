@@ -27,6 +27,7 @@ namespace Core_Form
         private Boolean full_run = new bool();
         private List<String> courier_assignment_list = new List<string>();
         private Boolean Error = false;
+        
         public Network_Design_Form_Core()
         {
             InitializeComponent();
@@ -306,6 +307,14 @@ namespace Core_Form
             parameter_file = Parameter_Box.Text;
             presolved_xDock_file = Presolved_box.Text ;
             mahalle_xdock_file = Mahalle_xDock_Ataması.Text;
+
+            if (Min_cap_courier.Text == "Default" || _threshold.Text== "Default" || Max_cap_courier.Text=="Default" || Km_başı_paket.Text== "Default")
+            {
+                Min_cap_courier.Text = "100";
+                Max_cap_courier.Text = "150";
+                _threshold.Text = "120";
+                Km_başı_paket.Text = "2";
+            }
             var courier_min_cap = Convert.ToDouble(Min_cap_courier.Text);
             var desired_efficiency = Convert.ToDouble(_threshold.Text);
             var courier_max_cap = Convert.ToDouble(Max_cap_courier.Text);

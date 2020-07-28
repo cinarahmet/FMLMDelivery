@@ -399,6 +399,7 @@
             this.Min_cap_courier.Name = "Min_cap_courier";
             this.Min_cap_courier.Size = new System.Drawing.Size(89, 27);
             this.Min_cap_courier.TabIndex = 28;
+            this.Min_cap_courier.Text = "Default";
             this.Min_cap_courier.TextChanged += new System.EventHandler(this.Min_Cap_TextChanged);
             // 
             // _threshold
@@ -408,6 +409,7 @@
             this._threshold.Name = "_threshold";
             this._threshold.Size = new System.Drawing.Size(89, 27);
             this._threshold.TabIndex = 29;
+            this._threshold.Text = "Default";
             this._threshold.TextChanged += new System.EventHandler(this._threshold_TextChanged);
             // 
             // Km_başı_paket
@@ -417,6 +419,7 @@
             this.Km_başı_paket.Name = "Km_başı_paket";
             this.Km_başı_paket.Size = new System.Drawing.Size(89, 27);
             this.Km_başı_paket.TabIndex = 30;
+            this.Km_başı_paket.Text = "Default";
             this.Km_başı_paket.TextChanged += new System.EventHandler(this.Km_başı_paket_TextChanged);
             // 
             // groupBox3
@@ -459,6 +462,7 @@
             this.Max_cap_courier.Name = "Max_cap_courier";
             this.Max_cap_courier.Size = new System.Drawing.Size(89, 27);
             this.Max_cap_courier.TabIndex = 34;
+            this.Max_cap_courier.Text = "Default";
             // 
             // label6
             // 
