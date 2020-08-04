@@ -9,6 +9,8 @@ namespace FMLMDelivery.Classes
     {
         private readonly String  _mahalle_id;
 
+        private readonly String _mahalle_district;
+
         private readonly Double _mahalle_long;
 
         private readonly Double _mahalle_lat;
@@ -17,11 +19,12 @@ namespace FMLMDelivery.Classes
 
         private bool _big_mahalle = false;
 
-        public Mahalle(String mahalle_id, Double mahalle_long, Double mahalle_lat, Double mahalle_demand)
+        public Mahalle(String mahalle_id,String mahalle_district, Double mahalle_long, Double mahalle_lat, Double mahalle_demand)
         {
             _mahalle_lat = mahalle_lat;
             _mahalle_long = mahalle_long;
             _mahalle_id = mahalle_id;
+            _mahalle_district = mahalle_district;
             _mahalle_demand = mahalle_demand;
         }
 
@@ -30,6 +33,10 @@ namespace FMLMDelivery.Classes
             return _mahalle_id;
         }
 
+        public String Return_Mahalle_District()
+        {
+            return _mahalle_district;
+        }
         public void Set_Remaning_Demand(Double extracted)
         {   
             _mahalle_demand = (_mahalle_demand - extracted);

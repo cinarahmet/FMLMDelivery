@@ -117,7 +117,7 @@ namespace FMLMDelivery.Classes
             //heuristic_particle.Run();
 
 
-            //Part 2 for county - xDock pair
+            // Part 2 for county - xDock pair
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
@@ -416,7 +416,7 @@ namespace FMLMDelivery.Classes
             String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
             System.IO.File.WriteAllText(@"" + _output_files + "\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
 
-            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
+            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle,Mahalle İlçe, Mahalle Boylam, Mahalle Enlem, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
             write_courier.Write_Records();
 

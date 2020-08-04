@@ -188,7 +188,7 @@ public class CSVReader
                 }
             }
         }
-        File.WriteAllLines("C:\\Workspace\\FMLMDelivery\\FMLMDelivery\\bin\\Debug\\netcoreapp2.1\\Output" + "\\Açılmış xDocklar Listesi.csv", failure_list.Select(x => string.Join(",", x)),Encoding.UTF8);
+        
     }
 
     public void Read_Partially()
@@ -259,7 +259,7 @@ public class CSVReader
                     var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
                     var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
                     var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
-                    var neighborhood = new Mahalle(demand_point_id, demand_point_long, demand_point_lat, demand);
+                    var neighborhood = new Mahalle(demand_point_id,demand_point_district, demand_point_long, demand_point_lat, demand);
                     var neighborhood_list = new List<Mahalle>();
                     var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
 
