@@ -92,7 +92,7 @@ namespace FMLMDelivery.Classes
             var assignments = first_phase.Return_Assignments();
             var heuristic_assignments = first_phase.Return_Heuristic_Assignment();
             var list_assign = new List<List<Double>>();
-            
+
             //if (is_genetic)
             //{
             //    var heuristic = new Genetic_Algorithm(opened_xDocks, _pot_xDocks, _demand_points, _parameters, demand_covarage, min_num, key);
@@ -103,7 +103,7 @@ namespace FMLMDelivery.Classes
             //}
             //var xdocks = new List<xDocks>();
             //var xdock_mahalle = new List<String>();
-            //(xdocks, xdock_mahalle) =Print_Solutions(opened_xDocks, list_assign, _demand_points, _pot_xDocks);
+            //(xdocks, xdock_mahalle) = Print_Solutions(opened_xDocks, list_assign, _demand_points, _pot_xDocks);
 
 
             //if (!is_genetic)

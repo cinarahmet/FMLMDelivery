@@ -315,6 +315,12 @@ namespace FMLMDelivery.Classes
                         {
                             var dist_cov = 0.0;
                             var courier_ıd = $"{"Courier "}{courier_list.Count}";
+                            var count = 1;
+                            while (courier_list.Any(x => x.Return_Courier_Id() == courier_ıd))
+                            {
+                                courier_ıd = $"{"Courier "}{courier_list.Count + count}";
+                                count += 1;
+                            }
                             var selected_c = new Courier(courier_ıd);
                             selected_c.Add_Mahalle_To_Courier(filtered_list[selected_index]);
                             selected_c.Add_Demand_From_Mahalle(filtered_list[selected_index].Return_Mahalle_Demand());
@@ -367,6 +373,25 @@ namespace FMLMDelivery.Classes
             {
                 courier_list.RemoveAll(x => x.Return_Courier_Id()==list_of_remove[i].Return_Courier_Id());
             }
+
+            Complete_Final_Assignments();
+            list_of_remove = new List<Courier>();
+            for (int i = 0; i < courier_list.Count; i++)
+            {
+                if (courier_list[i].Return_Total_Demand() < _courier_min_cap)
+                {
+                    for (int j = 0; j < courier_list[i].Return_Assigned_Mahalle().Count; j++)
+                    {
+                        _mahalle_list.Find(x => x.Return_Mahalle_Id() == courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id()).Set_Remaning_Demand(-courier_list[i].Return_Demand_At_Mahalle()[j]);
+                    }
+                    list_of_remove.Add(courier_list[i]);
+                }
+            }
+            for (int i = 0; i < list_of_remove.Count; i++)
+            {
+                courier_list.RemoveAll(x => x.Return_Courier_Id() == list_of_remove[i].Return_Courier_Id());
+            }
+
 
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
@@ -424,7 +449,6 @@ namespace FMLMDelivery.Classes
                     //        }
                     //    }
                     //}
-
 
                 }
             }
