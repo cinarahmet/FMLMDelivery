@@ -369,6 +369,25 @@ namespace FMLMDelivery.Classes
                 courier_list.RemoveAll(x => x.Return_Courier_Id()==list_of_remove[i].Return_Courier_Id());
             }
 
+            Complete_Final_Assignments();
+            list_of_remove = new List<Courier>();
+            for (int i = 0; i < courier_list.Count; i++)
+            {
+                if (courier_list[i].Return_Total_Demand() < _courier_min_cap)
+                {
+                    for (int j = 0; j < courier_list[i].Return_Assigned_Mahalle().Count; j++)
+                    {
+                        _mahalle_list.Find(x => x.Return_Mahalle_Id() == courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id()).Set_Remaning_Demand(-courier_list[i].Return_Demand_At_Mahalle()[j]);
+                    }
+                    list_of_remove.Add(courier_list[i]);
+                }
+            }
+            for (int i = 0; i < list_of_remove.Count; i++)
+            {
+                courier_list.RemoveAll(x => x.Return_Courier_Id() == list_of_remove[i].Return_Courier_Id());
+            }
+
+
             for (int i = 0; i < _mahalle_list.Count; i++)
             {
                 if (_mahalle_list[i].Return_Mahalle_Demand() > 0)
