@@ -370,9 +370,10 @@ public class DemandxDockModel
                             demand += _demandpoint[i].Get_Demand();
                             var mahalle_name = _demandpoint[i].Get_Id();
                             var mahalle_demand = _demandpoint[i].Get_Demand();
+                            var mahalle_district = _demandpoint[i].Get_District();
                             var mahalle_long = _demandpoint[i].Get_Longitude();
                             var mahalle_lat = _demandpoint[i].Get_Latitude();
-                            var mahalle = new Mahalle(mahalle_name, mahalle_long,mahalle_lat,mahalle_demand);
+                            var mahalle = new Mahalle(mahalle_name,mahalle_district, mahalle_long,mahalle_lat,mahalle_demand);
                             list_mahalle.Add(mahalle);
                         }
                     }

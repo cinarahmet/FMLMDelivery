@@ -54,7 +54,7 @@ namespace FMLMDelivery.Classes
                         count += 1;
                         if (count >= 2)
                         {
-                            var mahalle = new Mahalle(mahalle_list[j].Return_Mahalle_Id() +" "+ count.ToString(), mahalle_list[j].Return_Longitude(), mahalle_list[j].Return_Lattitude(), mahalle_list[j].Return_Mahalle_Demand());
+                            var mahalle = new Mahalle(mahalle_list[j].Return_Mahalle_Id() +" "+ count.ToString(), mahalle_list[j].Return_Mahalle_District(), mahalle_list[j].Return_Longitude(), mahalle_list[j].Return_Lattitude(), mahalle_list[j].Return_Mahalle_Demand());
                             mahalle_list[j] = mahalle;
                         }
                     }
@@ -150,10 +150,11 @@ namespace FMLMDelivery.Classes
                     for (int a = 0; a < _mahalle_list.Count; a++)
                     {
                         var mahalle_id = _mahalle_list[a].Return_Mahalle_Id();
+                        var mahalle_district = _mahalle_list[a].Return_Mahalle_District();
                         var mahalle_long = _mahalle_list[a].Return_Longitude();
                         var mahalle_lat = _mahalle_list[a].Return_Lattitude();
                         var mahalle_demand = _mahalle_list[a].Return_Mahalle_Demand();
-                        var new_mahalle = new Mahalle(mahalle_id, mahalle_long, mahalle_lat, mahalle_demand);
+                        var new_mahalle = new Mahalle(mahalle_id,mahalle_district, mahalle_long, mahalle_lat, mahalle_demand);
                         mahalle_list.Add(new_mahalle);
                     }
                     
@@ -406,7 +407,6 @@ namespace FMLMDelivery.Classes
                                 }
                             }
                         }
-
                     }
 
                     //go_in = true;
@@ -424,8 +424,6 @@ namespace FMLMDelivery.Classes
                     //        }
                     //    }
                     //}
-
-
                 }
             }
 
@@ -465,37 +463,36 @@ namespace FMLMDelivery.Classes
                         }
                     }
                 }
-
             }
-            
         }
 
-        
         private void Courier_Assignments()
         {
             var xdock_city = _xDock.Get_City();
             var xdock_district = _xDock.Get_District();
             var xdock_id = _xDock.Get_Id();
-            var count = 1;
+            var count = 0;
             for (int i = 0; i < courier_list.Count; i++)
             {
                 count += 1;
                 for (int j = 0; j < courier_list[i].Return_Assigned_Mahalle().Count; j++)
                 {
-                    var courier_id =count;
+                    var courier_id = "Courier "+ count;
                     var courier_mahalle_demand = courier_list[i].Return_Demand_At_Mahalle()[j];
                     var courier_mahalle_name = courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_Id();
+                    var courier_district = courier_list[i].Return_Assigned_Mahalle()[j].Return_Mahalle_District();
+                    var courier_mahalle_longitude = courier_list[i].Return_Assigned_Mahalle()[j].Return_Longitude();
+                    var courier_mahalle_lattitude = courier_list[i].Return_Assigned_Mahalle()[j].Return_Lattitude();
                     var courier_distance = courier_list[i].Return_Distance_List()[j];
                     var overload = "";
                     if (courier_list[i].Return_Total_Demand() > _courier_max_cap)
                     {
                         overload = "Overload";
                     }
-                    var list= $"{xdock_city },{xdock_district},{xdock_id},{courier_id},{courier_mahalle_name},{courier_mahalle_demand},{courier_distance},{overload}";
+                    var list= $"{xdock_city },{xdock_district},{xdock_id},{courier_id},{courier_mahalle_name},{courier_district},{courier_mahalle_longitude},{courier_mahalle_lattitude},{courier_mahalle_demand},{courier_distance},{overload}";
                     _assigned_courier_list.Add(list);
                 }
             }
-
         }
 
         public List<String> Return_Courier_Assignments()
@@ -516,7 +513,7 @@ namespace FMLMDelivery.Classes
 
         private void Create_Starting_xDock()
         {
-            starting_xdock = new Mahalle(_xDock.Get_Id(), _xDock.Get_Longitude(), _xDock.Get_Latitude(), 0);
+            starting_xdock = new Mahalle(_xDock.Get_Id(),_xDock.Get_District(), _xDock.Get_Longitude(), _xDock.Get_Latitude(), 0);
             var neighborhood_found = _mahalle_list.Find(x => x.Return_Mahalle_Id() == starting_xdock.Return_Mahalle_Id());
             if (Object.Equals(neighborhood_found, null))
             {
