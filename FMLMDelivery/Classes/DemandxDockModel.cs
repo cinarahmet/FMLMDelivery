@@ -370,9 +370,10 @@ public class DemandxDockModel
                             demand += _demandpoint[i].Get_Demand();
                             var mahalle_name = _demandpoint[i].Get_Id();
                             var mahalle_demand = _demandpoint[i].Get_Demand();
+                            var mahalle_district = _demandpoint[i].Get_District();
                             var mahalle_long = _demandpoint[i].Get_Longitude();
                             var mahalle_lat = _demandpoint[i].Get_Latitude();
-                            var mahalle = new Mahalle(mahalle_name, mahalle_long,mahalle_lat,mahalle_demand);
+                            var mahalle = new Mahalle(mahalle_name,mahalle_district, mahalle_long,mahalle_lat,mahalle_demand);
                             list_mahalle.Add(mahalle);
                         }
                     }
@@ -895,6 +896,7 @@ public class DemandxDockModel
             Open_Located_xDocks();
             Capacity_Constraint();
             Min_County_Constraint();
+            //One_Zero_Constraint();
         }
         if (_min_xDock_model)
         {
@@ -903,6 +905,20 @@ public class DemandxDockModel
             Min_County_Constraint();
         }
 
+    }
+
+    private void One_Zero_Constraint()
+    {
+        var constraint = _solver.LinearNumExpr();
+        for (int i = 0; i < _num_of_demand_point; i++)
+        {
+            for (int j = 0; j < _numOfXdocks; j++)
+            {
+                constraint.AddTerm(x[i][j], 1);
+                _solver.AddLe(constraint, a[i][j]);
+            }
+        }
+        
     }
 
     private void Open_Located_xDocks()

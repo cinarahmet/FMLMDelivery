@@ -20,7 +20,7 @@ namespace FMLMDelivery.MetaHeuristics
         private Int32 elitist_size = 2;
         private Random rand = new Random();
         private Int32 chromosome_length;
-        private Int32 iteration_count = 1000;
+        private Int32 iteration_count = 100;
         private Double infeasible_acceptance_percentage = 0.00;
         private Double alpha = 0.005;
         private Dictionary<Int32,Double> best_score_matrix = new Dictionary<Int32, Double>();
@@ -33,6 +33,7 @@ namespace FMLMDelivery.MetaHeuristics
         private Double covered_demand = new double();
         private Dictionary<String, Double> solution_list = new Dictionary<string, double>();
         private String heuristic_name = "Genetic Algorithm";
+        private List<List<Double>> model_assign = new List<List<Double>>();
 
 
 
@@ -145,7 +146,8 @@ namespace FMLMDelivery.MetaHeuristics
                     (selected_chromosome, objective_value, chromosome_status) = Suitability_Check(new_choromosome, Score_List.Count, current_infeasible_count, xDocks);
                     population.Add(selected_chromosome);
                     string_sol = String.Join(',', selected_chromosome);
-                    solution_list.Add(string_sol, objective_value);
+                    if (!(solution_list.ContainsKey(string_sol)))
+                        solution_list.Add(string_sol, objective_value);
                 }
                 score = new Score(i, objective_value);
                 Score_List.Add(score);
@@ -247,7 +249,12 @@ namespace FMLMDelivery.MetaHeuristics
                 {
                     Console.WriteLine("sad");
                 }
-                if (_num_xDock != num_xDock_in_chromosome)
+                if (_num_xDock ==1 && num_xDock_in_chromosome> _num_xDock)
+                {
+                    selected_chromosome = Repair_Chromosome(selected_chromosome, num_xDock_in_chromosome);
+                    num_xDock_in_chromosome = selected_chromosome.Where(x => x.Equals(1)).Count();
+                }
+                if (!((_num_xDock >= num_xDock_in_chromosome) && (_num_xDock-1 >= num_xDock_in_chromosome)))
                 {
                     selected_chromosome = Repair_Chromosome(selected_chromosome, num_xDock_in_chromosome);
                 }
@@ -265,7 +272,11 @@ namespace FMLMDelivery.MetaHeuristics
                     (final_chromosome, objective_value, chromosome_status) = Suitability_Check(selected_chromosome, new_population.Count, current_infeasible_count, new_xDocks);
                     new_population.Add(final_chromosome);
                     string_sol = String.Join(',', final_chromosome);
-                    solution_list.Add(string_sol, objective_value);
+                    if (!(solution_list.ContainsKey(string_sol)))
+                    {
+                        solution_list.Add(string_sol, objective_value);
+                    }
+                   
                 }
                 var score = new Score(i, objective_value);
                 new_scores.Add(score);
@@ -541,16 +552,27 @@ namespace FMLMDelivery.MetaHeuristics
             }
             Console.WriteLine("Finish");
             var xDocks = Update_Open_xDock(best_solution);
+            var model2 = new DemandxDockModel(_demand_Points, xDocks, _key, true, false, _lm_coverage, false, _num_xDock, false, 0.01, 30, false);
+            model2.Run();
+            var a2 = model2.GetObjVal();
+            var final_xDocks2 = model2.Return_XDock();
+            covered_demand = Find_Covered_Demand(final_xDocks2);
             var model = new DemandxDockModel(_demand_Points, xDocks, _key, false, false, _lm_coverage, false, _num_xDock, false, 0.01, 30 ,true);
             model.Run();
             var a = model.GetObjVal();
             var final_xDocks = model.Return_XDock();
             covered_demand = Find_Covered_Demand(final_xDocks);
             var model_assignments = model.Return_Heuristic_Assignment();
+            model_assign = model.Return_Heuristic_Assignment();
             heuristic_pairs = Create_Initial_Solution_Procedure(best_solution, model_assignments);
             Console.WriteLine("Finish");
         }
+        public List<List<Double>> Return_Assignments_District()
+        {
+            return model_assign;
+        }
     }
+    
 
     internal class Score
     {

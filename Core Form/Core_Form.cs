@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Text;
 
 namespace Core_Form
 {
@@ -25,6 +26,8 @@ namespace Core_Form
         private Dictionary<String, int> month_dict = new Dictionary<string, int>();
         private Boolean full_run = new bool();
         private List<String> courier_assignment_list = new List<string>();
+        private Boolean Error = false;
+        
         public Network_Design_Form_Core()
         {
             InitializeComponent();
@@ -289,7 +292,12 @@ namespace Core_Form
             var direct = folderBrowserDialog1.SelectedPath;
             Outbut_loc.Text = direct;
         }
-        
+
+        /// <summary>
+        /// This function takes all the given parameters and Run types as an input and runs the relative parts of the program.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void send_button_Click(object sender, EventArgs e)
         {
             var month = 1;
@@ -299,6 +307,14 @@ namespace Core_Form
             parameter_file = Parameter_Box.Text;
             presolved_xDock_file = Presolved_box.Text ;
             mahalle_xdock_file = Mahalle_xDock_Ataması.Text;
+
+            if (Min_cap_courier.Text == "Default" || _threshold.Text== "Default" || Max_cap_courier.Text=="Default" || Km_başı_paket.Text== "Default")
+            {
+                Min_cap_courier.Text = "100";
+                Max_cap_courier.Text = "150";
+                _threshold.Text = "120";
+                Km_başı_paket.Text = "2";
+            }
             var courier_min_cap = Convert.ToDouble(Min_cap_courier.Text);
             var desired_efficiency = Convert.ToDouble(_threshold.Text);
             var courier_max_cap = Convert.ToDouble(Max_cap_courier.Text);
@@ -332,56 +348,100 @@ namespace Core_Form
                 var reader = new CSVReader(demand_file, pot_xDock_file, seller_file, parameter_file, "", month);
 
                 reader.Read();
-                demand_point = reader.Get_County();
-                potential_xDocks = reader.Get_XDocks();
-                agency = reader.Get_Agency();
-                var prior_small_sellers = reader.Get_Prior_Small_Sellers();
-                var regular_small_sellers = reader.Get_Regular_Small_Sellers();
-                var prior_big_sellers = reader.Get_Prior_Big_Sellers();
-                var regular_big_sellers = reader.Get_Regular_Big_Sellers();
-                var parameter_list = reader.Get_Parameter_List();
+                var error_list = reader.Get_Input_Failure_List();
+                if (error_list.Count == 1)
+                {
+                    demand_point = reader.Get_County();
+                    potential_xDocks = reader.Get_XDocks();
+                    agency = reader.Get_Agency();
+                    var prior_small_sellers = reader.Get_Prior_Small_Sellers();
+                    var regular_small_sellers = reader.Get_Regular_Small_Sellers();
+                    var prior_big_sellers = reader.Get_Prior_Big_Sellers();
+                    var regular_big_sellers = reader.Get_Regular_Big_Sellers();
+                    var parameter_list = reader.Get_Parameter_List();
 
 
-                var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
-                (xDocks, hubs) = await Task.Run(() => runner.Run());
-                //Console.ReadKey();
+                    var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
+                    (xDocks, hubs) = await Task.Run(() => runner.Run());
+                    //Console.ReadKey();
+                }
+                else
+                {
+                    Error = true;
+                    File.WriteAllLines(directory+"\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
+                    //Report error and create a log file
+                }
+
             }
             else if (only_courier_assignments)
             {
                 var partial_reader = new CSVReader("", "", "", "", mahalle_xdock_file, month);
                 partial_reader.Read_xDock_Neighborhood_Assignments();
-                xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
-                Courier_Runner_Writer(xDock_neighborhood_assignments, courier_parameter_list,directory);
+                var error_list = partial_reader.Get_Input_Failure_List();
+                if (error_list.Count == 1)
+                {
+                    xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
+                    Courier_Runner_Writer(xDock_neighborhood_assignments, courier_parameter_list, directory);
+                }
+                else
+                {
+                    Error = true;
+                    File.WriteAllLines(directory + "\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
+                    //report error and create a log file
+                }
+                
             }
             else if (partial_solution)
             {
                 var reader = new CSVReader(demand_file, pot_xDock_file, seller_file, parameter_file, "", month);
 
                 reader.Read();
-                demand_point = reader.Get_County();
-                potential_xDocks = reader.Get_XDocks();
-                agency = reader.Get_Agency();
-                var prior_small_sellers = reader.Get_Prior_Small_Sellers();
-                var regular_small_sellers = reader.Get_Regular_Small_Sellers();
-                var prior_big_sellers = reader.Get_Prior_Big_Sellers();
-                var regular_big_sellers = reader.Get_Regular_Big_Sellers();
-                var parameter_list = reader.Get_Parameter_List();
+                var error_list = reader.Get_Input_Failure_List();
+                if (error_list.Count == 1)
+                {
+                    demand_point = reader.Get_County();
+                    potential_xDocks = reader.Get_XDocks();
+                    agency = reader.Get_Agency();
+                    var prior_small_sellers = reader.Get_Prior_Small_Sellers();
+                    var regular_small_sellers = reader.Get_Regular_Small_Sellers();
+                    var prior_big_sellers = reader.Get_Prior_Big_Sellers();
+                    var regular_big_sellers = reader.Get_Regular_Big_Sellers();
+                    var parameter_list = reader.Get_Parameter_List();
 
-                var partial_reader = new CSVReader("", presolved_xDock_file, "", "", mahalle_xdock_file, month);
-                partial_reader.Read_Partial_Solution_Xdocks();
-                partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
-                partial_reader.Read_xDock_Neighborhood_Assignments();
-                xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
-                var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments,courier_parameter_list);
-                (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
-                //Console.ReadKey();
+                    var partial_reader = new CSVReader("", presolved_xDock_file, "", "", mahalle_xdock_file, month);
+                    partial_reader.Read_Partial_Solution_Xdocks();
+                    partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
+                    partial_reader.Read_xDock_Neighborhood_Assignments();
+                    xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
+                    var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
+                    (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
+                    //Console.ReadKey();
+                }
+                else
+                {
+                    Error = true;
+                    File.WriteAllLines(directory + "\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
+                    //report error and create a log file
+                }
+
             }
-
-            var path = directory + "\\";
-            var dirname = new DirectoryInfo(path).Name;
-            MessageBoxButtons buttons= MessageBoxButtons.OK;
-            MessageBoxIcon icon = MessageBoxIcon.Information;
-            MessageBox.Show("Çalıştırma Bitti! Sonuçları "+"'"+dirname+"'"+" dosyasında bulabilirsiniz.","Bilgi", buttons,icon);
+            if (!Error)
+            {
+                var path = directory + "\\";
+                var dirname = new DirectoryInfo(path).Name;
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                MessageBoxIcon icon = MessageBoxIcon.Information;
+                MessageBox.Show("Çalıştırma Bitti! Sonuçları " + "'" + dirname + "'" + " dosyasında bulabilirsiniz.", "Bilgi", buttons, icon);
+            }
+            else
+            {
+                var path = directory + "\\";
+                var dirname = new DirectoryInfo(path).Name;
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                MessageBoxIcon icon = MessageBoxIcon.Information;
+                MessageBox.Show("Input Dosyasında okuma hatası tespit edildi. Ayrıntıları " + "'" + dirname + "'" + " dosyasında bulabilirsiniz.", "Bilgi", buttons, icon);
+            }
+            
             
         }
     }
