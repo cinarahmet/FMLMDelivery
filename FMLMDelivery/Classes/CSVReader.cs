@@ -141,7 +141,7 @@ public class CSVReader
             {
                 index += 1;
                 try
-                {
+                { 
                     var line = s.Split(',');
                     var demand_point_City = line[0];
                     var demand_point_district = line[1];
