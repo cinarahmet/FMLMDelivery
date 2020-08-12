@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ChoETL;
 using FMLMDelivery.Classes;
+using Nancy.Json;
+using Newtonsoft.Json;
 
 public class CSVReader
 {
@@ -48,6 +51,9 @@ public class CSVReader
     private Dictionary<xDocks, List<Mahalle>> _xDock_neighborhood_assignments = new Dictionary<xDocks, List<Mahalle>>();
 
     private List<String> failure_list = new List<string> {"Dosya İsmi, Satır, Satır İçeriği"};
+
+    private Dictionary<String, String[]> total_dictionary_of_Inputs= new Dictionary<string, string[]>();
+
 
     public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments, Int32 month)
     {
@@ -188,7 +194,8 @@ public class CSVReader
                 }
             }
         }
-        
+        var lines = System.IO.File.ReadAllLines(_demand_point_file);
+        total_dictionary_of_Inputs.Add("Demand Points", lines);
     }
 
     public void Read_Partially()
@@ -230,7 +237,8 @@ public class CSVReader
                     var failure = $"{file_name},{line_index},{failed_line}";
                     failure_list.Add(failure);
                 }
-
+                var lines = System.IO.File.ReadAllLines(_xDocks_file);
+                total_dictionary_of_Inputs.Add("Partial Solution xDocks", lines);
             }
         }
     }
@@ -283,8 +291,9 @@ public class CSVReader
                     var failure = $"{file_name},{line_index},{failed_line}";
                     failure_list.Add(failure);
                 }
-               
             }
+            var lines = System.IO.File.ReadAllLines(_xDock_neighborhood_assignments_file);
+            total_dictionary_of_Inputs.Add("Xdock Neighbourhood Assignments", lines);
         }
     }
 
@@ -318,6 +327,8 @@ public class CSVReader
                 
             }
         }
+        var lines = System.IO.File.ReadAllLines(_parameter_file);
+        total_dictionary_of_Inputs.Add("Parameters", lines);
     }
 
 
@@ -371,6 +382,8 @@ public class CSVReader
                 }
             }
         }
+        var lines = System.IO.File.ReadAllLines(_xDocks_file);
+        total_dictionary_of_Inputs.Add("Potential_xDocks", lines);
     }
     public void Read_Sellers()
     {
@@ -430,10 +443,29 @@ public class CSVReader
                     }
                 }
             }
-
+            var lines = System.IO.File.ReadAllLines(_seller_file);
+            total_dictionary_of_Inputs.Add("Sellers", lines);
         }
     }
+    public void Create_Input_Log_Json()
+    {
+        //var javaScriptSerializer = new JavaScriptSerializer();
+        //var demand_points = javaScriptSerializer.DeserializeObject(demand_point_json);
+        //var potential_xdocks = javaScriptSerializer.DeserializeObject(potential_xdocks_json);
+        //var sellers = javaScriptSerializer.DeserializeObject(sellers_json);
+        //var parameters = javaScriptSerializer.DeserializeObject(parameters_json);
+        
+        //var resultJson = JsonConvert.SerializeObject(new { Demand_Points = demand_points, Potential_xDocks = potential_xdocks, Parameter=parameters, Seller_File=sellers });
+        
+        //var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
+        //File.WriteAllText(@"C:\Users\cagri.iyican\Desktop\Input of " + runtime + ".json", resultJson);
+    }
 
+
+    public Dictionary<String,String[]> Get_Input_Dictionary()
+    {
+        return total_dictionary_of_Inputs;
+    }
     public Dictionary<xDocks, List<Mahalle>> Get_xDock_neighborhood_Assignments()
     {
         return _xDock_neighborhood_assignments;

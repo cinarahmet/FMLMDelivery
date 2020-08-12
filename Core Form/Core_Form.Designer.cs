@@ -70,6 +70,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.run_option_group_box = new System.Windows.Forms.GroupBox();
             this.Courier_Run = new System.Windows.Forms.RadioButton();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.input_files_parameters.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -341,7 +342,7 @@
             // Run_CitybyCity
             // 
             this.Run_CitybyCity.AutoSize = true;
-            this.Run_CitybyCity.Location = new System.Drawing.Point(21, 58);
+            this.Run_CitybyCity.Location = new System.Drawing.Point(18, 46);
             this.Run_CitybyCity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Run_CitybyCity.Name = "Run_CitybyCity";
             this.Run_CitybyCity.Size = new System.Drawing.Size(177, 24);
@@ -361,7 +362,7 @@
             // Full_Run
             // 
             this.Full_Run.AutoSize = true;
-            this.Full_Run.Location = new System.Drawing.Point(21, 114);
+            this.Full_Run.Location = new System.Drawing.Point(18, 89);
             this.Full_Run.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Full_Run.Name = "Full_Run";
             this.Full_Run.Size = new System.Drawing.Size(327, 24);
@@ -383,7 +384,7 @@
             // Partial_Run
             // 
             this.Partial_Run.AutoSize = true;
-            this.Partial_Run.Location = new System.Drawing.Point(21, 174);
+            this.Partial_Run.Location = new System.Drawing.Point(18, 136);
             this.Partial_Run.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Partial_Run.Name = "Partial_Run";
             this.Partial_Run.Size = new System.Drawing.Size(228, 24);
@@ -437,7 +438,7 @@
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.month_label);
             this.groupBox3.ForeColor = System.Drawing.Color.Black;
-            this.groupBox3.Location = new System.Drawing.Point(615, 330);
+            this.groupBox3.Location = new System.Drawing.Point(615, 256);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -502,7 +503,7 @@
             this.run_option_group_box.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.run_option_group_box.Name = "run_option_group_box";
             this.run_option_group_box.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.run_option_group_box.Size = new System.Drawing.Size(510, 280);
+            this.run_option_group_box.Size = new System.Drawing.Size(510, 232);
             this.run_option_group_box.TabIndex = 1;
             this.run_option_group_box.TabStop = false;
             this.run_option_group_box.Text = "Model Tipi ";
@@ -510,7 +511,7 @@
             // Courier_Run
             // 
             this.Courier_Run.AutoSize = true;
-            this.Courier_Run.Location = new System.Drawing.Point(21, 236);
+            this.Courier_Run.Location = new System.Drawing.Point(18, 181);
             this.Courier_Run.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Courier_Run.Name = "Courier_Run";
             this.Courier_Run.Size = new System.Drawing.Size(177, 24);
@@ -520,12 +521,25 @@
             this.Courier_Run.UseVisualStyleBackColor = true;
             this.Courier_Run.CheckedChanged += new System.EventHandler(this.Courier_Checked);
             // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(822, 660);
+            this.linkLabel1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(303, 20);
+            this.linkLabel1.TabIndex = 32;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "Eskiye Dönük Çalıştırma İçin Lütfen Tıklayınız";
+            this.linkLabel1.Click += new System.EventHandler(this.Retrospective_Run);
+            // 
             // Network_Design_Form_Core
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1139, 780);
+            this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.send_button);
             this.Controls.Add(this.run_option_group_box);
@@ -545,6 +559,7 @@
             this.run_option_group_box.ResumeLayout(false);
             this.run_option_group_box.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -591,6 +606,7 @@
         private System.Windows.Forms.RadioButton Courier_Run;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox Max_cap_courier;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }
 

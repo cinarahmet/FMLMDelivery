@@ -662,6 +662,7 @@ public class DemandxDockModel
     private void Get_Csv_Information()
     {                      
         var count = 0;
+        var assigned_list = new List<Double>();
         
         for (int j = 0; j < _xDocks.Count; j++)
         {
@@ -676,7 +677,9 @@ public class DemandxDockModel
                 for (int i = 0; i < _demandpoint.Count; i++)
                 { 
                     if (_solver.GetValue(x[i][j]) > 0.9)
-                    {   var x_dock_ranking = "Xdock" + count ;
+                    {
+                        if (!assigned_list.Contains(i)) assigned_list.Add(i);
+                        var x_dock_ranking = "Xdock" + count ;
                         var demand_point_city = _demandpoint[i].Get_City();
                         var demand_point_district = _demandpoint[i].Get_District();
                         var demand_point_id = _demandpoint[i].Get_Id();
@@ -689,6 +692,27 @@ public class DemandxDockModel
                     }                    
                 }
             }
+        }
+        for (int i = 0; i < _demandpoint.Count; i++)
+        {
+            if (!assigned_list.Contains(i))
+            {
+                var xdock_city = "Atanmayan Talep Noktası";
+                var xdock_district = "Atanmayan Talep Noktası";
+                var xdock_lat = "Atanmayan Talep Noktası";
+                var xdock_long = "Atanmayan Talep Noktası";
+                var xdock_id = "Atanmayan Talep Noktası";
+                var demand_point_city = _demandpoint[i].Get_City();
+                var demand_point_district = _demandpoint[i].Get_District();
+                var demand_point_id = _demandpoint[i].Get_Id();
+                var demand_point_lat = _demandpoint[i].Get_Latitude();
+                var demand_point_long = _demandpoint[i].Get_Longitude();
+                var demand = _demandpoint[i].Get_Demand();
+                var distance_xdock_county = "";
+                var result = $"{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{demand_point_city},{demand_point_district},{demand_point_id},{demand_point_lat},{demand_point_long},{distance_xdock_county},{demand}";
+                record_list.Add(result);
+            }
+            
         }
                         
     }
