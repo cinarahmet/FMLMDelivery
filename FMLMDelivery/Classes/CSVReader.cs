@@ -254,34 +254,37 @@ public class CSVReader
                 try
                 {
                     var line = s.Split(',');
-                    var xdock_city = line[0];
-                    var xdock_district = line[1];
-                    var xdock_id = line[2];
-                    var xdock_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                    var xdock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand_point_city = line[5];
-                    var demand_point_district = line[6];
-                    var demand_point_id = line[7];
-                    var demand_point_lat = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                    var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
-                    var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
-                    var neighborhood = new Mahalle(demand_point_id,demand_point_district, demand_point_long, demand_point_lat, demand);
-                    var neighborhood_list = new List<Mahalle>();
-                    var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
-
-                    if (list_contains.Count > 0)
+                    if(line[0]!= "Atanmayan Talep Noktası")
                     {
-                        _xDock_neighborhood_assignments[list_contains[0]].Add(neighborhood);
+                        var xdock_city = line[0];
+                        var xdock_district = line[1];
+                        var xdock_id = line[2];
+                        var xdock_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                        var xdock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                        var demand_point_city = line[5];
+                        var demand_point_district = line[6];
+                        var demand_point_id = line[7];
+                        var demand_point_lat = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                        var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                        var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                        var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
+                        var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
+                        var neighborhood = new Mahalle(demand_point_id, demand_point_district, demand_point_long, demand_point_lat, demand);
+                        var neighborhood_list = new List<Mahalle>();
+                        var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
 
-                    }
-                    else
-                    {
-                        neighborhood_list.Add(neighborhood);
-                        _xDock_neighborhood_assignments.Add(dummy_xDock, neighborhood_list);
-                    }
+                        if (list_contains.Count > 0)
+                        {
+                            _xDock_neighborhood_assignments[list_contains[0]].Add(neighborhood);
 
+                        }
+                        else
+                        {
+                            neighborhood_list.Add(neighborhood);
+                            _xDock_neighborhood_assignments.Add(dummy_xDock, neighborhood_list);
+                        }
+                    }
+                   
                 }
                 catch(Exception ex)
                 {
