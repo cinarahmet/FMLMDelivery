@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ChoETL.JSON" Version="1.2.0.8" />
+    <PackageReference Include="ChoETL.JSON.NETStandard" Version="1.2.0.8" />
+    <PackageReference Include="Nancy" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Device.Location.Portable" Version="1.0.0" />
     <PackageReference Include="System.Security.Permissions" Version="4.7.0" />
   </ItemGroup>

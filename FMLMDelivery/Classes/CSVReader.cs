@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ChoETL;
 using FMLMDelivery.Classes;
+using Nancy.Json;
+using Newtonsoft.Json;
 
 public class CSVReader
 {
@@ -48,6 +51,9 @@ public class CSVReader
     private Dictionary<xDocks, List<Mahalle>> _xDock_neighborhood_assignments = new Dictionary<xDocks, List<Mahalle>>();
 
     private List<String> failure_list = new List<string> {"Dosya İsmi, Satır, Satır İçeriği"};
+
+    private Dictionary<String, String[]> total_dictionary_of_Inputs= new Dictionary<string, string[]>();
+
 
     public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments, Int32 month)
     {
@@ -188,7 +194,8 @@ public class CSVReader
                 }
             }
         }
-        
+        var lines = System.IO.File.ReadAllLines(_demand_point_file);
+        total_dictionary_of_Inputs.Add("Demand Points", lines);
     }
 
     public void Read_Partially()
@@ -230,7 +237,8 @@ public class CSVReader
                     var failure = $"{file_name},{line_index},{failed_line}";
                     failure_list.Add(failure);
                 }
-
+                var lines = System.IO.File.ReadAllLines(_xDocks_file);
+                total_dictionary_of_Inputs.Add("Partial Solution xDocks", lines);
             }
         }
     }
@@ -246,34 +254,37 @@ public class CSVReader
                 try
                 {
                     var line = s.Split(',');
-                    var xdock_city = line[0];
-                    var xdock_district = line[1];
-                    var xdock_id = line[2];
-                    var xdock_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
-                    var xdock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand_point_city = line[5];
-                    var demand_point_district = line[6];
-                    var demand_point_id = line[7];
-                    var demand_point_lat = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                    var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
-                    var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
-                    var neighborhood = new Mahalle(demand_point_id,demand_point_district, demand_point_long, demand_point_lat, demand);
-                    var neighborhood_list = new List<Mahalle>();
-                    var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
-
-                    if (list_contains.Count > 0)
+                    if(line[0]!= "Atanmayan Talep Noktası")
                     {
-                        _xDock_neighborhood_assignments[list_contains[0]].Add(neighborhood);
+                        var xdock_city = line[0];
+                        var xdock_district = line[1];
+                        var xdock_id = line[2];
+                        var xdock_lat = Convert.ToDouble(line[3], System.Globalization.CultureInfo.InvariantCulture);
+                        var xdock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                        var demand_point_city = line[5];
+                        var demand_point_district = line[6];
+                        var demand_point_id = line[7];
+                        var demand_point_lat = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                        var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                        var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                        var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
+                        var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
+                        var neighborhood = new Mahalle(demand_point_id, demand_point_district, demand_point_long, demand_point_lat, demand);
+                        var neighborhood_list = new List<Mahalle>();
+                        var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
 
-                    }
-                    else
-                    {
-                        neighborhood_list.Add(neighborhood);
-                        _xDock_neighborhood_assignments.Add(dummy_xDock, neighborhood_list);
-                    }
+                        if (list_contains.Count > 0)
+                        {
+                            _xDock_neighborhood_assignments[list_contains[0]].Add(neighborhood);
 
+                        }
+                        else
+                        {
+                            neighborhood_list.Add(neighborhood);
+                            _xDock_neighborhood_assignments.Add(dummy_xDock, neighborhood_list);
+                        }
+                    }
+                   
                 }
                 catch(Exception ex)
                 {
@@ -283,8 +294,9 @@ public class CSVReader
                     var failure = $"{file_name},{line_index},{failed_line}";
                     failure_list.Add(failure);
                 }
-               
             }
+            var lines = System.IO.File.ReadAllLines(_xDock_neighborhood_assignments_file);
+            total_dictionary_of_Inputs.Add("Xdock Neighbourhood Assignments", lines);
         }
     }
 
@@ -318,6 +330,8 @@ public class CSVReader
                 
             }
         }
+        var lines = System.IO.File.ReadAllLines(_parameter_file);
+        total_dictionary_of_Inputs.Add("Parameters", lines);
     }
 
 
@@ -371,6 +385,8 @@ public class CSVReader
                 }
             }
         }
+        var lines = System.IO.File.ReadAllLines(_xDocks_file);
+        total_dictionary_of_Inputs.Add("Potential_xDocks", lines);
     }
     public void Read_Sellers()
     {
@@ -430,10 +446,29 @@ public class CSVReader
                     }
                 }
             }
-
+            var lines = System.IO.File.ReadAllLines(_seller_file);
+            total_dictionary_of_Inputs.Add("Sellers", lines);
         }
     }
+    public void Create_Input_Log_Json()
+    {
+        //var javaScriptSerializer = new JavaScriptSerializer();
+        //var demand_points = javaScriptSerializer.DeserializeObject(demand_point_json);
+        //var potential_xdocks = javaScriptSerializer.DeserializeObject(potential_xdocks_json);
+        //var sellers = javaScriptSerializer.DeserializeObject(sellers_json);
+        //var parameters = javaScriptSerializer.DeserializeObject(parameters_json);
+        
+        //var resultJson = JsonConvert.SerializeObject(new { Demand_Points = demand_points, Potential_xDocks = potential_xdocks, Parameter=parameters, Seller_File=sellers });
+        
+        //var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
+        //File.WriteAllText(@"C:\Users\cagri.iyican\Desktop\Input of " + runtime + ".json", resultJson);
+    }
 
+
+    public Dictionary<String,String[]> Get_Input_Dictionary()
+    {
+        return total_dictionary_of_Inputs;
+    }
     public Dictionary<xDocks, List<Mahalle>> Get_xDock_neighborhood_Assignments()
     {
         return _xDock_neighborhood_assignments;

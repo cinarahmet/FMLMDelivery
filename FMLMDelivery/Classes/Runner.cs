@@ -1,6 +1,9 @@
 ﻿using FMLMDelivery.MetaHeuristics;
+using Nancy.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -40,6 +43,10 @@ namespace FMLMDelivery.Classes
         private List<Double> _courier_parameters;
         private Dictionary<xDocks, List<Mahalle>> _courier_document;
         private List<String> courier_writer = new List<String>();
+        private Dictionary<String, String[]> total_json_log = new Dictionary<string, string[]>();
+
+
+
         public Runner(List<DemandPoint> _demand_points, List<xDocks> _xDocks,List<xDocks> _partial_xdocks, List<xDocks> _agency, List<Seller> prior_small, List<Seller> regular_small, List<Seller> prior_big, List<Seller> regular_big,List<Parameters> parameters,Boolean _partial_run,Boolean discrete_solution, string Output_files,double hub_demand_coverage,Boolean only_cities,Dictionary<xDocks,List<Mahalle>> courier_file, List<Double> courier_parameters)
         {
             partial_xdocks=_partial_xdocks;
@@ -341,29 +348,27 @@ namespace FMLMDelivery.Classes
                         Partial_Run(_parameters[i].Get_Key(), 1.0, Gap_Converter_1(_parameters[i].Get_Size()));
                     }
                 }
-                //var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Talep Noktası Enlem,Talep Noktası Boylam,Uzaklık,Talep Noktası Talebi";
-                //var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point, "C:\\Workspace\\FMLMDelivery\\FMLMDelivery\\bin\\Debug\\netcoreapp2.1\\Output");
-                //write_the_xdocks.Write_Records();
-
+                
+                
                 var header_xdock_demand_point = "xDocks İl,xDocks İlçe,xDock Mahalle,xDocks Enlem,xDokcs Boylam,Talep Noktası İl,Talep Noktası ilçe,Talep Noktası Mahalle,Talep Noktası Enlem,Talep Noktası Boylam,Uzaklık,Talep Noktası Talebi";
                 var write_the_xdocks = new Csv_Writer(writer_xdocks, "Mahalle xDock Atamaları", header_xdock_demand_point, _output_files);
                 write_the_xdocks.Write_Records();
-
-                //string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi", "Açık xDock veya Acente" };
-                //String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
-                //String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
-                //System.IO.File.WriteAllText(@"" + "C:\\Workspace\\FMLMDelivery\\FMLMDelivery\\bin\\Debug\\netcoreapp2.1\\Output" + "\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
-
+                var json_xdocks = writer_xdocks.ToArray();
+                total_json_log.Add("Mahalle xDock Atamaları", json_xdocks);
+               
                 string[] new_header_already_opened = { "İl", "İlçe", "Mahalle", "Bölge", "Boylam", "Enlem","Açık xDock veya Acente", "Atanma Km'si", "LM Hacim", "FM Hacim" };
                 String header_already_opened = String.Join(",", new_header_already_opened) + Environment.NewLine;
                 String csv_new =header_already_opened + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Region()},{d.Get_Longitude()},{d.Get_Latitude()},{d.If_Already_Opened()},{d.Get_Distance_Threshold()},{d.Get_LM_Demand()},{d.Get_FM_Demand()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Kısmi Çalıştırma Dosyası.csv", csv_new, Encoding.UTF8);
+                string[] json_partial_run = csv_new.Split("\r\n");
+                total_json_log.Add("Kısmi Çalıştırma Dosyası", json_partial_run);
 
                 Modify_xDocks(new_xDocks);
                 potential_hub_locations = Convert_to_Potential_Hubs(new_xDocks);
                 Add_Already_Open_Main_Hubs();
 
                 
+
                 if (!_only_cities)
                 {   //Seller-xDock Assignment
                     (assigned_prior_sellers, assigned_regular_sellers) = Second_Phase();
@@ -391,38 +396,54 @@ namespace FMLMDelivery.Classes
                 String headers_hub = String.Join(",", new_hubs_headers) + Environment.NewLine;
                 String csv7 = headers_hub + String.Join(Environment.NewLine, new_hubs.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Capacity()},{d.Get_FM_Capacity()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Açılmış Hublar Listesi.csv", csv7, Encoding.UTF8);
+                string[] json_opened_hub = csv7.Split("\r\n");
+                total_json_log.Add("Açılmış Hublar Listesi", json_opened_hub);
+
 
                 string[] big_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi" };
                 String big_s = String.Join(",", big_seller) + Environment.NewLine;
                 String csv5 = big_s + String.Join(Environment.NewLine, assigned_big_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Atanmış Büyük Tedarikçiler.csv", csv5, Encoding.UTF8);
+                string[] json_assigned_big_sellers = csv5.Split("\r\n");
+                total_json_log.Add("Atanmış Büyük Tedarikçiler", json_assigned_big_sellers);
 
 
                 string[] prior_small_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi" };
                 String p_small = String.Join(",", prior_small_seller) + Environment.NewLine;
                 String csv3 = p_small + String.Join(Environment.NewLine, assigned_prior_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Atanmış Öncelikli Küçük Tedarikçiler.csv", csv3, Encoding.UTF8);
-
+                string[] json_prior_small_seller = csv3.Split("\r\n");
+                total_json_log.Add("Atanmış Öncelikli Küçük Tedarikçiler", json_prior_small_seller);
 
                 string[] regular_small_seller = { "İsim", "ID", "Boylam", "Enlem", "Gönderi" };
                 String r_small = String.Join(",", regular_small_seller) + Environment.NewLine;
                 String csv4 = r_small + String.Join(Environment.NewLine, assigned_regular_sellers.Select(d => $"{d.Get_Name()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_Demand()}"));
                 System.IO.File.WriteAllText(@"" + _output_files + "\\Atanmış Sıradan Küçük Tedarikçiler.csv", csv4, Encoding.UTF8);
-
+                string[] json_regular_small_seller = csv4.Split("\r\n");
+                total_json_log.Add("Atanmış Sıradan Küçük Tedarikçiler", json_regular_small_seller);
             }
 
             string[] new_xdocks_headers_2 = { "İl", "İlçe", "Mahalle", "Boylam", "Enlem", "LM Talep", "FM Gönderi", "Açık xDock veya Acente" };
             String headers_xdock_2 = String.Join(",", new_xdocks_headers_2) + Environment.NewLine;
             String csv2 = headers_xdock_2 + String.Join(Environment.NewLine, new_xDocks.Select(d => $"{d.Get_City()},{d.Get_District()},{d.Get_Id()},{d.Get_Longitude()},{d.Get_Latitude()},{d.Get_LM_Demand()},{d.Get_FM_Demand()},{d.If_Already_Opened()}"));
             System.IO.File.WriteAllText(@"" + _output_files + "\\Açılmış xDocklar Listesi.csv", csv2, Encoding.UTF8);
+            string[] json_opened_xdocks = csv2.Split("\r\n");
+            total_json_log.Add("Açılmış xDocklar Listesi", json_opened_xdocks);
 
             var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle,Mahalle İlçe, Mahalle Boylam, Mahalle Enlem, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
             write_courier.Write_Records();
+            var json_courier_assignments = courier_writer.ToArray();
+            total_json_log.Add("Kurye Atamaları", json_courier_assignments);
 
             var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
             var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
             stat_writer.Write_Records();
+            var json_stats = stats_writer.ToArray();
+            total_json_log.Add("Statü", json_stats);
+
+            Create_Output_Log_Json(total_json_log);
+
 
 
             Console.WriteLine("Hello World!");
@@ -464,6 +485,13 @@ namespace FMLMDelivery.Classes
             }
 
             return potential_Hubs;
+        }
+        private void Create_Output_Log_Json(Dictionary<String,String[]> json_files)
+        {
+            var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
+            var javaScriptSerializer = new JavaScriptSerializer();
+            var resultJson = JsonConvert.SerializeObject(json_files);
+            File.WriteAllText(@"C:\Users\cagri.iyican\Desktop\Output of " + runtime + ".json", resultJson);
         }
         private void Modify_xDocks(List<xDocks> new_xDocks)
         {

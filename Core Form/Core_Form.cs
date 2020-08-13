@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Core_Form
 {
@@ -178,6 +179,7 @@ namespace Core_Form
                 Km_başı_paket.Enabled = true;
                 Mahalle_xDock_Ataması.Enabled = true;
 
+
                 full_run = false;
                 partial_solution = false;
                 only_cities = false;
@@ -282,7 +284,7 @@ namespace Core_Form
                 var list = courier_assignment.Return_Courier_Assignments();
                 courier_assignment_list.AddRange(list);
             }
-            var header_xdock_demand_point = "";
+            var header_xdock_demand_point = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle,Mahalle İlçe, Mahalle Boylam, Mahalle Enlem, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_the_xdocks = new Csv_Writer(courier_assignment_list, "Kurye Atamaları", header_xdock_demand_point, output_loc);
             write_the_xdocks.Write_Records();
         }
@@ -326,7 +328,8 @@ namespace Core_Form
             }
             if (Hub_Cov_Box.Text != "") hub_demand_coverage = Convert.ToDouble(Hub_Cov_Box.Text);
             directory = Outbut_loc.Text;
-            //Application.Run(new Form1());
+
+
             var demand_point = new List<DemandPoint>();
             var potential_xDocks = new List<xDocks>();
             var xDocks = new List<xDocks>();
@@ -339,9 +342,11 @@ namespace Core_Form
             //This variable decides which solution method will be run. If true; every city individually assigned, else regions are assigned as a whole
             var discrete_solution = true;
 
-            //Provide the month index (1-January, 12-December)
-            //var reader = new CSVReader("Demand_Points.csv", "2020_Potential_xDocks_Case3.csv", "2020_FM_Ekim.csv", "Parameters.csv", month);
-            
+            //Creating String Array to store the inputs for creating a Json file
+            String[] run_type = { full_run.ToString(), partial_solution.ToString(), only_cities.ToString(), only_courier_assignments.ToString() };
+            String[] courier_params = { courier_min_cap.ToString(), courier_max_cap.ToString(), desired_efficiency.ToString(), compensation.ToString()};
+            String[] month_parameter = { month.ToString() };
+            String[] hub_coverage = { hub_demand_coverage.ToString()};
 
             if (full_run)
             {   
@@ -371,7 +376,9 @@ namespace Core_Form
                     File.WriteAllLines(directory+"\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
                     //Report error and create a log file
                 }
-
+                var total_json = reader.Get_Input_Dictionary();
+                Create_Write_Json_File(total_json, run_type, courier_params, month_parameter, hub_coverage);
+                
             }
             else if (only_courier_assignments)
             {
@@ -389,7 +396,9 @@ namespace Core_Form
                     File.WriteAllLines(directory + "\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
                     //report error and create a log file
                 }
-                
+                var total_json = partial_reader.Get_Input_Dictionary();
+                Create_Write_Json_File(total_json, run_type, courier_params, month_parameter, hub_coverage);
+
             }
             else if (partial_solution)
             {
@@ -423,6 +432,8 @@ namespace Core_Form
                     File.WriteAllLines(directory + "\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
                     //report error and create a log file
                 }
+                var total_json = reader.Get_Input_Dictionary();
+                Create_Write_Json_File(total_json, run_type, courier_params, month_parameter, hub_coverage);
 
             }
             if (!Error)
@@ -443,6 +454,23 @@ namespace Core_Form
             }
             
             
+        }
+        private void Create_Write_Json_File(Dictionary<String,String[]> total_input, String[] run_type, String[] courier, String[] Month, String[] Hub)
+        {
+            total_input.Add("Run Type", run_type);
+            total_input.Add("Courier Parameters", courier);
+            total_input.Add("Run Month", Month);
+            total_input.Add("Hub Coverage", Hub);
+
+            var resultjson = JsonConvert.SerializeObject(total_input);
+            var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
+            File.WriteAllText(@"C:\Users\cagri.iyican\Desktop\Input of " + runtime + ".json", resultjson);
+
+        }
+        private void Retrospective_Run(object sender, EventArgs e)
+        {
+            new Retrorespective_Run().Show();
+            this.Hide();
         }
     }
 }

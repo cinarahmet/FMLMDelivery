@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FMLMDelivery", "FMLMDeliver
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework_Form", "Framework_Form\Framework_Form.csproj", "{E56FEA74-FA71-45A3-9723-8919A1BA1AD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core Form", "Core Form\Core Form.csproj", "{6315EE1E-F0AE-444C-9056-0B7BEC22EF36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core Form", "Core Form\Core Form.csproj", "{6315EE1E-F0AE-444C-9056-0B7BEC22EF36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
