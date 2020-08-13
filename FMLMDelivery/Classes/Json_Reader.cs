@@ -453,7 +453,7 @@ namespace FMLMDelivery.Classes
 
         public List<Seller> Get_Prior_Small_Sellers()
         {
-            return _prior_big_seller;
+            return _prior_small_seller;
         }
 
         public List<Seller> Get_Regular_Small_Sellers()
