@@ -339,6 +339,7 @@ namespace Core_Form
             var partial_xDocks = new List<xDocks>();
             var parameters = new List<Parameters>();
             var xDock_neighborhood_assignments = new Dictionary<xDocks, List<Mahalle>>();
+            var total_json = new Dictionary<String, String[]>();
             //This variable decides which solution method will be run. If true; every city individually assigned, else regions are assigned as a whole
             var discrete_solution = true;
 
@@ -376,7 +377,7 @@ namespace Core_Form
                     File.WriteAllLines(directory+"\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
                     //Report error and create a log file
                 }
-                var total_json = reader.Get_Input_Dictionary();
+                total_json = reader.Get_Input_Dictionary();
                 Create_Write_Json_File(total_json, run_type, courier_params, month_parameter, hub_coverage);
                 
             }
@@ -396,7 +397,7 @@ namespace Core_Form
                     File.WriteAllLines(directory + "\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
                     //report error and create a log file
                 }
-                var total_json = partial_reader.Get_Input_Dictionary();
+                total_json = partial_reader.Get_Input_Dictionary();
                 Create_Write_Json_File(total_json, run_type, courier_params, month_parameter, hub_coverage);
 
             }
@@ -424,6 +425,9 @@ namespace Core_Form
                     xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
                     var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
                     (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
+
+                    total_json = partial_reader.Get_Input_Dictionary();
+                    
                     //Console.ReadKey();
                 }
                 else
@@ -432,7 +436,8 @@ namespace Core_Form
                     File.WriteAllLines(directory + "\\Error_Log.csv", error_list.Select(x => string.Join(",", x)), Encoding.UTF8);
                     //report error and create a log file
                 }
-                var total_json = reader.Get_Input_Dictionary();
+                var new_total_json = reader.Get_Input_Dictionary();
+                total_json = total_json.Union(new_total_json).ToDictionary(a => a.Key, b => b.Value);
                 Create_Write_Json_File(total_json, run_type, courier_params, month_parameter, hub_coverage);
 
             }
