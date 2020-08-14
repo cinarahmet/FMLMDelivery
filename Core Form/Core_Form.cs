@@ -469,7 +469,7 @@ namespace Core_Form
 
             var resultjson = JsonConvert.SerializeObject(total_input);
             var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
-            File.WriteAllText(@"C:\Users\cagri.iyican\Desktop\Input of " + runtime + ".json", resultjson);
+            File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of " + runtime + ".json", resultjson);
 
         }
         private void Retrospective_Run(object sender, EventArgs e)

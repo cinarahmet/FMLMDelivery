@@ -237,9 +237,9 @@ public class CSVReader
                     var failure = $"{file_name},{line_index},{failed_line}";
                     failure_list.Add(failure);
                 }
-                var lines = System.IO.File.ReadAllLines(_xDocks_file);
-                total_dictionary_of_Inputs.Add("Partial Solution xDocks", lines);
             }
+            var lines = System.IO.File.ReadAllLines(_xDocks_file);
+            total_dictionary_of_Inputs.Add("Partial Solution xDocks", lines);
         }
     }
 

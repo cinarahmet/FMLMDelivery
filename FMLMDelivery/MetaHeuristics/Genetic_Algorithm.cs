@@ -472,10 +472,10 @@ namespace FMLMDelivery.MetaHeuristics
         protected override void Optimize()
         {
             Console.WriteLine("I'm genetic algorithm :)");
-            List<Double> new_choromosome = Enumerable.Repeat(0.0, chromosome_length).ToList();
-            new_choromosome[11] = 1;
-            new_choromosome[100] = 1;
-            var value=Test_Chromosome_Evaluation(new_choromosome);
+            //List<Double> new_choromosome = Enumerable.Repeat(0.0, chromosome_length).ToList();
+            //new_choromosome[11] = 1;
+            //new_choromosome[100] = 1;
+            //var value=Test_Chromosome_Evaluation(new_choromosome);
             Create_Initial_Population();
             Evaluation();
            // Eliminate_Initial_Population();
