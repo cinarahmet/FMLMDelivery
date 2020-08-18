@@ -130,9 +130,54 @@ namespace FMLMDelivery.Classes
             return sCoord.GetDistanceTo(eCoord) / 1000;
         }
 
+        private void Update_Distance_Threshold()
+        {
+            for (int i = 0; i < _whole_demand_points.Count; i++)
+            {
+                var id = _whole_demand_points[i].Get_Id();
+                var county = _whole_demand_points[i].Get_District();
+                int index = 0;
+                try
+                {
+                    index = _whole_xDocks.FindIndex(x => x.Get_Id() == id);
+                }
+                catch(System.Exception ex)
+                {
+                    index = _whole_xDocks.FindIndex(x => x.Get_District() == county);
+                }
+                var capacity_threshold = _whole_xDocks[index].Get_Min_Cap();
+                var distance_list = new List<Distance_Demand_Point>();
+                var distances = d[i];
+                for (int j = 0; j < _whole_demand_points.Count; j++)
+                {
+                    var pair = new Distance_Demand_Point(distances[j], _whole_demand_points[j]);
+                    distance_list.Add(pair);
+                }
+                distance_list = distance_list.OrderBy(x => x.Get_Distance()).ToList();
+                var collected_demand = 0.0;
+                var dist_index = 0;
+                for (int k = 0; collected_demand < capacity_threshold & k<_whole_demand_points.Count; k++)
+                {
+                    collected_demand += distance_list[k].Get_Point().Get_Demand();
+                    dist_index = k;
+                }
+                var candidate_point = distance_list[dist_index].Get_Point();
+                var candidate_distance = distance_list[dist_index].Get_Distance();
+                var points = distance_list.FindAll(x => x.Get_Point().Get_District() == candidate_point.Get_District());
+                var suggested_distance = points.Last().Get_Distance();
+                if (suggested_distance > _whole_demand_points[i].Get_Distance_Threshold())
+                {
+                    _whole_demand_points[i].Set_Distance_Threshold(suggested_distance);
+                }
+
+
+            }
+        }
+
         public void Run()
         {
             Get_Distance_Matrix();
+            Update_Distance_Threshold();
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
             Get_Demand_of_Already_Open_Hubs();
@@ -199,4 +244,25 @@ namespace FMLMDelivery.Classes
             }
         }
     }
+
+    internal class Distance_Demand_Point
+    {
+        private Double distance;
+        private DemandPoint demandpoint;
+        public Distance_Demand_Point(Double dist, DemandPoint p)
+        {
+            distance = dist;
+            demandpoint = p;
+        }
+
+        public Double Get_Distance()
+        {
+            return distance;
+        }
+        public DemandPoint Get_Point()
+        {
+            return demandpoint;
+        }
+    }
+
 }

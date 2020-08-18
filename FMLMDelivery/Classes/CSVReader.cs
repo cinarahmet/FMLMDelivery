@@ -159,7 +159,7 @@ public class CSVReader
                     {
                         demand_point_Demand = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
                     }
-                    if (demand_point_Demand > 10.0)
+                    if (demand_point_Demand > 5.0)
                     {
                         var demand_point = new DemandPoint(demand_point_City, demand_point_district, demand_point_ID, demand_point_region, demand_point_long, demand_point_lat, demand_point_dis_thres, demand_point_Demand);
                         _demand_point.Add(demand_point);

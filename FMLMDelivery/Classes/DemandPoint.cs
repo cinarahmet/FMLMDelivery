@@ -17,7 +17,7 @@ public class DemandPoint
 
     private readonly Double _latitude;
 
-    private readonly Double _distance_threshold;
+    private Double _distance_threshold;
 
     private readonly Double _demand;
 
@@ -33,6 +33,10 @@ public class DemandPoint
         _demand = demand;
     }
 
+    public void Set_Distance_Threshold(Double new_threshold)
+    {
+        _distance_threshold = new_threshold;
+    }
    
     public Double Get_Distance_Threshold()
     {
