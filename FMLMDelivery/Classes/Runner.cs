@@ -44,6 +44,7 @@ namespace FMLMDelivery.Classes
         private Dictionary<xDocks, List<Mahalle>> _courier_document;
         private List<String> courier_writer = new List<String>();
         private Dictionary<String, String[]> total_json_log = new Dictionary<string, string[]>();
+        private List<String> xdock_mahalle;
 
 
 
@@ -109,7 +110,6 @@ namespace FMLMDelivery.Classes
             //    demand_covarage = heuristic.Return_Covered_Demand();
             //}
             //var xdocks = new List<xDocks>();
-            //var xdock_mahalle = new List<String>();
             //(xdocks, xdock_mahalle) = Print_Solutions(opened_xDocks, list_assign, _demand_points, _pot_xDocks);
 
 
@@ -137,7 +137,7 @@ namespace FMLMDelivery.Classes
             potential_Hubs = first_phase.Return_Potential_Hubs();
             stats.AddRange(first_phase.Get_Model_Stats_Info());
             var assignment_dictionary = first_phase.Return_xDock_Mahalle();
-            var xdock_mahalle = first_phase.Get_Xdock_County_Info();
+            xdock_mahalle = first_phase.Get_Xdock_County_Info();
             Run_Courier_Problem(assignment_dictionary);
 
             return Tuple.Create(new_xDocks, potential_Hubs, xdock_mahalle, stats);

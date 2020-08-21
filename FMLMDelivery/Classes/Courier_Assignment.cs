@@ -21,7 +21,7 @@ namespace FMLMDelivery.Classes
         private List<String> _assigned_courier_list = new List<string>();
         private Double _courier_max_cap;
         private Mahalle starting_xdock = null;
-        
+        private Double deleted_courier_count = 0;
 
         public Courier_Assignment(xDocks xDock, List<Mahalle> mahalles, Double courier_min_cap, Double courier_max_cap, Double threshold,Double compansation)
         {
@@ -289,7 +289,7 @@ namespace FMLMDelivery.Classes
                     {
                         var potential_ratio = 0.0;
                         var total_dist_covered = 0.0;
-                        var courier_ıd = $"{"Courier "}{courier_list.Count}";
+                        var courier_ıd = $"{"Courier "}{courier_list.Count+deleted_courier_count}";
                         var new2_courier = new Courier(courier_ıd);
                         (new2_courier, total_dist_covered) = Nearest_Neighbour_Assignment(filtered_list[i], new2_courier, _threshold-filtered_list[i].Return_Mahalle_Demand(),true);
                         new2_courier.Add_Mahalle_To_Courier(filtered_list[i]);
@@ -315,7 +315,7 @@ namespace FMLMDelivery.Classes
                         else
                         {
                             var dist_cov = 0.0;
-                            var courier_ıd = $"{"Courier "}{courier_list.Count}";
+                            var courier_ıd = $"{"Courier "}{courier_list.Count + deleted_courier_count}";
                             var selected_c = new Courier(courier_ıd);
                             selected_c.Add_Mahalle_To_Courier(filtered_list[selected_index]);
                             selected_c.Add_Demand_From_Mahalle(filtered_list[selected_index].Return_Mahalle_Demand());
@@ -352,6 +352,7 @@ namespace FMLMDelivery.Classes
 
         private void Termination_Phase()
         {
+            
             var list_of_remove = new List<Courier>();
             for (int i = 0; i < courier_list.Count; i++)
             {
@@ -368,7 +369,7 @@ namespace FMLMDelivery.Classes
             {
                 courier_list.RemoveAll(x => x.Return_Courier_Id()==list_of_remove[i].Return_Courier_Id());
             }
-
+            deleted_courier_count = list_of_remove.Count;
             Complete_Final_Assignments();
             list_of_remove = new List<Courier>();
             for (int i = 0; i < courier_list.Count; i++)

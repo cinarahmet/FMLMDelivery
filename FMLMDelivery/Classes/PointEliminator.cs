@@ -137,11 +137,8 @@ namespace FMLMDelivery.Classes
                 var id = _whole_demand_points[i].Get_Id();
                 var county = _whole_demand_points[i].Get_District();
                 int index = 0;
-                try
-                {
-                    index = _whole_xDocks.FindIndex(x => x.Get_Id() == id);
-                }
-                catch(System.Exception ex)
+                index = _whole_xDocks.FindIndex(x => x.Get_Id() == id);
+                if (index == -1)
                 {
                     index = _whole_xDocks.FindIndex(x => x.Get_District() == county);
                 }
@@ -177,7 +174,7 @@ namespace FMLMDelivery.Classes
         public void Run()
         {
             Get_Distance_Matrix();
-            Update_Distance_Threshold();
+            //Update_Distance_Threshold();
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
             Get_Demand_of_Already_Open_Hubs();
