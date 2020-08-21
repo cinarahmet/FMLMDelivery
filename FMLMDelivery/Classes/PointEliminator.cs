@@ -174,7 +174,7 @@ namespace FMLMDelivery.Classes
         public void Run()
         {
             Get_Distance_Matrix();
-            Update_Distance_Threshold();
+            //Update_Distance_Threshold();
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
             Get_Demand_of_Already_Open_Hubs();
