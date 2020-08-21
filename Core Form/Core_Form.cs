@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using Nancy.Json;
 
 namespace Core_Form
 {
@@ -287,6 +288,12 @@ namespace Core_Form
             var header_xdock_demand_point = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle,Mahalle İlçe, Mahalle Boylam, Mahalle Enlem, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_the_xdocks = new Csv_Writer(courier_assignment_list, "Kurye Atamaları", header_xdock_demand_point, output_loc);
             write_the_xdocks.Write_Records();
+            var json_courier = courier_assignment_list.ToArray();
+            
+            var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
+            var javaScriptSerializer = new JavaScriptSerializer();
+            var resultJson = JsonConvert.SerializeObject(json_courier);
+            File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Output of Courier Assignment  " + runtime + ".json", resultJson);
         }
         private void Outbut_loc_Click(object sender, EventArgs e)
         {
@@ -469,8 +476,48 @@ namespace Core_Form
 
             var resultjson = JsonConvert.SerializeObject(total_input);
             var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
-            File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of " + runtime + ".json", resultjson);
+            String list_to_write = "";
 
+            if (Convert.ToBoolean(run_type[0]) && Convert.ToBoolean(run_type[2]))
+            {
+                var cities = total_input["Parameters"].ToList();
+                var city = new List<String>();
+                
+                for (int i = 0; i < cities.Count; i++)
+                {
+                    var stringset= cities[i].Split(",");
+                    if (stringset[2]=="1")
+                    {
+                        city.Add(stringset[0]);
+
+                    }
+                    list_to_write = String.Join(",",city.ToArray());
+                }
+
+                if (city.Count<=5)
+                {   
+                    File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of " + list_to_write  + runtime + ".json", resultjson);
+                }
+                else
+                {
+                    File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of multiple cities" + runtime + ".json", resultjson);
+                }
+                
+            }
+            else if (Convert.ToBoolean(run_type[3]))
+            {
+                File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of  Courier Assignment Run Type " + runtime + ".json", resultjson);
+
+            }
+            else if (Convert.ToBoolean(run_type[1]))
+            {
+                File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of Partial Run Type" + runtime + ".json", resultjson);
+            }
+            else
+            {
+                File.WriteAllText(@"C:\Users\Public\RetroRestpectiveRun\Input of Full Run" + runtime + ".json", resultjson);
+            }
+             
         }
         private void Retrospective_Run(object sender, EventArgs e)
         {

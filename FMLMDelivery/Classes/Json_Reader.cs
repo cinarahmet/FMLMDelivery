@@ -180,8 +180,8 @@ namespace FMLMDelivery.Classes
                     var demand_point_district = line[1];
                     var demand_point_ID = line[2];
                     var demand_point_region = line[3];
-                    var demand_point_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand_point_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var demand_point_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var demand_point_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var demand_point_dis_thres = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     if (demand_point_dis_thres == 0.0)
                     {
@@ -236,8 +236,8 @@ namespace FMLMDelivery.Classes
                     var xDock_District = line[1];
                     var xDock_Id = line[2];
                     var xDock_region = line[3];
-                    var xDock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var xDock_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                     if (xDock_dist_threshold == 0.0)
@@ -301,8 +301,8 @@ namespace FMLMDelivery.Classes
                     var seller_city = line[2];
                     var seller_district = line[3];
                     var seller_priority = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var seller_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                    var seller_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var seller_long = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var seller_dist = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                     var seller_size = line[9];
@@ -350,8 +350,8 @@ namespace FMLMDelivery.Classes
                     var xDock_Id = line[2];
                     var xDock_region = line[3];
                     var type_value = false;
-                    var xDock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var xDock_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var Already_Opened = Convert.ToBoolean(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
