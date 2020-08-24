@@ -98,19 +98,19 @@ public class CSVReader
         var s_1 = "Akdeniz";
         var value = 180;
         var s_2 = "Marmara";
-        var value_2 = 150;
+        var value_2 = 180;
         var s_3 = "İç Anadolu";
-        var value_3 = 180;
+        var value_3 = 250;
         var s_4 = "Ege";
         var value_4 = 220;
         var s_5 = "Güneydoğu";
-        var value_5 = 200;
+        var value_5 = 250;
         var s_6 = "Karadeniz";
         var value_6 = 200;
         var s_7 = "Güneydoğu Anadolu";
-        var value_7 = 200;
+        var value_7 = 300;
         var s_8 = "Doğu Anadolu";
-        var value_8 = 200;
+        var value_8 = 300;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
@@ -147,8 +147,8 @@ public class CSVReader
                     var demand_point_district = line[1];
                     var demand_point_ID = line[2];
                     var demand_point_region = line[3];
-                    var demand_point_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var demand_point_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var demand_point_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var demand_point_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var demand_point_dis_thres = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     if (demand_point_dis_thres == 0.0)
                     {
@@ -157,32 +157,32 @@ public class CSVReader
                     var demand_point_Demand = Convert.ToDouble(line[_month - 1]);
                     if (demand_point_Demand != 0.0)
                     {
-                        demand_point_Demand = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
+                        //demand_point_Demand = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
                     }
                     if (demand_point_Demand > 5.0)
                     {
-                        var demand_point = new DemandPoint(demand_point_City, demand_point_district, demand_point_ID, demand_point_region, demand_point_long, demand_point_lat, demand_point_dis_thres, demand_point_Demand);
+                        var demand_point = new DemandPoint(demand_point_City, demand_point_district, demand_point_ID, demand_point_region, demand_point_long, demand_point_lat,  demand_point_dis_thres, demand_point_Demand);
                         _demand_point.Add(demand_point);
 
-                        if (Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000) > 1)
-                        {
-                            for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000); i++)
-                            {
-                                var demand_point_City_ = line[0];
-                                var demand_point_district_ = line[1];
-                                var demand_point_ID_ = line[2] + " " + i;
-                                var demand_point_Region_ = line[3];
-                                var demand_point_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                                var demand_point_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                                var demand_point_dis_thres_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                                var demand_point_Demand_ = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
-                                if (demand_point_Demand_ > scope_out_threshold)
-                                {
-                                    var demand_point_ = new DemandPoint(demand_point_City_, demand_point_district_, demand_point_ID_, demand_point_Region_, demand_point_long_, demand_point_lat_, demand_point_dis_thres_, demand_point_Demand_);
-                                    _demand_point.Add(demand_point_);
-                                }
-                            }
-                        }
+                        //if (Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000) > 1)
+                        //{
+                        //    for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000); i++)
+                        //    {
+                        //        var demand_point_City_ = line[0];
+                        //        var demand_point_district_ = line[1];
+                        //        var demand_point_ID_ = line[2] + " " + i;
+                        //        var demand_point_Region_ = line[3];
+                        //        var demand_point_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                        //        var demand_point_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                        //        var demand_point_dis_thres_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                        //        var demand_point_Demand_ = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
+                        //        if (demand_point_Demand_ > scope_out_threshold)
+                        //        {
+                        //            var demand_point_ = new DemandPoint(demand_point_City_, demand_point_district_, demand_point_ID_, demand_point_Region_, demand_point_long_, demand_point_lat_, demand_point_dis_thres_, demand_point_Demand_);
+                        //            _demand_point.Add(demand_point_);
+                        //        }
+                        //    }
+                        //}
                     }
                 }catch(Exception ex)
                 {
@@ -219,9 +219,9 @@ public class CSVReader
                     var xDock_District = line[1];
                     var xDock_Id = line[2];
                     var xDock_region = line[3];
-                    var type_value = false ;
-                    var xDock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var xDock_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var type_value = false;
+                    var xDock_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var Already_Opened = Convert.ToBoolean(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
@@ -351,8 +351,8 @@ public class CSVReader
                     var xDock_District = line[1];
                     var xDock_Id = line[2];
                     var xDock_region = line[3];
-                    var xDock_long = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                    var xDock_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_lat = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                     if (xDock_dist_threshold == 0.0)
@@ -407,8 +407,8 @@ public class CSVReader
                         var seller_city = line[2];
                         var seller_district = line[3];
                         var seller_priority = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                        var seller_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                        var seller_lat = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                        var seller_lat = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                        var seller_long = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
                         var seller_demand = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                         var seller_dist = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                         var seller_size = line[9];
@@ -450,20 +450,7 @@ public class CSVReader
             total_dictionary_of_Inputs.Add("Sellers", lines);
         }
     }
-    public void Create_Input_Log_Json()
-    {
-        //var javaScriptSerializer = new JavaScriptSerializer();
-        //var demand_points = javaScriptSerializer.DeserializeObject(demand_point_json);
-        //var potential_xdocks = javaScriptSerializer.DeserializeObject(potential_xdocks_json);
-        //var sellers = javaScriptSerializer.DeserializeObject(sellers_json);
-        //var parameters = javaScriptSerializer.DeserializeObject(parameters_json);
-        
-        //var resultJson = JsonConvert.SerializeObject(new { Demand_Points = demand_points, Potential_xDocks = potential_xdocks, Parameter=parameters, Seller_File=sellers });
-        
-        //var runtime = DateTime.Now.ToString(" dd MMMM HH;mm;ss ");
-        //File.WriteAllText(@"C:\Users\cagri.iyican\Desktop\Input of " + runtime + ".json", resultJson);
-    }
-
+    
 
     public Dictionary<String,String[]> Get_Input_Dictionary()
     {

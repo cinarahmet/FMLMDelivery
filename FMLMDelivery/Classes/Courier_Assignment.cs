@@ -491,6 +491,8 @@ namespace FMLMDelivery.Classes
             var xdock_city = _xDock.Get_City();
             var xdock_district = _xDock.Get_District();
             var xdock_id = _xDock.Get_Id();
+            var xdock_lat = _xDock.Get_Latitude();
+            var xdock_long = _xDock.Get_Longitude();
             var count = 0;
             for (int i = 0; i < courier_list.Count; i++)
             {
@@ -509,7 +511,7 @@ namespace FMLMDelivery.Classes
                     {
                         overload = "Overload";
                     }
-                    var list= $"{xdock_city },{xdock_district},{xdock_id},{courier_id},{courier_mahalle_name},{courier_district},{courier_mahalle_longitude},{courier_mahalle_lattitude},{courier_mahalle_demand},{courier_distance},{overload}";
+                    var list= $"{xdock_city },{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{courier_id},{courier_mahalle_name},{courier_district},{courier_mahalle_lattitude},{courier_mahalle_longitude},{courier_mahalle_demand},{courier_distance},{overload}";
                     _assigned_courier_list.Add(list);
                 }
             }

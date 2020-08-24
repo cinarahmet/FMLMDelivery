@@ -168,9 +168,9 @@ namespace FMLMDelivery
         /// <summary>
         /// Gap limit is given in percentage
         /// </summary>
-        private readonly double _gap = 0.00001;
+        private readonly double _gap = 0.01;
 
-        /// <summary>
+        /// <summary>u
         /// if cost is incurred
         /// </summary>
         private Boolean _cost_incurred;
