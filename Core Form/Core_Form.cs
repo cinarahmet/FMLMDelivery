@@ -285,7 +285,7 @@ namespace Core_Form
                 var list = courier_assignment.Return_Courier_Assignments();
                 courier_assignment_list.AddRange(list);
             }
-            var header_xdock_demand_point = "xDock İl,xDock İlçe,xDock Mahalle,Kurye Id, Atanan Mahalle,Mahalle İlçe, Mahalle Boylam, Mahalle Enlem, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
+            var header_xdock_demand_point = "xDock İl,xDock İlçe,xDock Mahalle,xDock Enlem,xDock Boylam,Kurye Id,Atanan Mahalle,Mahalle İlçe,Mahalle Enlem,Mahalle Boylam,Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_the_xdocks = new Csv_Writer(courier_assignment_list, "Kurye Atamaları", header_xdock_demand_point, output_loc);
             write_the_xdocks.Write_Records();
             var json_courier = courier_assignment_list.ToArray();
