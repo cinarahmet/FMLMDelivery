@@ -430,7 +430,7 @@ namespace FMLMDelivery.Classes
             string[] json_opened_xdocks = csv2.Split("\r\n");
             total_json_log.Add("Açılmış xDocklar Listesi", json_opened_xdocks);
 
-            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,xDock Enlem,xDock Boylam, Kurye Id, Atanan Mahalle,Mahalle İlçe, Mahalle Enlem, Mahalle Boylam, Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
+            var header_courier = "xDock İl,xDock İlçe,xDock Mahalle,xDock Enlem,xDock Boylam,Kurye Id,Atanan Mahalle,Mahalle İlçe,Mahalle Enlem,Mahalle Boylam,Mahalleye Götüreceği Paket,Tahmini Uzaklık,Kapasite Aşımı";
             var write_courier = new Csv_Writer(courier_writer, "Kurye Atamaları", header_courier, _output_files);
             write_courier.Write_Records();
             var json_courier_assignments = courier_writer.ToArray();
