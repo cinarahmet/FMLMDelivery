@@ -697,6 +697,7 @@ public class DemandxDockModel
         {
             if (!assigned_list.Contains(i))
             {
+                var distance_list = new List<Double>();
                 var xdock_city = "Atanmayan Talep Noktası";
                 var xdock_district = "Atanmayan Talep Noktası";
                 var xdock_lat = "Atanmayan Talep Noktası";
@@ -708,7 +709,11 @@ public class DemandxDockModel
                 var demand_point_lat = _demandpoint[i].Get_Latitude();
                 var demand_point_long = _demandpoint[i].Get_Longitude();
                 var demand = _demandpoint[i].Get_Demand();
-                var distance_xdock_county = "";
+                for (int j = 0; j < _xDocks.Count ; j++)
+                {
+                    if(_solver.GetValue(y[j]) > 0.9) distance_list.Add(Calculate_Distances(demand_point_long, demand_point_lat, _xDocks[j].Get_Longitude(), _xDocks[j].Get_Latitude()));
+                }
+                var distance_xdock_county = distance_list.Min().ToString();
                 var result = $"{xdock_city},{xdock_district},{xdock_id},{xdock_lat},{xdock_long},{demand_point_city},{demand_point_district},{demand_point_id},{demand_point_lat},{demand_point_long},{distance_xdock_county},{demand}";
                 record_list.Add(result);
             }
