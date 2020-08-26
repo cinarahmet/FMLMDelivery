@@ -142,6 +142,11 @@ namespace FMLMDelivery.Classes
                 {
                     index = _whole_xDocks.FindIndex(x => x.Get_District() == county);
                 }
+                if (index == -1)
+                {
+                    var max_min = _whole_xDocks.Max(x => x.Get_Min_Cap());
+                    index = _whole_xDocks.FindIndex(x => x.Get_Min_Cap() == max_min);
+                }
                 var capacity_threshold = _whole_xDocks[index].Get_Min_Cap();
                 var distance_list = new List<Distance_Demand_Point>();
                 var distances = d[i];
@@ -174,7 +179,7 @@ namespace FMLMDelivery.Classes
         public void Run()
         {
             Get_Distance_Matrix();
-            //Update_Distance_Threshold();
+            Update_Distance_Threshold();
             Create_Distance_Threshold_Matrix();
             Get_Total_Demand();
             Get_Demand_of_Already_Open_Hubs();
