@@ -157,32 +157,32 @@ public class CSVReader
                     var demand_point_Demand = Convert.ToDouble(line[_month - 1]);
                     if (demand_point_Demand != 0.0)
                     {
-                        //demand_point_Demand = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
+                        demand_point_Demand = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
                     }
                     if (demand_point_Demand > 5.0)
                     {
                         var demand_point = new DemandPoint(demand_point_City, demand_point_district, demand_point_ID, demand_point_region, demand_point_long, demand_point_lat,  demand_point_dis_thres, demand_point_Demand);
                         _demand_point.Add(demand_point);
 
-                        //if (Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000) > 1)
-                        //{
-                        //    for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000); i++)
-                        //    {
-                        //        var demand_point_City_ = line[0];
-                        //        var demand_point_district_ = line[1];
-                        //        var demand_point_ID_ = line[2] + " " + i;
-                        //        var demand_point_Region_ = line[3];
-                        //        var demand_point_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
-                        //        var demand_point_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
-                        //        var demand_point_dis_thres_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
-                        //        var demand_point_Demand_ = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
-                        //        if (demand_point_Demand_ > scope_out_threshold)
-                        //        {
-                        //            var demand_point_ = new DemandPoint(demand_point_City_, demand_point_district_, demand_point_ID_, demand_point_Region_, demand_point_long_, demand_point_lat_, demand_point_dis_thres_, demand_point_Demand_);
-                        //            _demand_point.Add(demand_point_);
-                        //        }
-                        //    }
-                        //}
+                        if (Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000) > 1)
+                        {
+                            for (int i = 2; i <= Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000); i++)
+                            {
+                                var demand_point_City_ = line[0];
+                                var demand_point_district_ = line[1];
+                                var demand_point_ID_ = line[2] + " " + i;
+                                var demand_point_Region_ = line[3];
+                                var demand_point_long_ = Convert.ToDouble(line[4], System.Globalization.CultureInfo.InvariantCulture);
+                                var demand_point_lat_ = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
+                                var demand_point_dis_thres_ = Convert.ToDouble(line[6], System.Globalization.CultureInfo.InvariantCulture);
+                                var demand_point_Demand_ = Convert.ToDouble(line[_month - 1]) / Math.Ceiling(Convert.ToDouble(line[_month - 1]) / 4000);
+                                if (demand_point_Demand_ > scope_out_threshold)
+                                {
+                                    var demand_point_ = new DemandPoint(demand_point_City_, demand_point_district_, demand_point_ID_, demand_point_Region_, demand_point_long_, demand_point_lat_, demand_point_dis_thres_, demand_point_Demand_);
+                                    _demand_point.Add(demand_point_);
+                                }
+                            }
+                        }
                     }
                 }catch(Exception ex)
                 {
