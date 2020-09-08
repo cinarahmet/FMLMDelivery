@@ -532,6 +532,7 @@ namespace FMLMDelivery
                         var valueslat = _hubs[j].Get_Latitude();
                         var valueslong = _hubs[j].Get_Longitude();
                         var dist = _hubs[j].Get_Distance_Threshold();
+                        var hub_point = _hubs[j].Get_Hub_Points();
                         var lm_distribution = 0.0;
                         var fm_distribution = 0.0;
                         for (int i = 0; i < _numOfXdocks; i++)
@@ -551,7 +552,7 @@ namespace FMLMDelivery
                         }
                         var already_opened = _hubs[j].If_Already_Opened();
 
-                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist, lm_distribution, already_opened);
+                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist,hub_point, lm_distribution, already_opened);
                         new_hub.Set_FM_Capacity(fm_distribution);
                         new_hubs.Add(new_hub);
                     }
@@ -1111,7 +1112,7 @@ namespace FMLMDelivery
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
-                        _objective.AddTerm(x[i][j], d[i][j] * (x_dock_LM_demand[i] + x_dock_FM_demand[i]));
+                        _objective.AddTerm(x[i][j], d[i][j] * (x_dock_LM_demand[i] + x_dock_FM_demand[i])*_hubs[j].Get_Hub_Points());
 
                     }
                 }
@@ -1119,7 +1120,7 @@ namespace FMLMDelivery
                 {
                     for (int j = 0; j < _numOfHubs; j++)
                     {
-                        _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]);
+                        _objective.AddTerm(s[i][j], d_seller[i][j] * seller_demand[i]*_hubs[j].Get_Hub_Points());
                     }   
                 }
 

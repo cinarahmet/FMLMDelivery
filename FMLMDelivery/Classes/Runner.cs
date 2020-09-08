@@ -235,9 +235,10 @@ namespace FMLMDelivery.Classes
             var longitude = xDocks[i].Get_Longitude();
             var latitude = xDocks[i].Get_Latitude();
             var dist_thres = xDocks[i].Get_Distance_Threshold();
+            var hub_point = xDocks[i].Get_Hub_Point();
             var capacity = _capacity;
             var already_opened = true;
-            var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+            var open_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres,hub_point, capacity, already_opened);
             potential_hub_locations.Add(open_hub);
         }
 
@@ -251,14 +252,14 @@ namespace FMLMDelivery.Classes
                 }
                 else if (xDocks[i].Get_District() == "YÜREĞİR" && xDocks[i].Get_Id() == "İNCİRLİK CUMHURİYET")
                 {
-                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 50000);
+                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 200000);
                 }
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
                     Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 227000);
                 }else if (xDocks[i].Get_District() == "KEMALPAŞA" && xDocks[i].Get_Id() == "KIZILÜZÜM")
                 {
-                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 65000);
+                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 180000);
                 }
             }
         }
@@ -288,7 +289,7 @@ namespace FMLMDelivery.Classes
             var cov_demand = second_phase.Return_Covered_Demand();
             writer_seller.AddRange(second_phase.Get_Seller_Xdock_Info());
             stats_writer.AddRange(second_phase.Get_Small_Seller_Model_Stat());
-            var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam, Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
+            var header = "xDocks İl,xDocks İlçe,xDocks Mahalle,xDocks Enlem,xDokcs Boylam,Seller İsmi,Seller İl,Seller İlçe,Seller Uzaklık,Seller Gönderi Adeti";
             //var stats_header = "Part,Model,Demand Coverage,Status,Time,Gap";
             var writer_small_seller = new Csv_Writer(writer_seller, "Küçük Tedarikçi xDock Atamaları", header, _output_files);
            // var stat_writer = new Csv_Writer(stats_writer, "Statü", stats_header, _output_files);
@@ -478,9 +479,10 @@ namespace FMLMDelivery.Classes
                 var longitude = new_XDocks[i].Get_Longitude();
                 var latitude = new_XDocks[i].Get_Latitude();
                 var dist_thres = new_XDocks[i].Get_Distance_Threshold();
+                var hub_point = new_xDocks[i].Get_Hub_Point();
                 var capacity = 4000000;
                 var already_opened = false;
-                var potential_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                var potential_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres,hub_point, capacity, already_opened);
                 potential_Hubs.Add(potential_hub);
             }
 
