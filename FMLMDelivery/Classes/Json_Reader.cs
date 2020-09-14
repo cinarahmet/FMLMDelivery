@@ -365,9 +365,9 @@ namespace FMLMDelivery.Classes
                     var Already_Opened = Convert.ToBoolean(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                    var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                    var empty_hub_point = 0.0;
-                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap,empty_hub_point,xdock_demand, Already_Opened, type_value);
+                    var hub_point = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                    var xdock_demand = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap,hub_point,xdock_demand, Already_Opened, type_value);
                     _partial_xdocks.Add(xDock);
                 }
             }
