@@ -240,6 +240,10 @@ namespace FMLMDelivery
 
         private List<String> record_stats = new List<String>();
 
+        private List<Double> number_of_chute_usage = new List<Double>();
+
+        private Double average_xdock_cap = 4000;
+
 
         public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
@@ -399,6 +403,14 @@ namespace FMLMDelivery
 
         }
 
+        private void Create_Chute_Usage_List()
+        {
+            for (int i = 0; i < _xDocks.Count; i++)
+            {
+                var chute_number = Math.Round(_xDocks[i].Get_LM_Demand() / average_xdock_cap);
+                number_of_chute_usage.Add(chute_number);
+            }
+        }
         public void Run()
         {
             Get_Parameters();
@@ -535,12 +547,14 @@ namespace FMLMDelivery
                         var hub_point = _hubs[j].Get_Hub_Points();
                         var lm_distribution = 0.0;
                         var fm_distribution = 0.0;
+                        var chute_cap_distribution = 0.0;
                         for (int i = 0; i < _numOfXdocks; i++)
                         {
                             if (_solver.GetValue(x[i][j]) > 0.9)
                             {
                                 lm_distribution += _xDocks[i].Get_LM_Demand();
                                 fm_distribution += _xDocks[i].Get_FM_Demand();
+                                chute_cap_distribution += number_of_chute_usage[i];
                             }
                         }
                         for (int i = 0; i < _numOfSeller; i++)
@@ -552,7 +566,7 @@ namespace FMLMDelivery
                         }
                         var already_opened = _hubs[j].If_Already_Opened();
 
-                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist,hub_point, lm_distribution, already_opened);
+                        var new_hub = new Hub(city, district, id, region, valueslong, valueslat, dist,hub_point, lm_distribution,chute_cap_distribution, already_opened);
                         new_hub.Set_FM_Capacity(fm_distribution);
                         new_hubs.Add(new_hub);
                     }
@@ -684,6 +698,7 @@ namespace FMLMDelivery
             Create_Distance_Threshold_Seller();
             Get_Demand_Parameters();
             Get_Total_Demand();
+            Create_Chute_Usage_List();
         }
 
         private void Get_Total_Demand()
@@ -742,6 +757,7 @@ namespace FMLMDelivery
             CoverageConstraints();
             Open_Hub_Constraint();
             Nonnegativity_Constraint();
+            //Chute_Capacity_Constraint();
             if (_cost_incurred)
             {
                 UnAssigned_XDock_Constraints();
@@ -925,8 +941,6 @@ namespace FMLMDelivery
                     _solver.AddLe(constraint, 1);
                 }
             }
-           
-          
         }
 
         //y[j]*alfa >= ∑x[i,j]*a[i,j]*demand[i]
@@ -952,6 +966,21 @@ namespace FMLMDelivery
                     constraint.AddTerm(x[i][j], a[i][j]);
                 }
                 constraint.AddTerm(y[j], -max_num_xdock_assigned);
+                _solver.AddLe(constraint, 0);
+            }
+
+        }
+
+        private void Chute_Capacity_Constraint()
+        {
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                var constraint = _solver.LinearNumExpr();
+                for (int i = 0; i < _numOfXdocks; i++)
+                {
+                    constraint.AddTerm(x[i][j], number_of_chute_usage[i]);
+                }
+                constraint.AddTerm(y[j], -_hubs[j].Get_Chute_Capacity());
                 _solver.AddLe(constraint, 0);
             }
         }

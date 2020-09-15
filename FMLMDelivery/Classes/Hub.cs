@@ -26,9 +26,11 @@ public class Hub
 
     private Double _fm_capacity;
 
+    private Double _chute_capacity;
+
     private readonly Boolean _already_opened;
 
-    public Hub(String city, String district,String id,String region, Double longitude, Double latitude,Double dist_thres, Double hub_points, Double capacity, Boolean already_opened)
+    public Hub(String city, String district,String id,String region, Double longitude, Double latitude,Double dist_thres, Double hub_points, Double capacity,Double chute_capacity, Boolean already_opened)
     {
         _city = city;
         _district = district;
@@ -41,6 +43,7 @@ public class Hub
         _fm_capacity = capacity;
         _already_opened = already_opened;
         _hub_points = hub_points;
+        _chute_capacity = chute_capacity;
     }
 
 
@@ -102,5 +105,10 @@ public class Hub
     public Double Get_Hub_Points()
     {
         return _hub_points;
+    }
+
+    public Double Get_Chute_Capacity()
+    {
+        return _chute_capacity;
     }
 }

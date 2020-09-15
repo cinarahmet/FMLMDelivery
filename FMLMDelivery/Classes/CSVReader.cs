@@ -357,14 +357,14 @@ public class CSVReader
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                     var hub_point = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                    if (hub_point == 0)
+                    if (hub_point <= 1)
                     {
-                        hub_point = 2;
+                        hub_point = 1.5;
                     }
                     else
                     {
-                        var log_value = Math.Log(hub_point, 10);
-                        hub_point = (2 - log_value);
+                        var log_value = Math.Log(hub_point, 10)/2;
+                        hub_point = (1.5 - log_value);
                     }
                     if (xDock_dist_threshold == 0.0)
                     {

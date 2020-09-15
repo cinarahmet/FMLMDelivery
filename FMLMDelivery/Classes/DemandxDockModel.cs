@@ -14,8 +14,16 @@ using FMLMDelivery.Classes;
 /// </summary>
 public class DemandxDockModel
 {
-    private Double max_hub_capacity = 4000000;
 
+    /// <summary>
+    /// Max chute capacity a Main Hub can have
+    /// </summary>
+    private Double max_chute_capacity = 150;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private Double max_hub_capacity = 4000000;
     /// <summary>
     /// Cplex object
     /// </summary>  
@@ -402,8 +410,9 @@ public class DemandxDockModel
                 var dist_thres = new_XDocks[i].Get_Distance_Threshold();
                 var hub_point = new_XDocks[i].Get_Hub_Point();
                 var capacity = max_hub_capacity;
+                var chute_capacity = max_chute_capacity;
                 var already_opened = false;
-                var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres,hub_point, capacity, already_opened);
+                var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres,hub_point, capacity,chute_capacity, already_opened);
                 potential_Hubs.Add(potential_hub);
 
             }
