@@ -27,7 +27,7 @@ namespace FMLMDelivery
             var hub_demand_coverage = 0.97;
             //Provide the month index (1-January, 12-December)
             var month = 12;
-            var reader = new CSVReader("Demand Points Disctrict 2021.csv", "Potential xDocks District 2021.csv", "2021 Seller File.csv", "Parameters_new.csv","","İl İlçe Distance Matrix.csv", month);
+            var reader = new CSVReader("Demand Points Disctrict 2021.csv", "Potential xDocks District 2021.csv", "2021 Seller File.csv", "Parameters_new.csv","", month);
             reader.Read();
             demand_point = reader.Get_County();
             potential_xDocks = reader.Get_XDocks();
@@ -49,13 +49,13 @@ namespace FMLMDelivery
             }
             else if (only_courier_assignmnets)
             {
-                var partial_reader = new CSVReader("", "", "", "", "Output/Mahalle xDock Atamaları.csv","", month);
+                var partial_reader = new CSVReader("", "", "", "", "Output/Mahalle xDock Atamaları.csv", month);
                 partial_reader.Read_xDock_Neighborhood_Assignments();
                 xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
             }
             else
             {
-                var partial_reader = new CSVReader("", "Output/Kısmi Çalıştırma Dosyası.csv", "", "","Output/Mahalle xDock Atamaları.csv","", month);
+                var partial_reader = new CSVReader("", "Output/Kısmi Çalıştırma Dosyası.csv", "", "","Output/Mahalle xDock Atamaları.csv", month);
                 partial_reader.Read_Partially();
                 partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                 xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();

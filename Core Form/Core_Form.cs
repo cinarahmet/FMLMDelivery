@@ -372,9 +372,10 @@ namespace Core_Form
                     var prior_big_sellers = reader.Get_Prior_Big_Sellers();
                     var regular_big_sellers = reader.Get_Regular_Big_Sellers();
                     var parameter_list = reader.Get_Parameter_List();
+                    var distance_matrix = reader.Get_Distance_Matrix();
 
 
-                    var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
+                    var runner = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list,distance_matrix);
                     (xDocks, hubs) = await Task.Run(() => runner.Run());
                     //Console.ReadKey();
                 }
@@ -424,13 +425,14 @@ namespace Core_Form
                     var prior_big_sellers = reader.Get_Prior_Big_Sellers();
                     var regular_big_sellers = reader.Get_Regular_Big_Sellers();
                     var parameter_list = reader.Get_Parameter_List();
+                    var distance_matrix = reader.Get_Distance_Matrix();
 
                     var partial_reader = new CSVReader("", presolved_xDock_file, "", "", mahalle_xdock_file, month);
                     partial_reader.Read_Partial_Solution_Xdocks();
                     partial_xDocks = partial_reader.Get_Partial_Solution_Xdocks();
                     partial_reader.Read_xDock_Neighborhood_Assignments();
                     xDock_neighborhood_assignments = partial_reader.Get_xDock_neighborhood_Assignments();
-                    var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list);
+                    var runner_partial = new Runner(demand_point, potential_xDocks, partial_xDocks, agency, prior_small_sellers, regular_small_sellers, prior_big_sellers, regular_big_sellers, parameter_list, partial_solution, discrete_solution, directory, hub_demand_coverage, only_cities, xDock_neighborhood_assignments, courier_parameter_list,distance_matrix);
                     (xDocks, hubs) = await Task.Run(() => runner_partial.Run());
 
                     total_json = partial_reader.Get_Input_Dictionary();

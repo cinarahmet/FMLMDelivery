@@ -61,7 +61,7 @@ public class CSVReader
     private List<String> city_list;
 
 
-    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments,string dist_matrix, Int32 month)
+    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments, Int32 month)
     {
         _demand_point_file = county_file;
         _xDocks_file = xDock_file;
@@ -69,7 +69,7 @@ public class CSVReader
         _seller_file = Seller_file;
         _parameter_file = parameter_file;
         _xDock_neighborhood_assignments_file = assignments;
-        _dist_matrix_file = dist_matrix;
+        _dist_matrix_file = "İl İlçe Distance Matrix.csv";
     }
 
     private void Create_Demand_Point_Region_Threshold()

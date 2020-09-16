@@ -343,7 +343,7 @@ namespace FMLMDelivery
         private void Get_Distance_Matrix_Seller()
         {   //Calculating distance matrix for sellers
             List<string> keyList = new List<string>(this._distance_matrix.Keys);
-
+            var bird_flew_dist = 0;
             for (int i = 0; i < _numOfSeller; i++)
             {
                 var key1 =_sellers[i].Get_City();
@@ -353,23 +353,61 @@ namespace FMLMDelivery
                 }
                 var key2 = _sellers[i].Get_District();
                 var key = key1 + "-" + key2;
-                var distance_list = _distance_matrix[key];
+                var distance_list = new List<Double>();
+                var dist_list_exist = true;
+                if (_distance_matrix.ContainsKey(key))
+                {
+                    distance_list = _distance_matrix[key];
+
+                }
+                else
+                {
+                    dist_list_exist = false;
+                }
                 var d_k = new List<double>();
                 for (int j = 0; j < _numOfHubs; j++)
                 {
-                    var key3 = _hubs[j].Get_City();
-                    if (key3 == "İSTANBUL AVRUPA" || key3 == "İSTANBUL ASYA")
+                    var d_ij = 0.0;
+                    if (dist_list_exist)
                     {
-                        key3 = "İSTANBUL";
+                        var key3 = _hubs[j].Get_City();
+                        if (key3 == "İSTANBUL AVRUPA" || key3 == "İSTANBUL ASYA")
+                        {
+                            key3 = "İSTANBUL";
+                        }
+                        var key4 = _hubs[j].Get_District();
+                        var key5 = key3 + "-" + key4;
+                        if (keyList.Contains(key5))
+                        {
+                            var index2 = keyList.FindIndex(x => x == key5);
+                            d_ij = distance_list[index2];
+                        }
+                        else
+                        {
+                            var lat1 = _sellers[i].Get_Latitude();
+                            var lat2 = _hubs[j].Get_Latitude();
+                            var long1 = _sellers[i].Get_Longitude();
+                            var long2 = _hubs[j].Get_Longitude();
+                            d_ij = Calculate_Distances(long1, lat1, long2, lat2);
+                            bird_flew_dist += 1;
+                        }
+                        
                     }
-                    var key4 = _hubs[j].Get_District();
-                    var key5 = key3 + "-" + key4;
-                    var index2 = keyList.FindIndex(x => x == key5);
-                    var d_ij = distance_list[index2];
+                    else
+                    {
+                        var lat1 = _sellers[i].Get_Latitude();
+                        var lat2 = _hubs[j].Get_Latitude();
+                        var long1 = _sellers[i].Get_Longitude();
+                        var long2 = _hubs[j].Get_Longitude();
+                        d_ij = Calculate_Distances(long1, lat1, long2, lat2);
+                        bird_flew_dist++;
+                    }
+                    
 
                     d_k.Add(d_ij);
                 }
                 d_seller.Add(d_k);
+
             }
 
 
