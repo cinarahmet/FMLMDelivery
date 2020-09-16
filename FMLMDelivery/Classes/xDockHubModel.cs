@@ -6,6 +6,7 @@ using System.Text;
 using ILOG.CPLEX;
 using ILOG.Concert;
 using System.Device.Location;
+using ChoETL;
 
 namespace FMLMDelivery
 {
@@ -240,8 +241,10 @@ namespace FMLMDelivery
 
         private List<String> record_stats = new List<String>();
 
+        private Dictionary<String, List<Double>> _distance_matrix;
 
-        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P , Boolean cost_incurred = false, Boolean capacity_incurred = false)
+
+        public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P ,Dictionary<String,List<Double>> distance_matrix,Boolean cost_incurred = false, Boolean capacity_incurred = false)
         {
 
             _solver = new Cplex();
@@ -260,6 +263,7 @@ namespace FMLMDelivery
             _demand_weighted = Demandweight;
             _demand_covarage = Demand_Covarage;
             phase_2 = Phase2;
+            _distance_matrix = distance_matrix;
 
 
             x = new List<List<INumVar>>();
@@ -295,39 +299,96 @@ namespace FMLMDelivery
 
         private void Get_Distance_Matrix()
         {
+            List<string> keyList = new List<string>(this._distance_matrix.Keys);
+
             //Calculating the distance matrix
             for (int i = 0; i < _numOfXdocks; i++)
             {
+                var key1 = _xDocks[i].Get_City();
+                var key2 = _xDocks[i].Get_District();
+                var key = key1 + "-" + key2;
+                var distance_list = _distance_matrix[key];
                 var d_i = new List<double>();
                 for (int j = 0; j < _numOfHubs; j++)
                 {
-                    var long_1 = _xDocks[i].Get_Longitude();
-                    var lat_1 = _xDocks[i].Get_Latitude();
-                    var long_2 = _hubs[j].Get_Longitude();
-                    var lat_2 = _hubs[j].Get_Latitude();
-                    var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+                    var key3 = _hubs[j].Get_City();
+                    var key4 = _hubs[j].Get_District();
+                    var key5 = key3 + "-" + key4;
+                    var index2 = keyList.FindIndex(x => x == key5);
+                    var d_ij = distance_list[index2];
                     d_i.Add(d_ij);
                 }
                 d.Add(d_i);
             }
+
+            //for (int i = 0; i < _numOfXdocks; i++)
+            //{
+            //    var d_i = new List<double>();
+            //    for (int j = 0; j < _numOfHubs; j++)
+            //    {
+            //        var long_1 = _xDocks[i].Get_Longitude();
+            //        var lat_1 = _xDocks[i].Get_Latitude();
+            //        var long_2 = _hubs[j].Get_Longitude();
+            //        var lat_2 = _hubs[j].Get_Latitude();
+            //        var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+            //        d_i.Add(d_ij);
+            //    }
+            //    d.Add(d_i);
+            //}
+
+
         }
         private void Get_Distance_Matrix_Seller()
         {   //Calculating distance matrix for sellers
+            List<string> keyList = new List<string>(this._distance_matrix.Keys);
+
             for (int i = 0; i < _numOfSeller; i++)
             {
+                var key1 =_sellers[i].Get_City();
+                if (key1 == "İSTANBUL AVRUPA" ||  key1 == "İSTANBUL ASYA")
+                {
+                    key1 = "İSTANBUL";
+                }
+                var key2 = _sellers[i].Get_District();
+                var key = key1 + "-" + key2;
+                var distance_list = _distance_matrix[key];
                 var d_k = new List<double>();
                 for (int j = 0; j < _numOfHubs; j++)
                 {
-                    var long_1 = _sellers[i].Get_Longitude();
-                    var lat_1 = _sellers[i].Get_Latitude();
-                    var long_2 = _hubs[j].Get_Longitude();
-                    var lat_2 = _hubs[j].Get_Latitude();
-                    var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+                    var key3 = _hubs[j].Get_City();
+                    if (key3 == "İSTANBUL AVRUPA" || key3 == "İSTANBUL ASYA")
+                    {
+                        key3 = "İSTANBUL";
+                    }
+                    var key4 = _hubs[j].Get_District();
+                    var key5 = key3 + "-" + key4;
+                    var index2 = keyList.FindIndex(x => x == key5);
+                    var d_ij = distance_list[index2];
 
                     d_k.Add(d_ij);
                 }
                 d_seller.Add(d_k);
             }
+
+
+
+
+
+            //for (int i = 0; i < _numOfSeller; i++)
+            //{
+            //    var d_k = new List<double>();
+            //    for (int j = 0; j < _numOfHubs; j++)
+            //    {
+            //        var long_1 = _sellers[i].Get_Longitude();
+            //        var lat_1 = _sellers[i].Get_Latitude();
+            //        var long_2 = _hubs[j].Get_Longitude();
+            //        var lat_2 = _hubs[j].Get_Latitude();
+            //        var d_ij = Calculate_Distances(long_1, lat_1, long_2, lat_2);
+
+            //        d_k.Add(d_ij);
+            //    }
+            //    d_seller.Add(d_k);
+            //}
 
         }
 

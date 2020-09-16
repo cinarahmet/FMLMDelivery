@@ -1187,7 +1187,6 @@ public class DemandxDockModel
                 for (int j = 0; j < _numOfXdocks; j++)
                 {
                     _objective.AddTerm(x[i][j], d[i][j] * demand_of_demand_point[i]*a[i][j]);
-
                 }
             }
 

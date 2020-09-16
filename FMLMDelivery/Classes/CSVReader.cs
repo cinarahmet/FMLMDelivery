@@ -38,6 +38,8 @@ public class CSVReader
 
     private readonly string _xDock_neighborhood_assignments_file;
 
+    private readonly string _dist_matrix_file;
+
     private Dictionary<String, Double> region_county_threshold = new Dictionary<string, double>();
 
     private Dictionary<String, Double> region_xDock_threshold = new Dictionary<string, double>();
@@ -54,8 +56,12 @@ public class CSVReader
 
     private Dictionary<String, String[]> total_dictionary_of_Inputs= new Dictionary<string, string[]>();
 
+    private Dictionary<String,List<Double>> dist_matrix = new Dictionary<string, List<double>>() ;
 
-    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments, Int32 month)
+    private List<String> city_list;
+
+
+    public CSVReader(string county_file, string xDock_file, string Seller_file,string parameter_file,string assignments,string dist_matrix, Int32 month)
     {
         _demand_point_file = county_file;
         _xDocks_file = xDock_file;
@@ -63,6 +69,7 @@ public class CSVReader
         _seller_file = Seller_file;
         _parameter_file = parameter_file;
         _xDock_neighborhood_assignments_file = assignments;
+        _dist_matrix_file = dist_matrix;
     }
 
     private void Create_Demand_Point_Region_Threshold()
@@ -123,12 +130,30 @@ public class CSVReader
 
     public void Read()
     {
+        Read_Distance_Matrix();
         Create_Demand_Point_Region_Threshold();
         Create_xDock_Region_Threshold();
         Read_XDock();
         Read_Demand_Point();
         Read_Parameters();
         Read_Sellers();
+    }
+
+    private void Read_Distance_Matrix()
+    {
+        using (var sr = File.OpenText(_dist_matrix_file))
+        {
+            String s = sr.ReadLine();
+            city_list = s.Split(',').ToList();
+            var index = 0;
+            while ((s = sr.ReadLine()) != null)
+            {
+                var dist_list = s.Split(',').ToList();
+                var d_list = dist_list.Select(a => double.Parse(a)).ToList();
+                dist_matrix.Add(city_list[index], d_list);
+                index += 1;
+            }
+        }
     }
 
     private void Read_Demand_Point()
@@ -508,5 +533,9 @@ public class CSVReader
     public List<String> Get_Input_Failure_List()
     {
         return failure_list;
+    }
+    public Dictionary<string, List<Double>> Get_Distance_Matrix()
+    {
+        return dist_matrix;
     }
 }
