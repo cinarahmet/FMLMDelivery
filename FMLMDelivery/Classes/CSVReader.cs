@@ -115,9 +115,9 @@ public class CSVReader
         var s_6 = "Karadeniz";
         var value_6 = 200;
         var s_7 = "Güneydoğu Anadolu";
-        var value_7 = 300;
+        var value_7 = 350;
         var s_8 = "Doğu Anadolu";
-        var value_8 = 300;
+        var value_8 = 350;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);
@@ -250,8 +250,9 @@ public class CSVReader
                     var Already_Opened = Convert.ToBoolean(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                    var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap, xdock_demand, Already_Opened, type_value);
+                    var hub_point= Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                    var xdock_demand = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap,hub_point, xdock_demand, Already_Opened, type_value);
                     _partial_xdocks.Add(xDock);
                 }
                 catch(Exception ex)
@@ -292,8 +293,8 @@ public class CSVReader
                         var demand_point_lat = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
                         var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
                         var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
-                        var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
-                        var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
+                        var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);                        
+                        var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250,1,4000, false, false);
                         var neighborhood = new Mahalle(demand_point_id, demand_point_district, demand_point_long, demand_point_lat, demand);
                         var neighborhood_list = new List<Mahalle>();
                         var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();
@@ -380,6 +381,16 @@ public class CSVReader
                     var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                    var hub_point = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                    if (hub_point <= 1)
+                    {
+                        hub_point = 1.5;
+                    }
+                    else
+                    {
+                        var log_value = Math.Log(hub_point, 10)/2;
+                        hub_point = (1.5 - log_value);
+                    }
                     if (xDock_dist_threshold == 0.0)
                     {
                         xDock_dist_threshold = region_xDock_threshold[xDock_region];
@@ -390,12 +401,12 @@ public class CSVReader
                     {
                         xDock_Already_Opened = true;
                     }
-                    var xDock_Capacity = Convert.ToDouble(line[_month + 1]);
+                    var xDock_Capacity = Convert.ToDouble(line[_month+2]);
 
                     if (xDock_Capacity > scope_out_threshold)
                     {
                         var type_value = false;
-                        var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap, xDock_Capacity, xDock_Already_Opened, type_value);
+                        var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap,hub_point, xDock_Capacity, xDock_Already_Opened, type_value);
                         _xDocks.Add(xDock);
 
                     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Windows.Forms;
 
 public class Hub
 {
@@ -19,13 +20,17 @@ public class Hub
 
     private readonly Double _dist_thres;
 
+    private readonly Double _hub_points;
+
     private readonly Double _lm_capacity;
 
     private Double _fm_capacity;
 
+    private Double _chute_capacity;
+
     private readonly Boolean _already_opened;
 
-    public Hub(String city, String district,String id,String region, Double longitude, Double latitude,Double dist_thres, Double capacity, Boolean already_opened)
+    public Hub(String city, String district,String id,String region, Double longitude, Double latitude,Double dist_thres, Double hub_points, Double capacity,Double chute_capacity, Boolean already_opened)
     {
         _city = city;
         _district = district;
@@ -37,6 +42,8 @@ public class Hub
         _lm_capacity = capacity;
         _fm_capacity = capacity;
         _already_opened = already_opened;
+        _hub_points = hub_points;
+        _chute_capacity = chute_capacity;
     }
 
 
@@ -93,5 +100,15 @@ public class Hub
     public void Set_FM_Capacity(double capacity)
     {
         _fm_capacity = capacity;
+    }
+    
+    public Double Get_Hub_Points()
+    {
+        return _hub_points;
+    }
+
+    public Double Get_Chute_Capacity()
+    {
+        return _chute_capacity;
     }
 }

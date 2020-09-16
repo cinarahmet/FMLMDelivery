@@ -14,8 +14,16 @@ using FMLMDelivery.Classes;
 /// </summary>
 public class DemandxDockModel
 {
-    private Double max_hub_capacity = 4000000;
 
+    /// <summary>
+    /// Max chute capacity a Main Hub can have
+    /// </summary>
+    private Double max_chute_capacity = 150;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private Double max_hub_capacity = 4000000;
     /// <summary>
     /// Cplex object
     /// </summary>  
@@ -325,6 +333,8 @@ public class DemandxDockModel
                     var already_opened = _xDocks[j].If_Already_Opened();
                     var is_agency = _xDocks[j].If_Agency();
                     var min_cap = _xDocks[j].Get_Min_Cap();
+                    var hub_points = _xDocks[j].Get_Hub_Point();
+
                     for (int i = 0; i < _num_of_demand_point; i++)
                     {
                         if (_solver.GetValue(x[i][j])>0.9)
@@ -332,7 +342,7 @@ public class DemandxDockModel
                             demand += _demandpoint[i].Get_Demand();
                         }
                     }
-                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold, min_cap,demand, already_opened,is_agency);
+                    var x_Dock =new xDocks(city,district,county,region,valueslong,valueslat,distance_threshold, min_cap,hub_points,demand, already_opened,is_agency);
                     new_XDocks.Add(x_Dock);
 
                 }
@@ -361,6 +371,7 @@ public class DemandxDockModel
                     var already_opened = _xDocks[j].If_Already_Opened();
                     var is_agency = _xDocks[j].If_Agency();
                     var min_cap = _xDocks[j].Get_Min_Cap();
+                    var hub_points = _xDocks[j].Get_Hub_Point();
                     
                     for (int i = 0; i < _num_of_demand_point; i++)
                     {
@@ -377,7 +388,7 @@ public class DemandxDockModel
                             list_mahalle.Add(mahalle);
                         }
                     }
-                    var x_Dock = new xDocks(city, district, county, region, valueslong, valueslat, distance_threshold, min_cap, demand, already_opened, is_agency);
+                    var x_Dock = new xDocks(city, district, county, region, valueslong, valueslat, distance_threshold, min_cap, hub_points, demand, already_opened, is_agency);
                     _xDock_Mahalle.Add(x_Dock, list_mahalle);
                 }
             }
@@ -397,9 +408,11 @@ public class DemandxDockModel
                 var longitude = new_XDocks[i].Get_Longitude();
                 var latitude = new_XDocks[i].Get_Latitude();
                 var dist_thres = new_XDocks[i].Get_Distance_Threshold();
+                var hub_point = new_XDocks[i].Get_Hub_Point();
                 var capacity = max_hub_capacity;
+                var chute_capacity = max_chute_capacity;
                 var already_opened = false;
-                var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres, capacity, already_opened);
+                var potential_hub = new Hub(city,district, id, region, longitude, latitude, dist_thres,hub_point, capacity,chute_capacity, already_opened);
                 potential_Hubs.Add(potential_hub);
 
             }

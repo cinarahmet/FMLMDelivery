@@ -240,6 +240,16 @@ namespace FMLMDelivery.Classes
                     var xDock_long = Convert.ToDouble(line[5], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
+                    var hub_point = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                    if (hub_point == 0)
+                    {
+                        hub_point = 2;
+                    }
+                    else
+                    {
+                        var log_value = Math.Log(hub_point, 10);
+                        hub_point = (2 - log_value);
+                    }
                     if (xDock_dist_threshold == 0.0)
                     {
                         xDock_dist_threshold = region_xDock_threshold[xDock_region];
@@ -250,12 +260,12 @@ namespace FMLMDelivery.Classes
                     {
                         xDock_Already_Opened = true;
                     }
-                    var xDock_Capacity = Convert.ToDouble(line[month + 8]);
+                    var xDock_Capacity = Convert.ToDouble(line[month + 9]);
 
                     if (xDock_Capacity > scope_out_threshold)
                     {
                         var type_value = false;
-                        var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap, xDock_Capacity, xDock_Already_Opened, type_value);
+                        var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap,hub_point ,xDock_Capacity, xDock_Already_Opened, type_value);
                         _potential_xdocks.Add(xDock);
 
                     }
@@ -355,8 +365,9 @@ namespace FMLMDelivery.Classes
                     var Already_Opened = Convert.ToBoolean(line[6], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_dist_threshold = Convert.ToDouble(line[7], System.Globalization.CultureInfo.InvariantCulture);
                     var xDock_min_cap = Convert.ToDouble(line[8], System.Globalization.CultureInfo.InvariantCulture);
-                    var xdock_demand = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
-                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap, xdock_demand, Already_Opened, type_value);
+                    var hub_point = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
+                    var xdock_demand = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
+                    var xDock = new xDocks(xDock_City, xDock_District, xDock_Id, xDock_region, xDock_long, xDock_lat, xDock_dist_threshold, xDock_min_cap,hub_point,xdock_demand, Already_Opened, type_value);
                     _partial_xdocks.Add(xDock);
                 }
             }
@@ -386,7 +397,7 @@ namespace FMLMDelivery.Classes
                         var demand_point_long = Convert.ToDouble(line[9], System.Globalization.CultureInfo.InvariantCulture);
                         var distance_xdock_county = Convert.ToDouble(line[10], System.Globalization.CultureInfo.InvariantCulture);
                         var demand = Convert.ToDouble(line[11], System.Globalization.CultureInfo.InvariantCulture);
-                        var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250, 4000, false, false);
+                        var dummy_xDock = new xDocks(xdock_city, xdock_district, xdock_id, "a", xdock_long, xdock_lat, 30, 1250,0,4000, false, false);
                         var neighborhood = new Mahalle(demand_point_id, demand_point_district, demand_point_long, demand_point_lat, demand);
                         var neighborhood_list = new List<Mahalle>();
                         var list_contains = _xDock_neighborhood_assignments.Keys.Where(x => x.Get_City() == xdock_city && x.Get_District() == xdock_district && x.Get_Id() == xdock_id).ToList();

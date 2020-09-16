@@ -20,6 +20,8 @@ public class xDocks
 
     private readonly Double _min_xdock_cap;
 
+    private readonly Double _hub_points;
+
     private Double _lm_demand;
 
     private Double _fm_demand;
@@ -30,7 +32,7 @@ public class xDocks
 
     
 
-    public xDocks(String city,String district,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double min_xdock_cap,Double demand,Boolean already_opened,Boolean type_value)
+    public xDocks(String city,String district,String id,String region, Double longitude, Double latitude, Double distance_threshold,Double min_xdock_cap,Double Hub_Points,Double demand,Boolean already_opened,Boolean type_value)
     {
         _city = city;
         _district = district; 
@@ -44,6 +46,7 @@ public class xDocks
         _already_opened = already_opened;
         _type_value = type_value;
         _min_xdock_cap = min_xdock_cap;
+        _hub_points = Hub_Points;
     }
 
     public Boolean If_Already_Opened()
@@ -114,6 +117,10 @@ public class xDocks
         _lm_demand += demand;
     }
    
+    public Double Get_Hub_Point()
+    {
+        return _hub_points;
+    }
 }
 
     
