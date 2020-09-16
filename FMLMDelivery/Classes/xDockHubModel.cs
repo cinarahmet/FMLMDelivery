@@ -308,16 +308,58 @@ namespace FMLMDelivery
             {
                 var key1 = _xDocks[i].Get_City();
                 var key2 = _xDocks[i].Get_District();
+                if (key1 == "İSTANBUL AVRUPA" || key1 == "İSTANBUL ASYA")
+                {
+                    key1 = "İSTANBUL";
+                }
                 var key = key1 + "-" + key2;
-                var distance_list = _distance_matrix[key];
+                var dist_mat_exist = true;
+                var distance_list = new List<Double>();
+                if (_distance_matrix.ContainsKey(key))
+                {
+                    distance_list = _distance_matrix[key];
+                }
+                else
+                {
+                    dist_mat_exist = false;
+                }
+                
                 var d_i = new List<double>();
                 for (int j = 0; j < _numOfHubs; j++)
                 {
-                    var key3 = _hubs[j].Get_City();
-                    var key4 = _hubs[j].Get_District();
-                    var key5 = key3 + "-" + key4;
-                    var index2 = keyList.FindIndex(x => x == key5);
-                    var d_ij = distance_list[index2];
+                    var d_ij = 0.0;
+                    if (dist_mat_exist)
+                    {
+                        var key3 = _hubs[j].Get_City();
+                        if (key3 == "İSTANBUL AVRUPA" || key3 == "İSTANBUL ASYA")
+                        {
+                            key3 = "İSTANBUL";
+                        }
+                        var key4 = _hubs[j].Get_District();
+                        var key5 = key3 + "-" + key4;
+                        if (keyList.Contains(key5))
+                        {
+                            var index2 = keyList.FindIndex(x => x == key5);
+                            d_ij = distance_list[index2];
+
+                        }
+                        else
+                        {
+                            var lat1 = _xDocks[i].Get_Latitude();
+                            var lat2 = _hubs[j].Get_Latitude();
+                            var long1 = _xDocks[i].Get_Longitude();
+                            var long2 = _hubs[j].Get_Longitude();
+                            d_ij = Calculate_Distances(long1, lat1, long2, lat2);
+                        }
+                    }
+                    else
+                    {
+                        var lat1 = _xDocks[i].Get_Latitude();
+                        var lat2 = _hubs[j].Get_Latitude();
+                        var long1 = _xDocks[i].Get_Longitude();
+                        var long2 = _hubs[j].Get_Longitude();
+                        d_ij = Calculate_Distances(long1, lat1, long2, lat2);
+                    }
                     d_i.Add(d_ij);
                 }
                 d.Add(d_i);
