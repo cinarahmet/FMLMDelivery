@@ -256,15 +256,27 @@ namespace FMLMDelivery.Classes
                 }
                 else if (xDocks[i].Get_District() == "YÜREĞİR" && xDocks[i].Get_Id() == "İNCİRLİK CUMHURİYET")
                 {
-                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 200000, 100);
+                    //Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 500000, 100);
                 }
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
-                    Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 227000,96);
+                    Add_Main_Hub(i, "BAŞAKŞEHİR", "İKİTELLİ OSB", 2000000,96);
 
                 }else if (xDocks[i].Get_District() == "KEMALPAŞA" && xDocks[i].Get_Id() == "KIZILÜZÜM")
                 {
-                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 180000,98);
+                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 1000000,98);
+                }else if(xDocks[i].Get_District() == "KAHRAMANKAZAN" && xDocks[i].Get_Id() == "Merkez")
+                {
+                    Add_Main_Hub(i, "KAHRAMANKAZAN", "Merkez", 1000000, 175);
+                }else if (xDocks[i].Get_District() == "KAYAPINAR" && xDocks[i].Get_Id() == "Merkez")
+                {
+                    //Add_Main_Hub(i, "KAYAPINAR", "Merkez", 200000, 100);
+                }else if(xDocks[i].Get_District() == "YAKUTİYE" && xDocks[i].Get_Id() == "Merkez")
+                {
+                    //Add_Main_Hub(i, "YAKUTİYE", "Merkez", 200000, 100);
+                }else if(xDocks[i].Get_District() == "MERZİFON" && xDocks[i].Get_Id() == "Merkez")
+                {
+                    //Add_Main_Hub(i, "MERZİFON", "Merkez", 200000, 100);
                 }
             }
         }
@@ -475,7 +487,7 @@ namespace FMLMDelivery.Classes
         private List<Hub> Convert_to_Potential_Hubs(List<xDocks> new_XDocks)
         {
             var potential_Hubs = new List<Hub>();
-            var disabled = new List<String> { "ŞIRNAK", "SİİRT", "HAKKARİ", "KİLİS" };
+            var disabled = new List<String> { "ŞIRNAK", "SİİRT", "HAKKARİ", "KİLİS","KAHRAMANMARAŞ" };
             for (int i = 0; i < new_XDocks.Count; i++)
             {
                 if (!disabled.Contains(new_xDocks[i].Get_City()))
