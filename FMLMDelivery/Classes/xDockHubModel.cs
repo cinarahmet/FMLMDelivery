@@ -299,6 +299,30 @@ namespace FMLMDelivery
             return sCoord.GetDistanceTo(eCoord)/1000;
         }
 
+        private void Eliminate_Hub_Points()
+        {
+            List<string> keyList = new List<string>(this._distance_matrix.Keys);
+            List<Hub> eliminated_list = new List<Hub>();
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                var key3 = _hubs[j].Get_City();
+                if (key3 == "İSTANBUL AVRUPA" || key3 == "İSTANBUL ASYA")
+                {
+                    key3 = "İSTANBUL";
+                }
+                var key4 = _hubs[j].Get_District();
+                var key5 = key3 + "-" + key4;
+                if (!keyList.Contains(key5))
+                {
+                    eliminated_list.Add(_hubs[j]);
+                }
+            }
+            for (int i = 0; i < eliminated_list.Count; i++)
+            {
+                _hubs.Remove(eliminated_list[i]);
+            }
+        }
+
         private void Get_Distance_Matrix()
         {
             List<string> keyList = new List<string>(this._distance_matrix.Keys);
@@ -830,6 +854,7 @@ namespace FMLMDelivery
 
         private void Get_Parameters()
         {
+            Eliminate_Hub_Points();
             Get_Distance_Matrix_Seller();
             Get_Distance_Matrix();
             Get_Cost_Parameters();
