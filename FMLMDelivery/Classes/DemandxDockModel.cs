@@ -461,7 +461,6 @@ public class DemandxDockModel
     {
         _initial_xDocks = opened_xDocks;
         _initial_assignments = assignments;
-
     }
 
     public List<Double> Return_Opened_xDocks()

@@ -103,21 +103,21 @@ public class CSVReader
     private void Create_xDock_Region_Threshold()
     {
         var s_1 = "Akdeniz";
-        var value = 180;
+        var value = 300;
         var s_2 = "Marmara";
-        var value_2 = 180;
+        var value_2 = 300;
         var s_3 = "İç Anadolu";
-        var value_3 = 250;
+        var value_3 = 300;
         var s_4 = "Ege";
-        var value_4 = 220;
+        var value_4 = 300;
         var s_5 = "Güneydoğu";
-        var value_5 = 250;
+        var value_5 = 300;
         var s_6 = "Karadeniz";
         var value_6 = 200;
         var s_7 = "Güneydoğu Anadolu";
-        var value_7 = 350;
+        var value_7 = 300;
         var s_8 = "Doğu Anadolu";
-        var value_8 = 350;
+        var value_8 = 300;
         region_xDock_threshold.TryAdd(s_1, value);
         region_xDock_threshold.TryAdd(s_2, value_2);
         region_xDock_threshold.TryAdd(s_3, value_3);

@@ -256,7 +256,7 @@ namespace FMLMDelivery.Classes
                 }
                 else if (xDocks[i].Get_District() == "YÜREĞİR" && xDocks[i].Get_Id() == "İNCİRLİK CUMHURİYET")
                 {
-                    //Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 500000, 100);
+                    Add_Main_Hub(i, "YÜREĞİR", "İNCİRLİK CUMHURİYET", 150000, 100);
                 }
                 else if (xDocks[i].Get_District() == "BAŞAKŞEHİR" && xDocks[i].Get_Id() == "İKİTELLİ OSB")
                 {
@@ -264,19 +264,27 @@ namespace FMLMDelivery.Classes
 
                 }else if (xDocks[i].Get_District() == "KEMALPAŞA" && xDocks[i].Get_Id() == "KIZILÜZÜM")
                 {
-                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 1000000,98);
+                    Add_Main_Hub(i, "KEMALPAŞA", "KIZILÜZÜM", 150000,98);
                 }else if(xDocks[i].Get_District() == "KAHRAMANKAZAN" && xDocks[i].Get_Id() == "Merkez")
                 {
-                    Add_Main_Hub(i, "KAHRAMANKAZAN", "Merkez", 1000000, 175);
+                    Add_Main_Hub(i, "KAHRAMANKAZAN", "Merkez", 150000, 175);
                 }else if (xDocks[i].Get_District() == "KAYAPINAR" && xDocks[i].Get_Id() == "Merkez")
                 {
-                    //Add_Main_Hub(i, "KAYAPINAR", "Merkez", 200000, 100);
+                    Add_Main_Hub(i, "KAYAPINAR", "Merkez", 100000, 100);
                 }else if(xDocks[i].Get_District() == "YAKUTİYE" && xDocks[i].Get_Id() == "Merkez")
                 {
                     //Add_Main_Hub(i, "YAKUTİYE", "Merkez", 200000, 100);
                 }else if(xDocks[i].Get_District() == "MERZİFON" && xDocks[i].Get_Id() == "Merkez")
                 {
-                    //Add_Main_Hub(i, "MERZİFON", "Merkez", 200000, 100);
+                    Add_Main_Hub(i, "MERZİFON", "Merkez", 50000, 100);
+                }
+                else if (xDocks[i].Get_District() == "MURATPAŞA" && xDocks[i].Get_Id() == "Merkez")
+                {
+                    Add_Main_Hub(i, "MURATPAŞA", "Merkez", 100000, 175);
+                }
+                else if (xDocks[i].Get_District() == "NİLÜFER" && xDocks[i].Get_Id() == "Merkez")
+                {
+                    Add_Main_Hub(i, "NİLÜFER", "Merkez", 150000, 175);
                 }
             }
         }
@@ -327,11 +335,13 @@ namespace FMLMDelivery.Classes
             //xDock-Seller-Hub Assignment
             var third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, _hub_demand_coverage, phase_2, 0,_distance_matrix);
             third_phase.Run();
+            var assignments = third_phase.Return_Initial_Assignments();
             var num_clusters = third_phase.Return_num_Hubs();
             min_model_model = false;
             demand_weighted_model = true;
             phase_2 = true;
             third_phase = new xDockHubModel(new_xDocks, potential_hub_locations, _prior_big_seller, demand_weighted_model, min_model_model, _hub_demand_coverage, phase_2, num_clusters,_distance_matrix);
+            third_phase.Provide_Intitial_Solution(assignments);
             third_phase.Run();
             var objVal = third_phase.GetObjVal();
             new_hubs = third_phase.Return_New_Hubs();
@@ -487,7 +497,25 @@ namespace FMLMDelivery.Classes
         private List<Hub> Convert_to_Potential_Hubs(List<xDocks> new_XDocks)
         {
             var potential_Hubs = new List<Hub>();
+            var city_demand_dictionary = new Dictionary<String, Double>();
             var disabled = new List<String> { "ŞIRNAK", "SİİRT", "HAKKARİ", "KİLİS","KAHRAMANMARAŞ" };
+            for (int i = 0; i < new_xDocks.Count; i++)
+            {
+                if (!city_demand_dictionary.ContainsKey(new_xDocks[i].Get_City()))
+                {
+                    city_demand_dictionary.Add(new_xDocks[i].Get_City(), new_xDocks[i].Get_LM_Demand());
+                }
+                else
+                {
+                    var old_demand = city_demand_dictionary[new_xDocks[i].Get_City()];
+                    var new_demand = new_xDocks[i].Get_LM_Demand();
+                    city_demand_dictionary[new_XDocks[i].Get_City()] = old_demand + new_demand;
+                }
+            }
+            //for (int i = 0; i < _parameters.Count; i++)
+            //{
+            //    city_demand_dictionary.Add(_parameters[i].Get_Key(), _parameters[i].Get_Size());
+            //}
             for (int i = 0; i < new_XDocks.Count; i++)
             {
                 if (!disabled.Contains(new_xDocks[i].Get_City()))
@@ -501,6 +529,7 @@ namespace FMLMDelivery.Classes
                     var dist_thres = new_XDocks[i].Get_Distance_Threshold();
                     var hub_point = new_xDocks[i].Get_Hub_Point();
                     var capacity = 4000000;
+                    //if (city_demand_dictionary[new_xDocks[i].Get_City()] <=60000) capacity = 100000;
                     var chute_cap = max_chute_capacity;
                     var already_opened = false;
                     var potential_hub = new Hub(city, district, id, region, longitude, latitude, dist_thres, hub_point, capacity, chute_cap,already_opened);

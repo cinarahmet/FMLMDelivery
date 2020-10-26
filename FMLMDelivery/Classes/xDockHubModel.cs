@@ -37,7 +37,7 @@ namespace FMLMDelivery
         /// <summary>
         /// Number of Hubs
         /// </summary>
-        private readonly Int32 _numOfHubs;
+        private Int32 _numOfHubs;
 
         /// <summary>
         /// List of xDocks 
@@ -201,9 +201,24 @@ namespace FMLMDelivery
         /// <summary>
         /// LM Demand of each xDock
         /// </summary>
-        private List<Double> x_dock_LM_demand;
+        private List<Double> x_dock_LM_demand= new List<double>();
+        /// <summary>
+        /// Initial Solution for xDock assignments
+        /// </summary>
+        private List<Double> _xdock_assignments= new List<double>();
+        /// <summary>
+        /// Initial Solution for seller assignments
+        /// </summary>
+        private List<Double> _seller_assignments=new List<double>();
 
-
+        private List<List<Double>> _total_assignments=new List<List<double>>();
+        /// <summary>
+        /// Initial Solution for hub openings
+        /// </summary>
+        private List<Double> _opened_hubs=new List<double>();
+        /// <summary>
+        /// 
+        /// </summary>
         private List<Double> x_dock_FM_demand;
 
         /// <summary>
@@ -242,8 +257,12 @@ namespace FMLMDelivery
         private List<String> record_stats = new List<String>();
 
         private List<Double> number_of_chute_usage = new List<Double>();
+
         private Dictionary<String, List<Double>> _distance_matrix;
+
         private Double average_xdock_cap = 4000;
+
+        private Dictionary<String, Double> common_volume = new Dictionary<string, double>();
 
 
         public xDockHubModel(List<xDocks> xDocks, List<Hub> hubs, List<Seller> sellers, Boolean Demandweight,Boolean min_hub_model,Double Demand_Covarage,Boolean Phase2, Int32 P ,Dictionary<String,List<Double>> distance_matrix,Boolean cost_incurred = false, Boolean capacity_incurred = false)
@@ -298,6 +317,49 @@ namespace FMLMDelivery
 
             return sCoord.GetDistanceTo(eCoord)/1000;
         }
+        
+        private void Get_Assignments()
+        {
+            for (int j = 0; j < _numOfHubs; j++)
+            {
+                var value = Math.Round(_solver.GetValue(y[j]));
+                _opened_hubs.Add(value);
+            }
+
+            for (int i = 0; i < _numOfXdocks; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    var value = Math.Round(_solver.GetValue(x[i][j]));
+                    _xdock_assignments.Add(value);
+                }
+            }
+
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                for (int j = 0; j <_numOfHubs; j++)
+                {
+                    var value = Math.Round(_solver.GetValue(s[i][j]));
+                    _seller_assignments.Add(value);
+                }
+            }
+
+            _total_assignments.Add(_opened_hubs);
+            _total_assignments.Add(_xdock_assignments);
+            _total_assignments.Add(_seller_assignments);
+        }
+
+        public List<List<Double>> Return_Initial_Assignments()
+        {
+            return _total_assignments;
+        }
+
+        public void Provide_Intitial_Solution(List<List<Double>> assignments)
+        {
+            _opened_hubs = assignments[0];
+            _xdock_assignments = assignments[1];
+            _seller_assignments = assignments[2];
+        }
 
         private void Eliminate_Hub_Points()
         {
@@ -321,6 +383,8 @@ namespace FMLMDelivery
             {
                 _hubs.Remove(eliminated_list[i]);
             }
+
+            _numOfHubs = _hubs.Count;
         }
 
         private void Get_Distance_Matrix()
@@ -349,7 +413,7 @@ namespace FMLMDelivery
                 }
                 
                 var d_i = new List<double>();
-                for (int j = 0; j < _numOfHubs; j++)
+                for (int j = 0; j < _hubs.Count; j++)
                 {
                     var d_ij = 0.0;
                     if (dist_mat_exist)
@@ -431,7 +495,7 @@ namespace FMLMDelivery
                     dist_list_exist = false;
                 }
                 var d_k = new List<double>();
-                for (int j = 0; j < _numOfHubs; j++)
+                for (int j = 0; j < _hubs.Count; j++)
                 {
                     var d_ij = 0.0;
                     if (dist_list_exist)
@@ -475,9 +539,6 @@ namespace FMLMDelivery
                 d_seller.Add(d_k);
 
             }
-
-
-
 
 
             //for (int i = 0; i < _numOfSeller; i++)
@@ -578,10 +639,14 @@ namespace FMLMDelivery
         {
             Get_Parameters();
             Build_Model();
-           // AddInitialSolution();
+            if (_demand_weighted)
+            {
+                AddInitialSolution();
+            }
             Solve();
             if ((_status == Cplex.Status.Feasible || _status == Cplex.Status.Optimal))
             {
+                Get_Assignments();
                 Get_Stats();
                 Create_Country_Names();
                 Get_Num_Hubs();
@@ -863,6 +928,7 @@ namespace FMLMDelivery
             Get_Demand_Parameters();
             Get_Total_Demand();
             Create_Chute_Usage_List();
+            Create_Common_Volume_Dictionary();
         }
 
         private void Get_Total_Demand()
@@ -894,6 +960,16 @@ namespace FMLMDelivery
             }
         }
 
+        private void Create_Common_Volume_Dictionary()
+        {
+            common_volume.Add("İSTANBUL ASYA", 35);
+            common_volume.Add("İSTANBUL AVRUPA", 35);
+            common_volume.Add("İZMİR", 12);
+            common_volume.Add("ANKARA", 12);
+            common_volume.Add("BURSA", 8);
+            common_volume.Add("ADANA", 8);
+        }
+
         private void Solve()
         {
             Console.WriteLine("Algorithm starts running at {0}", DateTime.Now);
@@ -902,6 +978,7 @@ namespace FMLMDelivery
             _solver.Solve();
             _solutionTime = ((DateTime.Now - startTime).Hours * 60 * 60 + (DateTime.Now - startTime).Minutes * 60 + (DateTime.Now - startTime).Seconds);
             _status = _solver.GetStatus();
+            _solver.ExportModel("Assignment.lp");
             Console.WriteLine("Algorithm stops running at {0}", DateTime.Now);
         }
 
@@ -1024,20 +1101,20 @@ namespace FMLMDelivery
         }
         private void Seller_Capacity_Constraint()
         {
-            for (int j = 0; j < _numOfHubs; j++)
-            {
-                var constraint = _solver.LinearNumExpr();
-                for (int i = 0; i < _numOfSeller; i++)
-                {
-                    constraint.AddTerm(s[i][j], a_seller[i][j]*_sellers[i].Get_Demand());
-                }
-                for (int k = 0; k < _numOfXdocks; k++)
-                {
-                    constraint.AddTerm(x[k][j], a[k][j]* _xDocks[k].Get_FM_Demand());
-                }
-                constraint.AddTerm(y[j], -(_hubs[j].Get_FM_Capacity()));
-                _solver.AddLe(constraint, 0);
-            }
+            //for (int j = 0; j < _numOfHubs; j++)
+            //{
+            //    var constraint = _solver.LinearNumExpr();
+            //    for (int i = 0; i < _numOfSeller; i++)
+            //    {
+            //        constraint.AddTerm(s[i][j], a_seller[i][j]*_sellers[i].Get_Demand());
+            //    }
+            //    for (int k = 0; k < _numOfXdocks; k++)
+            //    {
+            //        constraint.AddTerm(x[k][j], a[k][j]* _xDocks[k].Get_FM_Demand());
+            //    }
+            //    constraint.AddTerm(y[j], -(_hubs[j].Get_FM_Capacity()));
+            //    _solver.AddLe(constraint, 0);
+            //}
         }
 
 
@@ -1118,20 +1195,31 @@ namespace FMLMDelivery
                     var demand_included = x_dock_LM_demand[i] * a[i][j];
                     constraint.AddTerm(x[i][j], demand_included);
                 }
+
+                for (int k = 0; k < _numOfSeller; k++)
+                {
+                    var demand_included_2 = _sellers[k].Get_Demand()*a_seller[k][j];
+                    if (common_volume.ContainsKey(_hubs[j].Get_City()))
+                    {
+                        var percentage = common_volume[_hubs[j].Get_City()];
+                        demand_included_2 = demand_included_2*(100-percentage)/100;
+                    }
+                    constraint.AddTerm(s[k][j], demand_included_2);
+                }
                 constraint.AddTerm(y[j], -_hubs[j].Get_LM_Capacity());
                 _solver.AddLe(constraint, 0);
             }
 
-            for (int j = 0; j < _numOfHubs; j++)
-            {
-                var constraint = _solver.LinearNumExpr();
-                for (int i = 0; i < _numOfXdocks; i++)
-                {
-                    constraint.AddTerm(x[i][j], a[i][j]);
-                }
-                constraint.AddTerm(y[j], -max_num_xdock_assigned);
-                _solver.AddLe(constraint, 0);
-            }
+            //for (int j = 0; j < _numOfHubs; j++)
+            //{
+            //    var constraint = _solver.LinearNumExpr();
+            //    for (int i = 0; i < _numOfXdocks; i++)
+            //    {
+            //        constraint.AddTerm(x[i][j], a[i][j]);
+            //    }
+            //    constraint.AddTerm(y[j], -max_num_xdock_assigned);
+            //    _solver.AddLe(constraint, 0);
+            //}
 
         }
 
@@ -1407,9 +1495,30 @@ namespace FMLMDelivery
 
         }
 
-        private void AddInitialSolution(Double[] sol = null)
+        private void AddInitialSolution()
         {
-            _solver.AddMIPStart(y.ToArray(), sol);
+            _solver.AddMIPStart(y.ToArray(), _opened_hubs.ToArray());
+            
+            var xArray = new List<INumVar>();
+            for (int i = 0; i < _numOfXdocks; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    xArray.Add(x[i][j]);
+                }
+            }
+
+            _solver.AddMIPStart(xArray.ToArray(), _xdock_assignments.ToArray());
+
+            var sArray = new List<INumVar>();
+            for (int i = 0; i < _numOfSeller; i++)
+            {
+                for (int j = 0; j < _numOfHubs; j++)
+                {
+                    sArray.Add(s[i][j]);
+                }
+            }
+            _solver.AddMIPStart(sArray.ToArray(), _seller_assignments.ToArray());
         }
 
         public void ClearModel()
